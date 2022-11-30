@@ -50,10 +50,6 @@ namespace BlasphemousMultiworld
         public void onConnect(string playerName, ArchipelagoLocation[] locations)
         {
             // Init
-            FileUtil.loadJson("items.json", out Item[] allItems);
-            // Add progressive items
-            if (allItems.Length < 1)
-                return;
             apLocationIds.Clear();
             newItems.Clear();
 
@@ -61,7 +57,6 @@ namespace BlasphemousMultiworld
             for (int i = 0; i < locations.Length; i++)
             {
                 // Add conversion from location id to name
-                Main.Randomizer.Log(locations[i].id);
                 if (apLocationIds.ContainsKey(locations[i].id))
                 {
                     Main.Randomizer.Log(locations[i].id + " is a duplicate");
@@ -85,15 +80,16 @@ namespace BlasphemousMultiworld
                     // This is an item to a different game
                     newItems.Add(locations[i].id, new ArchipelagoItem(locations[i].name, locations[i].player_name));
                 }
+                Main.Randomizer.Log(locations[i].id + ": " + newItems[locations[i].id]);
             }
 
             // newItems has been filled with new shuffled items
             Main.Randomizer.Log("newItems has been filled from multiworld");
         }
         
-        private Item itemExists(Item[] items, string name)
+        private Item itemExists(List<Item> items, string name)
         {
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < items.Count; i++)
             {
                 if (items[i].name == name)
                     return items[i];

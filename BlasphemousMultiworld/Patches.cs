@@ -33,7 +33,7 @@ namespace BlasphemousMultiworld
     }
 
     // Get all items from the item filler
-    [HarmonyPatch(typeof(ItemFiller), "addSpecialItmes")]
+    [HarmonyPatch(typeof(ItemFiller), "addSpecialItems")]
     public class ItemFiller_Patch
     {
         public static void Postfix(List<Item> items)
