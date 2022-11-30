@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using System;
 using HarmonyLib;
 using BlasphemousRandomizer;
 
@@ -26,7 +27,7 @@ namespace BlasphemousMultiworld
 
         private void Patch()
         {
-            Harmony harmony = new Harmony(PluginInfo.PLUGIN_GUID);
+            Harmony harmony = new Harmony("com.damocles.blasphemous.multiworld");
             harmony.PatchAll();
         }
     }

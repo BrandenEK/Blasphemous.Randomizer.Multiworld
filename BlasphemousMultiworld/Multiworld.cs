@@ -9,6 +9,7 @@ namespace BlasphemousMultiworld
     public class Multiworld
     {
         private Dictionary<string, long> apLocationIds;
+        public List<Item> allItems;
         private Dictionary<string, Item> newItems;
 
         public Connection connection { get; private set; }
@@ -24,7 +25,9 @@ namespace BlasphemousMultiworld
         {
             if (Input.GetKeyDown(KeyCode.Keypad9))
             {
-                
+                if (allItems == null)
+                    Main.Randomizer.Log("All items is empty");
+                Main.Randomizer.Log(allItems[0].name);
             }
             else if (Input.GetKeyDown(KeyCode.Equals))
             {
@@ -80,7 +83,7 @@ namespace BlasphemousMultiworld
                 else
                 {
                     // This is an item to a different game
-                    newItems.Add(locations[i].id, new Item(locations[i].name, 200, 0, false));
+                    newItems.Add(locations[i].id, new ArchipelagoItem(locations[i].name, locations[i].player_name));
                 }
             }
 
