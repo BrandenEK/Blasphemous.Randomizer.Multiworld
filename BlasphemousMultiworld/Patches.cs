@@ -17,16 +17,16 @@ namespace BlasphemousMultiworld
         }
     }
 
-    // Add multiworld version to menu
+    // Add multiworld version to main menu
     [HarmonyPatch(typeof(VersionNumber), "Start")]
-    public class VersionNumber_Patch
+    public class VersionNumberPatch
     {
         public static void Postfix(VersionNumber __instance)
         {
-            Text versionText = __instance.GetComponent<Text>();
-            if (versionText.text.Contains("v."))
-                versionText.text = "";
-            versionText.text += "\nMultiworld v" + PluginInfo.PLUGIN_VERSION;
+            Text version = __instance.GetComponent<Text>();
+            if (version.text.Contains("v."))
+                version.text = "";
+            version.text += "Multiworld v" + PluginInfo.PLUGIN_VERSION + "\n";
         }
     }
 }

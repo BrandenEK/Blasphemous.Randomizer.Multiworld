@@ -40,7 +40,7 @@ namespace BlasphemousMultiworld
                 return "Already connected to a server!";
             }
             // If in game
-            bool success = connection.Connect(server, playerName.ToLower());
+            bool success = connection.Connect(server, playerName);
             return success ? "Connected to " + server + "!" : "Failed to connect to " + server + "!";
         }
 
@@ -48,6 +48,7 @@ namespace BlasphemousMultiworld
         {
             // Init
             FileUtil.loadJson("items.json", out Item[] allItems);
+            // Add progressive items
             if (allItems.Length < 1)
                 return;
             apLocationIds.Clear();
