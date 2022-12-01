@@ -97,7 +97,7 @@ namespace BlasphemousMultiworld
             {
                 __instance.itemShuffler.Shuffle(___seed);
                 Main.Multiworld.modifyNewItems(__instance.itemShuffler.getNewItems()); // Change to not randomize items first before replacing them
-                //__instance.hintShuffler.Shuffle(___seed);
+                __instance.hintShuffler.Shuffle(___seed);
                 __instance.enemyShuffler.Shuffle(___seed);
             }
             return false;

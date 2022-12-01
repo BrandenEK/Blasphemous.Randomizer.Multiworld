@@ -89,7 +89,6 @@ namespace BlasphemousMultiworld
                     // This is an item to a different game
                     newItems.Add(locations[i].id, new ArchipelagoItem(locations[i].name, locations[i].player_name));
                 }
-                Main.Randomizer.Log(locations[i].id + ": " + newItems[locations[i].id].name);
             }
 
             // newItems has been filled with new shuffled items
