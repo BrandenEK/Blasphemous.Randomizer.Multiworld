@@ -20,6 +20,7 @@ namespace BlasphemousMultiworld
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += recieveItem;
+                session.Socket.SocketClosed += disconnected;
                 result = session.TryConnectAndLogin("Blasphemous", player, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems);
             }
             catch (Exception e)
@@ -53,6 +54,17 @@ namespace BlasphemousMultiworld
             return true;
         }
 
+        public void Disconnect()
+        {
+            if (connected)
+            {
+                session.Socket.Disconnect();
+                connected = false;
+                session = null;
+                Main.Randomizer.Log("Disconnecting from multiworld server");
+            }
+        }
+
         // Returns a list of player names, or if unconnected then an empty list
         public string[] getPlayers()
         {
@@ -68,6 +80,15 @@ namespace BlasphemousMultiworld
             return new string[0];
         }
 
+        public string getServer()
+        {
+            if (connected)
+            {
+                return session.Socket.Uri.ToString();
+            }
+            return "";
+        }
+
         // Sends a new location check to the server
         public void sendLocation(long apLocationId)
         {
@@ -79,6 +100,14 @@ namespace BlasphemousMultiworld
         private void recieveItem(ReceivedItemsHelper helper)
         {
             Main.Multiworld.recieveItem(helper.PeekItemName());
+        }
+
+        // Got disconnected from server
+        private void disconnected(string reason)
+        {
+            Main.Randomizer.LogDisplay("Disconnected from multiworld server!");
+            connected = false;
+            session = null;
         }
     }
 }
