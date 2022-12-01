@@ -26,6 +26,7 @@ namespace BlasphemousMultiworld
             itemNames = new Dictionary<string, string>();
             itemsToGive = new List<Item>();
             FileUtil.parseFileToDictionary("names_items.dat", itemNames);
+            if (itemNames.Count > 0) updateItemNames();
             loadMultiworldImage();
         }
 
@@ -63,10 +64,6 @@ namespace BlasphemousMultiworld
                 Main.Randomizer.Log("Item names weren't loaded!");
                 return;
             }
-            itemNames.Remove("CH");
-            itemNames.Add("CH", "Child of Moonlight");
-            itemNames.Remove("TH");
-            itemNames.Add("TH", "Thorn");
 
             // Process locations
             for (int i = 0; i < locations.Length; i++)
@@ -160,6 +157,33 @@ namespace BlasphemousMultiworld
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(data);
             multiworldItemImage = Sprite.Create(tex, new Rect(0, 0, 32f, 32f), new Vector2(0.5f, 0.5f), 32f);
+        }
+
+        private void updateItemNames()
+        {
+            itemNames["CH"] = "Child of Moonlight";
+            itemNames["Tears[250]"] = "Tears of Atonement (250)";
+            itemNames["Tears[300]"] = "Tears of Atonement (300)";
+            itemNames["Tears[500]"] = "Tears of Atonement (500)";
+            itemNames["Tears[625]"] = "Tears of Atonement (625)";
+            itemNames["Tears[750]"] = "Tears of Atonement (750)";
+            itemNames["Tears[1000]"] = "Tears of Atonement (1000)";
+            itemNames["Tears[1250]"] = "Tears of Atonement (1250)";
+            itemNames["Tears[1500]"] = "Tears of Atonement (1500)";
+            itemNames["Tears[1750]"] = "Tears of Atonement (1750)";
+            itemNames["Tears[2000]"] = "Tears of Atonement (2000)";
+            itemNames["Tears[2100]"] = "Tears of Atonement (2100)";
+            itemNames["Tears[2500]"] = "Tears of Atonement (2500)";
+            itemNames["Tears[2600]"] = "Tears of Atonement (2600)";
+            itemNames["Tears[3000]"] = "Tears of Atonement (3000)";
+            itemNames["Tears[4300]"] = "Tears of Atonement (4300)";
+            itemNames["Tears[5000]"] = "Tears of Atonement (5000)";
+            itemNames["Tears[5500]"] = "Tears of Atonement (5500)";
+            itemNames["Tears[9000]"] = "Tears of Atonement (9000)";
+            itemNames["Tears[10000]"] = "Tears of Atonement (10000)";
+            itemNames["Tears[11250]"] = "Tears of Atonement (11250)";
+            itemNames["Tears[18000]"] = "Tears of Atonement (18000)";
+            itemNames["Tears[30000]"] = "Tears of Atonement (30000)";
         }
     }
 }
