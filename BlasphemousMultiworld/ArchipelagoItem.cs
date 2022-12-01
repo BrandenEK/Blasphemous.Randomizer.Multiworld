@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BlasphemousRandomizer.Structures;
+﻿using BlasphemousRandomizer.Structures;
 
 namespace BlasphemousMultiworld
 {
@@ -22,7 +18,7 @@ namespace BlasphemousMultiworld
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {
-            return null;
+            return new RewardInfo(name, "An item that belongs to " + playerName + ".", "Sending to " + playerName + "!", Main.Multiworld.multiworldItemImage);
         }
     }
 }

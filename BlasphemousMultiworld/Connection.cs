@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
-using Archipelago.MultiClient.Net.Models;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 
 namespace BlasphemousMultiworld
 {
@@ -25,6 +19,7 @@ namespace BlasphemousMultiworld
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
+                session.Items.ItemReceived += recieveItem;
                 result = session.TryConnectAndLogin("Blasphemous", player, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems);
             }
             catch (Exception e)
@@ -80,10 +75,10 @@ namespace BlasphemousMultiworld
                 session.Locations.CompleteLocationChecks(apLocationId);
         }
 
-        public void recieveItem(ReceivedItemsHelper helper)
+        // Recieves a new item from the server
+        private void recieveItem(ReceivedItemsHelper helper)
         {
-            // Get most recent item and add/display it or add it to queue
-            Main.Randomizer.Log("Recieved item");
+            Main.Multiworld.recieveItem(helper.PeekItemName());
         }
     }
 }
