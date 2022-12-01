@@ -144,6 +144,7 @@ namespace BlasphemousMultiworld
                 itemsToGive[i].addToInventory();
                 Main.Randomizer.itemShuffler.showItemPopUp(itemsToGive[i]);
             }
+            itemsToGive.Clear();
         }
 
         private void loadMultiworldImage()
