@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Gameplay.UI.Widgets;
 using Gameplay.UI.Console;
+using Gameplay.UI.Others.MenuLogic;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,8 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.Fillers;
 using BlasphemousRandomizer.Shufflers;
 using BlasphemousRandomizer.Structures;
+using BlasphemousRandomizer.Config;
+using BlasphemousRandomizer.UI;
 using Framework.Managers;
 using Gameplay.UI.Others;
 using Framework.FrameworkCore;
@@ -98,7 +101,7 @@ namespace BlasphemousMultiworld
             {
                 __instance.itemShuffler.Shuffle(___seed);
                 Main.Multiworld.modifyNewItems(__instance.itemShuffler.getNewItems()); // Change to not randomize items first before replacing them
-                __instance.hintShuffler.Shuffle(___seed);
+                //__instance.hintShuffler.Shuffle(___seed);
                 __instance.enemyShuffler.Shuffle(___seed);
             }
             return false;
@@ -131,6 +134,70 @@ namespace BlasphemousMultiworld
         {
             Main.Multiworld.gameStatus = true;
             Main.Multiworld.processItems();
+        }
+    }
+
+    // Don't allow to open a save file unless connected
+    [HarmonyPatch(typeof(SelectSaveSlots), "OnAcceptSlots")]
+    public class SelectSaveSlots_Patch
+    {
+        public static bool Prefix()
+        {
+            if (!Main.Multiworld.connection.connected)
+            {
+                Main.Randomizer.LogDisplay("Not connected to a multiworld server!");
+                return false;
+            }
+            return true;
+        }
+    }
+    [HarmonyPatch(typeof(SettingsMenu), "openMenu")]
+    public class SettingsMenuOpen_Patch
+    {
+        public static bool Prefix()
+        {
+            if (!Main.Multiworld.connection.connected)
+            {
+                Main.Randomizer.LogDisplay("Not connected to a multiworld server!");
+                return false;
+            }
+            return true;
+        }
+    }
+
+    // Handle config for settings menu
+    [HarmonyPatch(typeof(SettingsMenu), "setConfigSettings")]
+    public class SettingsMenuConfig_Patch
+    {
+        public static void Prefix(ref MainConfig config)
+        {
+            config = MainConfig.Default();
+            config.items.type = 0;
+        }
+    }
+    [HarmonyPatch(typeof(SettingsMenu), "update")]
+    public class SettingsMenuUpdate_Patch
+    {
+        public static void Postfix(ref Text ___descriptionText, GameObject ___settingsMenu, bool ___menuActive)
+        {
+            if (___settingsMenu != null && ___menuActive)
+                ___descriptionText.text = "Configuration settings have been determined by Multiworld";
+        }
+    }
+    [HarmonyPatch(typeof(SettingsMenu), "processKeyInput")]
+    public class SettingsMenuKeyInput_Patch
+    {
+        public static bool Prefix()
+        {
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(SettingsElement), "onClick")]
+    public class SettingsElement_Patch
+    {
+        public static bool Prefix()
+        {
+            return false;
         }
     }
 }
