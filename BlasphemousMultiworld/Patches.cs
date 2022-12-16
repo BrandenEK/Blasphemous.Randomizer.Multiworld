@@ -171,8 +171,7 @@ namespace BlasphemousMultiworld
     {
         public static void Prefix(ref MainConfig config)
         {
-            config = MainConfig.Default();
-            config.items.type = 0;
+            Main.Multiworld.modifyGameConfig(config);
         }
     }
     [HarmonyPatch(typeof(SettingsMenu), "update")]

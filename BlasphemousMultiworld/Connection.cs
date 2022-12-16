@@ -1,6 +1,7 @@
 ﻿using System;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
+using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
 
 namespace BlasphemousMultiworld
@@ -48,8 +49,9 @@ namespace BlasphemousMultiworld
             Main.Randomizer.Log("Multiworld connection successful");
 
             // Retrieve new locations
-            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>(); // Also receive config
-            Main.Multiworld.onConnect(player, locations);
+            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+            MainConfig config = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
+            Main.Multiworld.onConnect(player, locations, config);
             return true;
         }
 
