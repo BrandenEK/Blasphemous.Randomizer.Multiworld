@@ -1,6 +1,6 @@
 ﻿using BlasphemousRandomizer.Structures;
 
-namespace BlasphemousMultiworld
+namespace BlasphemousMultiworld.Structures
 {
     public class ArchipelagoItem : Item
     {

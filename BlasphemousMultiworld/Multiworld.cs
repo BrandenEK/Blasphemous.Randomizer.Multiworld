@@ -3,6 +3,7 @@ using UnityEngine;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.Structures;
 using BlasphemousRandomizer.Config;
+using BlasphemousMultiworld.Structures;
 
 namespace BlasphemousMultiworld
 {

@@ -3,6 +3,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
 using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
+using BlasphemousMultiworld.Structures;
 
 namespace BlasphemousMultiworld
 {
