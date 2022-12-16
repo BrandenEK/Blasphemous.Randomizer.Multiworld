@@ -21,7 +21,7 @@ namespace BlasphemousMultiworld
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += recieveItem;
                 session.Socket.SocketClosed += disconnected;
-                result = session.TryConnectAndLogin("Blasphemous", player, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.AllItems);
+                result = session.TryConnectAndLogin("Blasphemous", player, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.RemoteItems);
             }
             catch (Exception e)
             {
@@ -100,6 +100,7 @@ namespace BlasphemousMultiworld
         private void recieveItem(ReceivedItemsHelper helper)
         {
             Main.Multiworld.recieveItem(helper.PeekItemName());
+            helper.DequeueItem();
         }
 
         // Got disconnected from server
