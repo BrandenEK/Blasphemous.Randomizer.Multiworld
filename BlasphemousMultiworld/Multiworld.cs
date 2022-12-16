@@ -16,18 +16,25 @@ namespace BlasphemousMultiworld
 
         public bool gameStatus;
         private List<Item> itemsToGive;
-        public Sprite multiworldItemImage;
+        private Sprite[] multiworldImages;
 
         public Multiworld()
         {
+            // Create new connection
             connection = new Connection();
+
+            // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
             newItems = new Dictionary<string, Item>();
             itemNames = new Dictionary<string, string>();
             itemsToGive = new List<Item>();
-            FileUtil.parseFileToDictionary("names_items.dat", itemNames);
+
+            // Load external data
+            if (!FileUtil.parseFileToDictionary("names_items.dat", itemNames))
+                Main.Randomizer.Log("Error: Item names could not be loaded!");
+            if (!FileUtil.loadImages("multiworld_image.png", 32, 32, 0, out multiworldImages))
+                Main.Randomizer.Log("Error: Multiworld images could not be loaded!");
             if (itemNames.Count > 0) updateItemNames();
-            loadMultiworldImage();
         }
 
         public void update()
@@ -110,7 +117,7 @@ namespace BlasphemousMultiworld
             shufflerItems.Clear();
             foreach (string key in newItems.Keys)
             {
-                shufflerItems.Add(key, newItems[key]);
+                shufflerItems.Add(key, newItems[key]); // Can be optimized to just change value
             }
         }
 
@@ -143,19 +150,9 @@ namespace BlasphemousMultiworld
             itemsToGive.Clear();
         }
 
-        private void loadMultiworldImage()
+        public Sprite getImage(int idx)
         {
-            // Read bytes from file
-            if (!FileUtil.readBytes("multiworld_item.png", out byte[] data))
-            {
-                Main.Randomizer.Log("Error: Custom multiworld image could not be loaded!");
-                return;
-            }
-
-            // Create texture
-            Texture2D tex = new Texture2D(2, 2);
-            tex.LoadImage(data);
-            multiworldItemImage = Sprite.Create(tex, new Rect(0, 0, 32f, 32f), new Vector2(0.5f, 0.5f), 32f);
+            return idx >= 0 && idx < multiworldImages.Length ? multiworldImages[idx] : null;
         }
 
         private void updateItemNames()

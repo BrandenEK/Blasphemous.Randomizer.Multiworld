@@ -18,7 +18,7 @@ namespace BlasphemousMultiworld
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {
-            return new RewardInfo(name, "An item that belongs to " + playerName + ".", "Sending to " + playerName + "!", Main.Multiworld.multiworldItemImage);
+            return new RewardInfo(name, "An item that belongs to " + playerName + ".", "Sending to " + playerName + "!", Main.Multiworld.getImage(0));
         }
     }
 }

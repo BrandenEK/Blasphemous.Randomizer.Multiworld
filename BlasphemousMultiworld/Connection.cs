@@ -45,11 +45,10 @@ namespace BlasphemousMultiworld
             // Connection successful
             connected = true;
             LoginSuccessful login = result as LoginSuccessful;
-            session.Items.ItemReceived += recieveItem;
             Main.Randomizer.Log("Multiworld connection successful");
 
             // Retrieve new locations
-            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>(); // Also receive config
             Main.Multiworld.onConnect(player, locations);
             return true;
         }

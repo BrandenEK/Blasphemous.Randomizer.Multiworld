@@ -12,6 +12,7 @@ using BlasphemousRandomizer.Shufflers;
 using BlasphemousRandomizer.Structures;
 using Framework.Managers;
 using Gameplay.UI.Others;
+using Framework.FrameworkCore;
 
 namespace BlasphemousMultiworld
 {
@@ -34,7 +35,7 @@ namespace BlasphemousMultiworld
             Text version = __instance.GetComponent<Text>();
             if (version.text.Contains("v."))
                 version.text = "";
-            version.text += " Multiworld v" + PluginInfo.PLUGIN_VERSION + "\n";
+            version.text += "Multiworld v" + PluginInfo.PLUGIN_VERSION + "\n";
         }
     }
 
@@ -97,7 +98,7 @@ namespace BlasphemousMultiworld
             {
                 __instance.itemShuffler.Shuffle(___seed);
                 Main.Multiworld.modifyNewItems(__instance.itemShuffler.getNewItems()); // Change to not randomize items first before replacing them
-                //__instance.hintShuffler.Shuffle(___seed);
+                __instance.hintShuffler.Shuffle(___seed);
                 __instance.enemyShuffler.Shuffle(___seed);
             }
             return false;
@@ -114,12 +115,13 @@ namespace BlasphemousMultiworld
             Main.Multiworld.processItems();
         }
     }
-    [HarmonyPatch(typeof(Randomizer), "ResetPersistence")]
-    public class RandomizerExit_Patch
+    [HarmonyPatch(typeof(Randomizer), "onLevelLoaded")]
+    public class RandomizerLevelLoad_Patch
     {
-        public static void Postfix()
+        public static void Postfix(Level newLevel)
         {
-            Main.Multiworld.gameStatus = false;
+            if (newLevel.LevelName == "MainMenu")
+                Main.Multiworld.gameStatus = false;
         }
     }
     [HarmonyPatch(typeof(Randomizer), "newGame")]
