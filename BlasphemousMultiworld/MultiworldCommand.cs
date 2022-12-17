@@ -76,5 +76,9 @@ namespace BlasphemousMultiworld
         {
             return new List<string> { "multiworld" };
         }
+
+        public override bool ToLowerAll() { return false; }
+
+        public override bool HasLowerParameters() { return false; }
     }
 }
