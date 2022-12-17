@@ -62,9 +62,7 @@ namespace BlasphemousMultiworld
             {
                 return "Already connected to a server!";
             }
-            // If in game
-            bool success = connection.Connect(server, playerName, password);
-            return success ? "Connected to " + server + "!" : "Failed to connect to " + server + "!";
+            return connection.Connect(server, playerName, password); // Check if not in game first ?
         }
 
         public void onConnect(string playerName, ArchipelagoLocation[] locations, MainConfig config)
