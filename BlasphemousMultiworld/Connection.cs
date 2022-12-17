@@ -1,7 +1,10 @@
 ﻿using System;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.Enums;
+using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
+using BlasphemousMultiworld.Structures;
 
 namespace BlasphemousMultiworld
 {
@@ -10,10 +13,11 @@ namespace BlasphemousMultiworld
         private ArchipelagoSession session;
         public bool connected { get; private set; }
 
-        public bool Connect(string server, string player)
+        public string Connect(string server, string player, string password)
         {
             // Create login
             LoginResult result;
+            string resultMessage;
 
             // Try connection
             try
@@ -21,7 +25,7 @@ namespace BlasphemousMultiworld
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += recieveItem;
                 session.Socket.SocketClosed += disconnected;
-                result = session.TryConnectAndLogin("Blasphemous", player, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.RemoteItems);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password == "" ? null : password);
             }
             catch (Exception e)
             {
@@ -33,24 +37,26 @@ namespace BlasphemousMultiworld
             {
                 connected = false;
                 LoginFailure failure = result as LoginFailure;
-                string errorMessage = "Multiworld connection failed:\n";
-                foreach (string error in failure.Errors)
-                {
-                    errorMessage += error + "\n";
-                }
-                Main.Randomizer.Log(errorMessage);
-                return false;
+                resultMessage = "Multiworld connection failed: ";
+                if (failure.Errors.Length > 0)
+                    resultMessage += failure.Errors[0];
+                else
+                    resultMessage += "Reason unknown.";
+
+                return resultMessage;
             }
 
             // Connection successful
             connected = true;
+            resultMessage = "Multiworld connection successful";
             LoginSuccessful login = result as LoginSuccessful;
-            Main.Randomizer.Log("Multiworld connection successful");
 
-            // Retrieve new locations
-            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>(); // Also receive config
-            Main.Multiworld.onConnect(player, locations);
-            return true;
+            // Retrieve server slot data
+            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+            MainConfig config = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
+            Main.Multiworld.onConnect(player, locations, config);
+
+            return resultMessage;
         }
 
         public void Disconnect()

@@ -2,21 +2,27 @@
 using UnityEngine;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.Structures;
+using BlasphemousRandomizer.Config;
+using BlasphemousMultiworld.Structures;
 
 namespace BlasphemousMultiworld
 {
     public class Multiworld
     {
+        // Data
         private Dictionary<string, long> apLocationIds;
         public List<Item> allItems;
-        private Dictionary<string, Item> newItems;
         private Dictionary<string, string> itemNames;
+        private Sprite[] multiworldImages;
 
+        // Connection
         public Connection connection { get; private set; }
-
         public bool gameStatus;
         private List<Item> itemsToGive;
-        private Sprite[] multiworldImages;
+
+        // Game
+        private Dictionary<string, Item> newItems;
+        private MainConfig gameConfig;
 
         public Multiworld()
         {
@@ -32,7 +38,7 @@ namespace BlasphemousMultiworld
             // Load external data
             if (!FileUtil.parseFileToDictionary("names_items.dat", itemNames))
                 Main.Randomizer.Log("Error: Item names could not be loaded!");
-            if (!FileUtil.loadImages("multiworld_image.png", 32, 32, 0, out multiworldImages))
+            if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, out multiworldImages))
                 Main.Randomizer.Log("Error: Multiworld images could not be loaded!");
             if (itemNames.Count > 0) updateItemNames();
         }
@@ -49,19 +55,17 @@ namespace BlasphemousMultiworld
             }
         }
 
-        public string tryConnect(string server, string playerName)
+        public string tryConnect(string server, string playerName, string password)
         {
             // Check if not in game & not connected
             if (connection.connected)
             {
                 return "Already connected to a server!";
             }
-            // If in game
-            bool success = connection.Connect(server, playerName);
-            return success ? "Connected to " + server + "!" : "Failed to connect to " + server + "!";
+            return connection.Connect(server, playerName, password); // Check if not in game first ?
         }
 
-        public void onConnect(string playerName, ArchipelagoLocation[] locations)
+        public void onConnect(string playerName, ArchipelagoLocation[] locations, MainConfig config)
         {
             // Init
             apLocationIds.Clear();
@@ -71,6 +75,9 @@ namespace BlasphemousMultiworld
                 Main.Randomizer.Log("Item names weren't loaded!");
                 return;
             }
+
+            // Save config
+            gameConfig = config;
 
             // Process locations
             for (int i = 0; i < locations.Length; i++)
@@ -99,7 +106,7 @@ namespace BlasphemousMultiworld
             }
 
             // newItems has been filled with new shuffled items
-            Main.Randomizer.Log("newItems has been filled from multiworld");
+            Main.Randomizer.Log("New locations & config have been loaded from multiworld!");
         }
         
         private Item itemExists(List<Item> items, string descriptiveName)
@@ -112,6 +119,7 @@ namespace BlasphemousMultiworld
             return null;
         }
 
+        // Set randomizer data to updated multiworld data
         public void modifyNewItems(Dictionary<string, Item> shufflerItems)
         {
             shufflerItems.Clear();
@@ -119,6 +127,12 @@ namespace BlasphemousMultiworld
             {
                 shufflerItems.Add(key, newItems[key]); // Can be optimized to just change value
             }
+        }
+        public void modifyGameConfig(MainConfig config)
+        {
+            config.general = gameConfig.general;
+            config.items = gameConfig.items;
+            config.enemies = gameConfig.enemies;
         }
 
         public void sendLocation(string location)
@@ -131,6 +145,7 @@ namespace BlasphemousMultiworld
 
         public void recieveItem(string itemName)
         {
+            Main.Randomizer.Log("Receiving item: " + itemName);
             Item item = itemExists(allItems, itemName);
             if (item != null)
             {

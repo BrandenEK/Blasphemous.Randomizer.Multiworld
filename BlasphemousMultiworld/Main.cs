@@ -14,8 +14,8 @@ namespace BlasphemousMultiworld
 
         private void Awake()
         {
-            Multiworld = new Multiworld();
             Randomizer = BlasphemousRandomizer.Main.Randomizer;
+            Multiworld = new Multiworld();
             Patch();
         }
 
