@@ -55,7 +55,7 @@ namespace BlasphemousMultiworld
             }
         }
 
-        public string tryConnect(string server, string playerName)
+        public string tryConnect(string server, string playerName, string password)
         {
             // Check if not in game & not connected
             if (connection.connected)
@@ -63,7 +63,7 @@ namespace BlasphemousMultiworld
                 return "Already connected to a server!";
             }
             // If in game
-            bool success = connection.Connect(server, playerName);
+            bool success = connection.Connect(server, playerName, password);
             return success ? "Connected to " + server + "!" : "Failed to connect to " + server + "!";
         }
 

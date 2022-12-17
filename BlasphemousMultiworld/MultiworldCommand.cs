@@ -28,7 +28,7 @@ namespace BlasphemousMultiworld
             {
                 Console.Write("Available MULTIWORLD commands:");
                 Console.Write("multiworld status: Display connection status");
-                Console.Write("multiworld connect SERVER NAME: Connect to SERVER with player name as NAME");
+                Console.Write("multiworld connect SERVER NAME [PASSWORD]: Connect to SERVER with player name as NAME with optional PASSWORD");
                 Console.Write("multiworld disconnect: Disconnect from current server");
                 Console.Write("multiworld players : List all players in this multiworld");
             }
@@ -40,10 +40,19 @@ namespace BlasphemousMultiworld
                 else
                     Console.Write($"Connected to {server}");
             }
-            else if (command == "connect" && ValidateParams(fullCommand, 2, parameters))
+            else if (command == "connect")
             {
+                string password;
+                if (parameters.Count == 2) { password = ""; }
+                else if (parameters.Count == 3) { password = parameters[2]; }
+                else
+                {
+                    Console.Write("The command 'connect' requires either 2 or 3 parameters.  You passed " + parameters.Count);
+                    return;
+                }
+
                 Console.Write($"Attempting to connect to {parameters[0]} as {parameters[1]}...");
-                string result = Main.Multiworld.tryConnect(parameters[0], parameters[1]);
+                string result = Main.Multiworld.tryConnect(parameters[0], parameters[1], password);
                 Console.Write(result);
             }
             else if (command == "players" && ValidateParams(fullCommand, 0, parameters))

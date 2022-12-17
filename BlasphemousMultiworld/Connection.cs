@@ -1,6 +1,7 @@
 ﻿using System;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.Enums;
 using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
 using BlasphemousMultiworld.Structures;
@@ -12,7 +13,7 @@ namespace BlasphemousMultiworld
         private ArchipelagoSession session;
         public bool connected { get; private set; }
 
-        public bool Connect(string server, string player)
+        public bool Connect(string server, string player, string password)
         {
             // Create login
             LoginResult result;
@@ -23,7 +24,7 @@ namespace BlasphemousMultiworld
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += recieveItem;
                 session.Socket.SocketClosed += disconnected;
-                result = session.TryConnectAndLogin("Blasphemous", player, Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags.RemoteItems);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password == "" ? null : password);
             }
             catch (Exception e)
             {
@@ -40,7 +41,7 @@ namespace BlasphemousMultiworld
                 {
                     errorMessage += error + "\n";
                 }
-                Main.Randomizer.Log(errorMessage);
+                Main.Randomizer.Log(errorMessage.Substring(0, errorMessage.Length - 1);
                 return false;
             }
 
