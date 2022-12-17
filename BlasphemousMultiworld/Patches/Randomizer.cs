@@ -26,32 +26,13 @@ namespace BlasphemousMultiworld.Patches
         }
     }
 
-    // Set gameStatus when loading or exiting
-    [HarmonyPatch(typeof(Randomizer), "SetCurrentPersistentState")]
-    public class RandomizerLoad_Patch
-    {
-        public static void Postfix()
-        {
-            Main.Multiworld.gameStatus = true;
-            Main.Multiworld.processItems();
-        }
-    }
-    [HarmonyPatch(typeof(Randomizer), "onLevelLoaded")]
-    public class RandomizerLevelLoad_Patch
-    {
-        public static void Postfix(Level newLevel)
-        {
-            if (newLevel.LevelName == "MainMenu")
-                Main.Multiworld.gameStatus = false;
-        }
-    }
+    // Load data on new game
     [HarmonyPatch(typeof(Randomizer), "newGame")]
     public class RandomizerNew_Patch
     {
         public static void Postfix()
         {
-            Main.Multiworld.gameStatus = true;
-            Main.Multiworld.processItems();
+            Main.Multiworld.newGame();
         }
     }
 

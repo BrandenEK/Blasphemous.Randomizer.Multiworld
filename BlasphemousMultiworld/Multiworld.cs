@@ -4,10 +4,12 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.Structures;
 using BlasphemousRandomizer.Config;
 using BlasphemousMultiworld.Structures;
+using Framework.FrameworkCore;
+using Framework.Managers;
 
 namespace BlasphemousMultiworld
 {
-    public class Multiworld
+    public class Multiworld : PersistentInterface
     {
         // Data
         private Dictionary<string, long> apLocationIds;
@@ -17,17 +19,19 @@ namespace BlasphemousMultiworld
 
         // Connection
         public Connection connection { get; private set; }
-        public bool gameStatus;
+        private bool gameStatus;
         private List<Item> itemsToGive;
 
         // Game
         private Dictionary<string, Item> newItems;
         private MainConfig gameConfig;
+        private int itemsReceived;
 
-        public Multiworld()
+        public void Initialize()
         {
             // Create new connection
             connection = new Connection();
+            LevelManager.OnLevelLoaded += onLevelLoaded;
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
@@ -41,6 +45,48 @@ namespace BlasphemousMultiworld
             if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, out multiworldImages))
                 Main.Randomizer.Log("Error: Multiworld images could not be loaded!");
             if (itemNames.Count > 0) updateItemNames();
+
+            Main.Randomizer.Log("Multiworld has been initialized!");
+        }
+
+        public void Dispose()
+        {
+            LevelManager.OnLevelLoaded -= onLevelLoaded;
+        }
+
+        // Save game data
+        public PersistentManager.PersistentData GetCurrentPersistentState(string dataPath, bool fullSave)
+        {
+            return new MultiworldPersistenceData
+            {
+                itemsReceived = itemsReceived
+            };
+        }
+
+        // Load game data
+        public void SetCurrentPersistentState(PersistentManager.PersistentData data, bool isloading, string dataPath)
+        {
+            MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
+            if (multiworldData != null)
+            {
+                itemsReceived = multiworldData.itemsReceived;
+            }
+            
+            gameStatus = true;
+            processItems();
+        }
+
+        // Load new game
+        public void newGame()
+        {
+            gameStatus = true;
+            processItems();
+        }
+
+        private void onLevelLoaded(Level oldLevel, Level newLevel)
+        {
+            if (newLevel.LevelName == "MainMenu")
+                gameStatus = false;
         }
 
         public void update()
@@ -196,5 +242,12 @@ namespace BlasphemousMultiworld
             itemNames["Tears[18000]"] = "Tears of Atonement (18000)";
             itemNames["Tears[30000]"] = "Tears of Atonement (30000)";
         }
+
+        public string GetPersistenID() { return "ID_MULTIWORLD"; }
+
+        public int GetOrder() { return 0; }
+
+        public void ResetPersistence() { }
+
     }
 }

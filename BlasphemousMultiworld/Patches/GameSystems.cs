@@ -85,4 +85,23 @@ namespace BlasphemousMultiworld
             return true;
         }
     }
+
+    // Initialize Multiworld class
+    [HarmonyPatch(typeof(AchievementsManager), "AllInitialized")]
+    public class AchievementsManager_InitializePatch
+    {
+        public static void Postfix()
+        {
+            Main.Multiworld.Initialize();
+        }
+    }
+    // Dispose Multiworld class
+    [HarmonyPatch(typeof(AchievementsManager), "Dispose")]
+    public class AchievementsManager_DisposePatch
+    {
+        public static void Postfix()
+        {
+            Main.Multiworld.Dispose();
+        }
+    }
 }
