@@ -21,6 +21,7 @@ namespace BlasphemousMultiworld
         public Connection connection { get; private set; }
         private bool gameStatus;
         private List<QueuedItem> queuedItems;
+        public string receivedPlayer;
 
         // Game
         private Dictionary<string, Item> newItems;
@@ -33,6 +34,7 @@ namespace BlasphemousMultiworld
             connection = new Connection();
             LevelManager.OnLevelLoaded += onLevelLoaded;
             Core.Persistence.AddPersistentManager(this);
+            receivedPlayer = "";
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
@@ -188,13 +190,13 @@ namespace BlasphemousMultiworld
                 Main.Randomizer.Log("Location " + location + " does not exist in the multiworld!");
         }
 
-        public void recieveItem(string itemName, int index)
+        public void receiveItem(string itemName, int index, string player)
         {
             Main.Randomizer.Log("Receiving item: " + itemName);
             Item item = itemExists(allItems, itemName);
             if (item != null)
             {
-                queuedItems.Add(new QueuedItem(item, index));
+                queuedItems.Add(new QueuedItem(item, index, player));
                 processItems();
             }
         }
@@ -210,6 +212,7 @@ namespace BlasphemousMultiworld
                 if (queuedItems[i].index > itemsReceived)
                 {
                     queuedItems[i].item.addToInventory();
+                    receivedPlayer = queuedItems[i].player;
                     Main.Randomizer.itemShuffler.showItemPopUp(queuedItems[i].item);
                     itemsReceived++;
                 }
