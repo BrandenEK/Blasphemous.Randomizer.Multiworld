@@ -25,7 +25,8 @@ namespace BlasphemousMultiworld
 
         // Game
         private Dictionary<string, Item> newItems;
-        private MainConfig gameConfig;
+        private MainConfig gameConfig; // Move this data to new struct
+        private int chosenEnding;
         private int itemsReceived;
 
         public void Initialize()
@@ -112,7 +113,7 @@ namespace BlasphemousMultiworld
             return result;
         }
 
-        public void onConnect(string playerName, ArchipelagoLocation[] locations, MainConfig config)
+        public void onConnect(string playerName, ArchipelagoLocation[] locations, MainConfig config, int ending)
         {
             // Init
             apLocationIds.Clear();
@@ -123,8 +124,9 @@ namespace BlasphemousMultiworld
                 return;
             }
 
-            // Save config
+            // Save other data
             gameConfig = config;
+            chosenEnding = ending;
 
             // Process locations
             for (int i = 0; i < locations.Length; i++)
@@ -188,6 +190,15 @@ namespace BlasphemousMultiworld
                 connection.sendLocation(apLocationIds[location]);
             else
                 Main.Randomizer.Log("Location " + location + " does not exist in the multiworld!");
+        }
+
+        public void sendGoal(int ending)
+        {
+            if (ending >= chosenEnding)
+            {
+                Main.Randomizer.Log($"Completing goal {chosenEnding} with ending {ending}!");
+                connection.sendGoal();
+            }
         }
 
         public void receiveItem(string itemName, int index, string player)

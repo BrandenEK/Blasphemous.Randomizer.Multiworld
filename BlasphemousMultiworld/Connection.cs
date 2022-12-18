@@ -2,6 +2,7 @@
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Packets;
 using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
 using BlasphemousMultiworld.Structures;
@@ -54,7 +55,8 @@ namespace BlasphemousMultiworld
             // Retrieve server slot data
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             MainConfig config = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
-            Main.Multiworld.onConnect(player, locations, config);
+            int ending = int.Parse(login.SlotData["ending"].ToString());
+            Main.Multiworld.onConnect(player, locations, config, ending);
 
             return resultMessage;
         }
@@ -98,7 +100,20 @@ namespace BlasphemousMultiworld
         public void sendLocation(long apLocationId)
         {
             if (connected)
+            {
                 session.Locations.CompleteLocationChecks(apLocationId);
+            }
+        }
+
+        // Sends goal completion to the server
+        public void sendGoal()
+        {
+            if (connected)
+            {
+                StatusUpdatePacket statusUpdate = new StatusUpdatePacket();
+                statusUpdate.Status = ArchipelagoClientState.ClientGoal;
+                session.Socket.SendPacket(statusUpdate);
+            }
         }
 
         // Recieves a new item from the server
