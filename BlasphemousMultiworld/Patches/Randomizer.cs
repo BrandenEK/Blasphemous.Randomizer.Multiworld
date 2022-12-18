@@ -4,6 +4,7 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.Fillers;
 using BlasphemousRandomizer.Shufflers;
 using BlasphemousRandomizer.Structures;
+using BlasphemousMultiworld.Structures;
 using Framework.FrameworkCore;
 using Framework.Managers;
 
@@ -17,9 +18,10 @@ namespace BlasphemousMultiworld.Patches
         {
             if (Main.Multiworld.connection.connected)
             {
+                // Door shuffle
                 __instance.itemShuffler.Shuffle(___seed); // Patch inserts multiworld locations
-                //__instance.hintShuffler.Shuffle(___seed);
-                __instance.enemyShuffler.Shuffle(___seed); // Uses built-in enemy shuffle based on seed
+                __instance.hintShuffler.Shuffle(___seed); // Uses built-in hint filler based on multiworld items
+                __instance.enemyShuffler.Shuffle(___seed); // Uses built-in enemy shuffle
             }
             return false;
         }
@@ -38,6 +40,34 @@ namespace BlasphemousMultiworld.Patches
         }
     }
 
+    // Fix hint shuffle
+    [HarmonyPatch(typeof(HintFiller), "fillGrtdHintLocations")]
+    public class HintFillerGrtd_Patch
+    {
+        public static void Postfix(Dictionary<int, string> grtd)
+        {
+            grtd.Remove(34);
+            grtd.Remove(32);
+            grtd.Remove(30);
+            grtd.Remove(6);
+        }
+    }
+    [HarmonyPatch(typeof(HintFiller), "getHintText")]
+    public class HintFillerText_Patch
+    {
+        public static void Postfix(ref string __result, string location, Item item, Dictionary<string, string> ___locationHints)
+        {
+            if (item.type != 200 || !___locationHints.TryGetValue(location, out string locationHint))
+                return;
+
+            // This is a valid location that holds another player's item
+            ArchipelagoItem archItem = item as ArchipelagoItem;
+            string itemHint = $"a '{archItem.name}' for {archItem.playerName}";
+            string output = locationHint.Replace("*", itemHint);
+            __result = char.ToUpper(output[0]).ToString() + output.Substring(1) + "...";
+        }
+    }
+
     // Load data on new game
     [HarmonyPatch(typeof(Randomizer), "newGame")]
     public class RandomizerNew_Patch
@@ -49,7 +79,7 @@ namespace BlasphemousMultiworld.Patches
     }
 
     // Get all items from the item filler
-    [HarmonyPatch(typeof(ItemFiller), "addSpecialItems")]
+    [HarmonyPatch(typeof(ItemFiller), "addSpecialItems")] // Will be obselete when data storage is implemented
     public class ItemFiller_Patch
     {
         public static void Postfix(List<Item> items)
