@@ -155,7 +155,7 @@ namespace BlasphemousMultiworld
             }
 
             // newItems has been filled with new shuffled items
-            Main.Randomizer.Log("New locations & config have been loaded from multiworld!");
+            Main.Randomizer.Log("Game variables have been loaded from multiworld!");
         }
         
         private Item itemExists(List<Item> items, string descriptiveName)
@@ -169,13 +169,9 @@ namespace BlasphemousMultiworld
         }
 
         // Set randomizer data to updated multiworld data
-        public void modifyNewItems(Dictionary<string, Item> shufflerItems)
+        public void modifyNewItems(ref Dictionary<string, Item> shufflerItems)
         {
-            shufflerItems.Clear();
-            foreach (string key in newItems.Keys)
-            {
-                shufflerItems.Add(key, newItems[key]); // Can be optimized to just change value
-            }
+            shufflerItems = newItems;
         }
         public void modifyGameConfig(MainConfig config)
         {

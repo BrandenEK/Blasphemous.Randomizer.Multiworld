@@ -17,11 +17,23 @@ namespace BlasphemousMultiworld.Patches
         {
             if (Main.Multiworld.connection.connected)
             {
-                __instance.itemShuffler.Shuffle(___seed);
-                Main.Multiworld.modifyNewItems(__instance.itemShuffler.getNewItems()); // Change to not randomize items first before replacing them
+                __instance.itemShuffler.Shuffle(___seed); // Patch inserts multiworld locations
                 //__instance.hintShuffler.Shuffle(___seed);
-                __instance.enemyShuffler.Shuffle(___seed);
+                __instance.enemyShuffler.Shuffle(___seed); // Uses built-in enemy shuffle based on seed
             }
+            return false;
+        }
+    }
+
+    // Load new item locations into item shuffler
+    [HarmonyPatch(typeof(ItemShuffle), "Shuffle")]
+    public class ItemShuffleShuffle_Patch
+    {
+        public static bool Prefix(ItemShuffle __instance, ref Dictionary<string, Item> ___newItems)
+        {
+            Main.Multiworld.modifyNewItems(ref ___newItems);
+            Main.Randomizer.totalItems = ___newItems.Count;
+            Main.Randomizer.Log(___newItems.Count + " items have been inserted from multiworld!");
             return false;
         }
     }
@@ -48,7 +60,7 @@ namespace BlasphemousMultiworld.Patches
 
     // Send location check when giving item
     [HarmonyPatch(typeof(ItemShuffle), "giveItem")]
-    public class ItemShuffle_Patch
+    public class ItemShuffleLocation_Patch
     {
         public static void Postfix(string locationId)
         {
