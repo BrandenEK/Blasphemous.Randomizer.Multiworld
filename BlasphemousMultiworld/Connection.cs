@@ -104,7 +104,7 @@ namespace BlasphemousMultiworld
         // Recieves a new item from the server
         private void recieveItem(ReceivedItemsHelper helper)
         {
-            Main.Multiworld.recieveItem(helper.PeekItemName());
+            Main.Multiworld.recieveItem(helper.PeekItemName(), helper.Index);
             helper.DequeueItem();
         }
 

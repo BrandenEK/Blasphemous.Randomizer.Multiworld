@@ -20,7 +20,7 @@ namespace BlasphemousMultiworld
         // Connection
         public Connection connection { get; private set; }
         private bool gameStatus;
-        private List<Item> itemsToGive;
+        private List<QueuedItem> queuedItems;
 
         // Game
         private Dictionary<string, Item> newItems;
@@ -32,12 +32,13 @@ namespace BlasphemousMultiworld
             // Create new connection
             connection = new Connection();
             LevelManager.OnLevelLoaded += onLevelLoaded;
+            Core.Persistence.AddPersistentManager(this);
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
             newItems = new Dictionary<string, Item>();
             itemNames = new Dictionary<string, string>();
-            itemsToGive = new List<Item>();
+            queuedItems = new List<QueuedItem>();
 
             // Load external data
             if (!FileUtil.parseFileToDictionary("names_items.dat", itemNames))
@@ -71,22 +72,18 @@ namespace BlasphemousMultiworld
             {
                 itemsReceived = multiworldData.itemsReceived;
             }
-            
-            gameStatus = true;
-            processItems();
         }
 
         // Load new game
         public void newGame()
         {
-            gameStatus = true;
-            processItems();
+            itemsReceived = 0;
         }
 
         private void onLevelLoaded(Level oldLevel, Level newLevel)
         {
-            if (newLevel.LevelName == "MainMenu")
-                gameStatus = false;
+            gameStatus = newLevel.LevelName != "MainMenu";
+            processItems();
         }
 
         public void update()
@@ -108,7 +105,9 @@ namespace BlasphemousMultiworld
             {
                 return "Already connected to a server!";
             }
-            return connection.Connect(server, playerName, password); // Check if not in game first ?
+            string result = connection.Connect(server, playerName, password); // Check if not in game first ?
+            Main.Randomizer.Log(result);
+            return result;
         }
 
         public void onConnect(string playerName, ArchipelagoLocation[] locations, MainConfig config)
@@ -189,26 +188,33 @@ namespace BlasphemousMultiworld
                 Main.Randomizer.Log("Location " + location + " does not exist in the multiworld!");
         }
 
-        public void recieveItem(string itemName)
+        public void recieveItem(string itemName, int index)
         {
             Main.Randomizer.Log("Receiving item: " + itemName);
             Item item = itemExists(allItems, itemName);
             if (item != null)
             {
-                itemsToGive.Add(item);
-                if (gameStatus)
-                    processItems();
+                queuedItems.Add(new QueuedItem(item, index));
+                processItems();
             }
         }
 
         public void processItems()
         {
-            for (int i = 0; i < itemsToGive.Count; i++)
+            if (!gameStatus)
+                return;
+
+            for (int i = 0; i < queuedItems.Count; i++)
             {
-                itemsToGive[i].addToInventory();
-                Main.Randomizer.itemShuffler.showItemPopUp(itemsToGive[i]);
+                Main.Randomizer.Log($"Item '{queuedItems[i].item.name}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
+                if (queuedItems[i].index > itemsReceived)
+                {
+                    queuedItems[i].item.addToInventory();
+                    Main.Randomizer.itemShuffler.showItemPopUp(queuedItems[i].item);
+                    itemsReceived++;
+                }
             }
-            itemsToGive.Clear();
+            queuedItems.Clear();
         }
 
         public Sprite getImage(int idx)
