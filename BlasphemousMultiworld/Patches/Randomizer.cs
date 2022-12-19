@@ -62,7 +62,7 @@ namespace BlasphemousMultiworld.Patches
 
             // This is a valid location that holds another player's item
             ArchipelagoItem archItem = item as ArchipelagoItem;
-            string itemHint = $"a '{archItem.name}' for {archItem.playerName}";
+            string itemHint = $"'{archItem.name}' for {archItem.playerName}";
             string output = locationHint.Replace("*", itemHint);
             __result = char.ToUpper(output[0]).ToString() + output.Substring(1) + "...";
         }

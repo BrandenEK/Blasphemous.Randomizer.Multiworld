@@ -48,7 +48,7 @@ namespace BlasphemousMultiworld
                 Main.Randomizer.Log("Error: Item names could not be loaded!");
             if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, out multiworldImages))
                 Main.Randomizer.Log("Error: Multiworld images could not be loaded!");
-            if (itemNames.Count > 0) updateItemNames();
+            if (itemNames.Count > 0) itemNames["CH"] = "Child of Moonlight";
 
             Main.Randomizer.Log("Multiworld has been initialized!");
         }
@@ -230,33 +230,6 @@ namespace BlasphemousMultiworld
         public Sprite getImage(int idx)
         {
             return idx >= 0 && idx < multiworldImages.Length ? multiworldImages[idx] : null;
-        }
-
-        private void updateItemNames()
-        {
-            itemNames["CH"] = "Child of Moonlight";
-            itemNames["Tears[250]"] = "Tears of Atonement (250)";
-            itemNames["Tears[300]"] = "Tears of Atonement (300)";
-            itemNames["Tears[500]"] = "Tears of Atonement (500)";
-            itemNames["Tears[625]"] = "Tears of Atonement (625)";
-            itemNames["Tears[750]"] = "Tears of Atonement (750)";
-            itemNames["Tears[1000]"] = "Tears of Atonement (1000)";
-            itemNames["Tears[1250]"] = "Tears of Atonement (1250)";
-            itemNames["Tears[1500]"] = "Tears of Atonement (1500)";
-            itemNames["Tears[1750]"] = "Tears of Atonement (1750)";
-            itemNames["Tears[2000]"] = "Tears of Atonement (2000)";
-            itemNames["Tears[2100]"] = "Tears of Atonement (2100)";
-            itemNames["Tears[2500]"] = "Tears of Atonement (2500)";
-            itemNames["Tears[2600]"] = "Tears of Atonement (2600)";
-            itemNames["Tears[3000]"] = "Tears of Atonement (3000)";
-            itemNames["Tears[4300]"] = "Tears of Atonement (4300)";
-            itemNames["Tears[5000]"] = "Tears of Atonement (5000)";
-            itemNames["Tears[5500]"] = "Tears of Atonement (5500)";
-            itemNames["Tears[9000]"] = "Tears of Atonement (9000)";
-            itemNames["Tears[10000]"] = "Tears of Atonement (10000)";
-            itemNames["Tears[11250]"] = "Tears of Atonement (11250)";
-            itemNames["Tears[18000]"] = "Tears of Atonement (18000)";
-            itemNames["Tears[30000]"] = "Tears of Atonement (30000)";
         }
 
         public string GetPersistenID() { return "ID_MULTIWORLD"; }
