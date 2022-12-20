@@ -86,14 +86,14 @@ namespace BlasphemousMultiworld
         private void onLevelLoaded(Level oldLevel, Level newLevel)
         {
             gameStatus = newLevel.LevelName != "MainMenu";
-            processItems();
+            processItems(true);
         }
-
+        
         public void update()
         {
             if (Input.GetKeyDown(KeyCode.Keypad9))
             {
-                
+
             }
             else if (Input.GetKeyDown(KeyCode.Equals))
             {
@@ -204,13 +204,18 @@ namespace BlasphemousMultiworld
             if (item != null)
             {
                 queuedItems.Add(new QueuedItem(item, index, player));
-                processItems();
+                processItems(false);
+            }
+            else
+            {
+                Main.Randomizer.LogDisplay("Error: " + itemName + " doesn't exist!");
             }
         }
 
-        public void processItems()
+        public void processItems(bool ignoreLoadingCheck)
         {
-            if (!gameStatus)
+            // Wait to process items until inside a save file and the level is loaded
+            if (queuedItems.Count == 0 || !gameStatus || (!ignoreLoadingCheck && Core.LevelManager.InsideChangeLevel))
                 return;
 
             for (int i = 0; i < queuedItems.Count; i++)
