@@ -6,7 +6,7 @@ namespace BlasphemousMultiworld.Structures
     {
         public string playerName;
 
-        public ArchipelagoItem(string name, string player) : base(name, 200, 0, false)
+        public ArchipelagoItem(string name, string player) : base("AP", name, "[AP]", 200, false, 0)
         {
             playerName = player;
         }

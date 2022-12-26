@@ -39,7 +39,7 @@ namespace BlasphemousMultiworld.Patches
         {
             if (!enabled && Core.LevelManager.currentLevel.LevelName == "MainMenu")
             {
-                Button[] buttons = UnityEngine.Object.FindObjectsOfType<Button>();
+                Button[] buttons = Object.FindObjectsOfType<Button>();
                 foreach (Button b in buttons)
                 {
                     if (b.name == "Continue")

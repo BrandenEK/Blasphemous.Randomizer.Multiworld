@@ -4,6 +4,7 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.Fillers;
 using BlasphemousRandomizer.Shufflers;
 using BlasphemousRandomizer.Structures;
+using BlasphemousMultiworld.Structures;
 using Framework.FrameworkCore;
 using Framework.Managers;
 
@@ -17,57 +18,58 @@ namespace BlasphemousMultiworld.Patches
         {
             if (Main.Multiworld.connection.connected)
             {
-                __instance.itemShuffler.Shuffle(___seed);
-                Main.Multiworld.modifyNewItems(__instance.itemShuffler.getNewItems()); // Change to not randomize items first before replacing them
-                //__instance.hintShuffler.Shuffle(___seed);
-                __instance.enemyShuffler.Shuffle(___seed);
+                // Door shuffle
+                __instance.itemShuffler.Shuffle(___seed); // Patch inserts multiworld locations
+                __instance.hintShuffler.Shuffle(___seed); // Uses built-in hint filler based on multiworld items
+                __instance.enemyShuffler.Shuffle(___seed); // Uses built-in enemy shuffle
             }
             return false;
         }
     }
 
-    // Set gameStatus when loading or exiting
-    [HarmonyPatch(typeof(Randomizer), "SetCurrentPersistentState")]
-    public class RandomizerLoad_Patch
+    // Load new item locations into item shuffler
+    [HarmonyPatch(typeof(ItemShuffle), "Shuffle")]
+    public class ItemShuffleShuffle_Patch
     {
-        public static void Postfix()
+        public static bool Prefix(ItemShuffle __instance, ref Dictionary<string, Item> ___newItems)
         {
-            Main.Multiworld.gameStatus = true;
-            Main.Multiworld.processItems();
+            Main.Multiworld.modifyNewItems(ref ___newItems);
+            Main.Randomizer.totalItems = ___newItems.Count;
+            Main.Randomizer.Log(___newItems.Count + " items have been inserted from multiworld!");
+            return false;
         }
     }
-    [HarmonyPatch(typeof(Randomizer), "onLevelLoaded")]
-    public class RandomizerLevelLoad_Patch
+
+    // Change hint text for other player's items
+    [HarmonyPatch(typeof(HintShuffle), "getHintText")]
+    public class HintFillerText_Patch
     {
-        public static void Postfix(Level newLevel)
+        public static void Postfix(ref string __result, string location)
         {
-            if (newLevel.LevelName == "MainMenu")
-                Main.Multiworld.gameStatus = false;
+            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
+            if (item == null || item.type != 200)
+                return;
+
+            // This is a valid location that holds another player's item
+            ArchipelagoItem archItem = item as ArchipelagoItem;
+            string itemHint = $"'{archItem.name}' for {archItem.playerName}";
+            __result = __result.Replace("[AP]", itemHint);
         }
     }
+
+    // Load data on new game
     [HarmonyPatch(typeof(Randomizer), "newGame")]
     public class RandomizerNew_Patch
     {
         public static void Postfix()
         {
-            Main.Multiworld.gameStatus = true;
-            Main.Multiworld.processItems();
-        }
-    }
-
-    // Get all items from the item filler
-    [HarmonyPatch(typeof(ItemFiller), "addSpecialItems")]
-    public class ItemFiller_Patch
-    {
-        public static void Postfix(List<Item> items)
-        {
-            Main.Multiworld.allItems = items;
+            Main.Multiworld.newGame();
         }
     }
 
     // Send location check when giving item
     [HarmonyPatch(typeof(ItemShuffle), "giveItem")]
-    public class ItemShuffle_Patch
+    public class ItemShuffleLocation_Patch
     {
         public static void Postfix(string locationId)
         {
@@ -82,6 +84,20 @@ namespace BlasphemousMultiworld.Patches
         public static void Postfix()
         {
             Core.Events.SetFlag("MULTIWORLD", true, false);
+        }
+    }
+
+    // Show different notification when receiving an item
+    [HarmonyPatch(typeof(Item), "getRewardInfo")]
+    public class Item_Patch
+    {
+        public static void Postfix(ref RewardInfo __result)
+        {
+            if (Main.Multiworld.receivedPlayer != "")
+            {
+                __result.notification = "Receieved from " + Main.Multiworld.receivedPlayer + "!";
+                Main.Multiworld.receivedPlayer = "";
+            }
         }
     }
 }
