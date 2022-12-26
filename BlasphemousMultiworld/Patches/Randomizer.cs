@@ -40,31 +40,20 @@ namespace BlasphemousMultiworld.Patches
         }
     }
 
-    // Fix hint shuffle
-    [HarmonyPatch(typeof(HintFiller), "fillGrtdHintLocations")]
-    public class HintFillerGrtd_Patch
-    {
-        public static void Postfix(Dictionary<int, string> grtd)
-        {
-            grtd.Remove(34);
-            grtd.Remove(32);
-            grtd.Remove(30);
-            grtd.Remove(6);
-        }
-    }
-    [HarmonyPatch(typeof(HintFiller), "getHintText")]
+    // Change hint text for other player's items
+    [HarmonyPatch(typeof(HintShuffle), "getHintText")]
     public class HintFillerText_Patch
     {
-        public static void Postfix(ref string __result, string location, Item item, Dictionary<string, string> ___locationHints)
+        public static void Postfix(ref string __result, string location)
         {
-            if (item.type != 200 || !___locationHints.TryGetValue(location, out string locationHint))
+            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
+            if (item == null || item.type != 200)
                 return;
 
             // This is a valid location that holds another player's item
             ArchipelagoItem archItem = item as ArchipelagoItem;
             string itemHint = $"'{archItem.name}' for {archItem.playerName}";
-            string output = locationHint.Replace("*", itemHint);
-            __result = char.ToUpper(output[0]).ToString() + output.Substring(1) + "...";
+            __result = __result.Replace("[AP]", itemHint);
         }
     }
 
@@ -75,16 +64,6 @@ namespace BlasphemousMultiworld.Patches
         public static void Postfix()
         {
             Main.Multiworld.newGame();
-        }
-    }
-
-    // Get all items from the item filler
-    [HarmonyPatch(typeof(ItemFiller), "addSpecialItems")] // Will be obselete when data storage is implemented
-    public class ItemFiller_Patch
-    {
-        public static void Postfix(List<Item> items)
-        {
-            Main.Multiworld.allItems = items;
         }
     }
 

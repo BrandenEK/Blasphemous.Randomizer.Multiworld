@@ -13,8 +13,6 @@ namespace BlasphemousMultiworld
     {
         // Data
         private Dictionary<string, long> apLocationIds;
-        public List<Item> allItems;
-        private Dictionary<string, string> itemNames;
         private Sprite[] multiworldImages;
 
         // Connection
@@ -40,15 +38,13 @@ namespace BlasphemousMultiworld
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
             newItems = new Dictionary<string, Item>();
-            itemNames = new Dictionary<string, string>();
             queuedItems = new List<QueuedItem>();
 
             // Load external data
-            if (!FileUtil.parseFileToDictionary("names_items.dat", itemNames))
-                Main.Randomizer.Log("Error: Item names could not be loaded!");
-            if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, out multiworldImages))
-                Main.Randomizer.Log("Error: Multiworld images could not be loaded!");
-            if (itemNames.Count > 0) itemNames["CH"] = "Child of Moonlight";
+            if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, true, out multiworldImages))
+                Main.Randomizer.LogError("Error: Multiworld images could not be loaded!");
+            Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
+            if (cherub != null) cherub.name = "Child of Moonlight";
 
             Main.Randomizer.Log("Multiworld has been initialized!");
         }
@@ -118,11 +114,6 @@ namespace BlasphemousMultiworld
             // Init
             apLocationIds.Clear();
             newItems.Clear();
-            if (itemNames.Count < 1)
-            {
-                Main.Randomizer.Log("Item names weren't loaded!");
-                return;
-            }
 
             // Save other data
             gameConfig = config;
@@ -138,12 +129,12 @@ namespace BlasphemousMultiworld
                 if (locations[i].player_name == playerName)
                 {
                     // This is an item for this player
-                    Item item = itemExists(allItems, locations[i].name);
+                    Item item = itemExists(locations[i].name);
                     if (item != null)
                         newItems.Add(locations[i].id, item);
                     else
                     {
-                        Main.Randomizer.Log("Item " + locations[i].name + " doesn't exist!");
+                        Main.Randomizer.LogError("Item " + locations[i].name + " doesn't exist!");
                         continue;
                     }
                 }
@@ -158,12 +149,12 @@ namespace BlasphemousMultiworld
             Main.Randomizer.Log("Game variables have been loaded from multiworld!");
         }
         
-        private Item itemExists(List<Item> items, string descriptiveName)
+        private Item itemExists(string descriptiveName)
         {
-            for (int i = 0; i < items.Count; i++)
+            foreach (Item item in Main.Randomizer.data.items.Values)
             {
-                if (itemNames.ContainsKey(items[i].name) && itemNames[items[i].name] == descriptiveName)
-                    return items[i];
+                if (item.name == descriptiveName)
+                    return item;
             }
             return null;
         }
@@ -200,7 +191,7 @@ namespace BlasphemousMultiworld
         public void receiveItem(string itemName, int index, string player)
         {
             Main.Randomizer.Log("Receiving item: " + itemName);
-            Item item = itemExists(allItems, itemName);
+            Item item = itemExists(itemName);
             if (item != null)
             {
                 queuedItems.Add(new QueuedItem(item, index, player));
@@ -220,7 +211,7 @@ namespace BlasphemousMultiworld
 
             for (int i = 0; i < queuedItems.Count; i++)
             {
-                Main.Randomizer.Log($"Item '{queuedItems[i].item.name}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
+                Main.Randomizer.Log($"Item '{queuedItems[i].item.id}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
                 if (queuedItems[i].index > itemsReceived)
                 {
                     queuedItems[i].item.addToInventory();
