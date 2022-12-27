@@ -3,6 +3,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
+using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
 using BlasphemousMultiworld.Structures;
@@ -12,6 +13,8 @@ namespace BlasphemousMultiworld
     public class Connection
     {
         private ArchipelagoSession session;
+        private DeathLinkService deathLink;
+
         public bool connected { get; private set; }
 
         public string Connect(string server, string player, string password)
@@ -24,8 +27,13 @@ namespace BlasphemousMultiworld
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
+                deathLink = session.CreateDeathLinkService();
+
                 session.Items.ItemReceived += recieveItem;
                 session.Socket.SocketClosed += disconnected;
+                deathLink.OnDeathLinkReceived += receiveDeathLink; // Enable or disable it based on settings
+                deathLink.EnableDeathLink();
+
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password == "" ? null : password);
             }
             catch (Exception e)
@@ -53,11 +61,13 @@ namespace BlasphemousMultiworld
             LoginSuccessful login = result as LoginSuccessful;
 
             // Retrieve server slot data
+            GameData data = new GameData();
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
-            MainConfig config = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
-            int ending = int.Parse(login.SlotData["ending"].ToString());
-            Main.Multiworld.onConnect(player, locations, config, ending);
+            data.gameConfig = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
+            data.chosenEnding = int.Parse(login.SlotData["ending"].ToString());
+            data.playerName = player;
 
+            Main.Multiworld.onConnect(locations, data);
             return resultMessage;
         }
 
@@ -123,12 +133,24 @@ namespace BlasphemousMultiworld
             }
         }
 
+        // Sends player death to the server
+        public void sendDeathLink()
+        {
+            deathLink.SendDeathLink(new DeathLink(Main.Multiworld.gameData.playerName));
+        }
+
         // Recieves a new item from the server
         private void recieveItem(ReceivedItemsHelper helper)
         {
             string player = session.Players.GetPlayerName(helper.PeekItem().Player);
             Main.Multiworld.receiveItem(helper.PeekItemName(), helper.Index, player);
             helper.DequeueItem();
+        }
+
+        // Receives a death link from the server
+        private void receiveDeathLink(DeathLink link)
+        {
+            Main.Multiworld.receiveDeathLink();
         }
 
         // Got disconnected from server

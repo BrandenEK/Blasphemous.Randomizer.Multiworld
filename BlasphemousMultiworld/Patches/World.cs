@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 using Tools.Playmaker2.Action;
+using Gameplay.GameControllers.Entities;
+using Gameplay.GameControllers.Penitent;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -19,6 +21,17 @@ namespace BlasphemousMultiworld.Patches
                 else if (name == "CTS301-EndingC")
                     Main.Multiworld.sendGoal(2);
             }
+        }
+    }
+
+    // Send deathlink when dead
+    [HarmonyPatch(typeof(Penitent), "OnEntityDead")]
+    public class Penitent_Patch
+    {
+        public static void Postfix(Entity entity)
+        {
+            if (entity is Penitent)
+                Main.Multiworld.sendDeathLink();
         }
     }
 }

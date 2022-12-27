@@ -19,13 +19,13 @@ namespace BlasphemousMultiworld
         public Connection connection { get; private set; }
         private bool gameStatus;
         private bool sentLocations;
+        private bool currentlyInDeathLink;
         private List<QueuedItem> queuedItems;
         public string receivedPlayer;
 
         // Game
         private Dictionary<string, Item> newItems;
-        private MainConfig gameConfig; // Move this data to new struct
-        private int chosenEnding;
+        public GameData gameData;
         private int itemsReceived;
 
         public void Initialize()
@@ -40,6 +40,7 @@ namespace BlasphemousMultiworld
             apLocationIds = new Dictionary<string, long>();
             newItems = new Dictionary<string, Item>();
             queuedItems = new List<QueuedItem>();
+            gameData = new GameData();
 
             // Load external data
             if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, true, out multiworldImages))
@@ -111,15 +112,12 @@ namespace BlasphemousMultiworld
             return result;
         }
 
-        public void onConnect(string playerName, ArchipelagoLocation[] locations, MainConfig config, int ending)
+        public void onConnect(ArchipelagoLocation[] locations, GameData data)
         {
             // Init
             apLocationIds.Clear();
             newItems.Clear();
-
-            // Save other data
-            gameConfig = config;
-            chosenEnding = ending;
+            gameData = data;
 
             // Process locations
             for (int i = 0; i < locations.Length; i++)
@@ -128,7 +126,7 @@ namespace BlasphemousMultiworld
                 apLocationIds.Add(locations[i].id, locations[i].ap_id);
 
                 // Add to new list of random items
-                if (locations[i].player_name == playerName)
+                if (locations[i].player_name == data.playerName)
                 {
                     // This is an item for this player
                     Item item = itemExists(locations[i].name);
@@ -174,9 +172,9 @@ namespace BlasphemousMultiworld
         }
         public void modifyGameConfig(MainConfig config)
         {
-            config.general = gameConfig.general;
-            config.items = gameConfig.items;
-            config.enemies = gameConfig.enemies;
+            config.general = gameData.gameConfig.general;
+            config.items = gameData.gameConfig.items;
+            config.enemies = gameData.gameConfig.enemies;
         }
 
         public void sendLocation(string location)
@@ -209,11 +207,23 @@ namespace BlasphemousMultiworld
 
         public void sendGoal(int ending)
         {
-            if (ending >= chosenEnding)
+            if (ending >= gameData.chosenEnding)
             {
-                Main.Randomizer.Log($"Completing goal {chosenEnding} with ending {ending}!");
+                Main.Randomizer.Log($"Completing goal {gameData.chosenEnding} with ending {ending}!");
                 connection.sendGoal();
             }
+        }
+
+        public void sendDeathLink()
+        {
+            if (currentlyInDeathLink)
+            {
+                currentlyInDeathLink = false;
+                return;
+            }
+
+            Main.Randomizer.Log("Sending death link!");
+            connection.sendDeathLink();
         }
 
         public void receiveItem(string itemName, int index, string player)
@@ -229,6 +239,13 @@ namespace BlasphemousMultiworld
             {
                 Main.Randomizer.LogDisplay("Error: " + itemName + " doesn't exist!");
             }
+        }
+
+        public void receiveDeathLink()
+        {
+            Main.Randomizer.Log("Received death link!");
+            currentlyInDeathLink = true;
+            Core.Logic.Penitent.KillInstanteneously(); // Needs testing
         }
 
         public void processItems(bool ignoreLoadingCheck)
