@@ -30,6 +30,7 @@ namespace BlasphemousMultiworld
                 Console.Write("multiworld status: Display connection status");
                 Console.Write("multiworld connect SERVER NAME [PASSWORD]: Connect to SERVER with player name as NAME with optional PASSWORD");
                 Console.Write("multiworld disconnect: Disconnect from current server");
+                Console.Write("multiworld deathlink: Toggles deathlink on/off");
                 Console.Write("multiworld players : List all players in this multiworld");
             }
             else if (command == "status" && ValidateParams(fullCommand, 0, parameters))
@@ -55,6 +56,26 @@ namespace BlasphemousMultiworld
                 string result = Main.Multiworld.tryConnect(parameters[0], parameters[1], password);
                 Console.Write(result);
             }
+            else if (command == "disconnect" && ValidateParams(fullCommand, 0, parameters))
+            {
+                if (Main.Multiworld.connection.connected)
+                {
+                    Main.Multiworld.connection.Disconnect();
+                    Console.Write("Disconnected from server");
+                }
+                else
+                    Console.Write("Not connected to any server!");
+            }
+            else if (command == "deathlink" && ValidateParams(fullCommand, 0, parameters))
+            {
+                if (Main.Multiworld.connection.connected)
+                {
+                    bool enabled = Main.Multiworld.toggleDeathLink();
+                    Console.Write("Deathlink has been " + (enabled ? "enabled" : "disabled"));
+                }
+                else
+                    Console.Write("Not connected to any server!");
+            }
             else if (command == "players" && ValidateParams(fullCommand, 0, parameters))
             {
                 string[] players = Main.Multiworld.connection.getPlayers();
@@ -68,16 +89,6 @@ namespace BlasphemousMultiworld
                 foreach (string player in players)
                     output += player + ", ";
                 Console.Write(output.Substring(0, output.Length - 2));
-            }
-            else if (command == "disconnect" && ValidateParams(fullCommand, 0, parameters))
-            {
-                if (Main.Multiworld.connection.connected)
-                {
-                    Main.Multiworld.connection.Disconnect();
-                    Console.Write("Disconnected from server");
-                }
-                else
-                    Console.Write("Not connected to any server!");
             }
         }
 

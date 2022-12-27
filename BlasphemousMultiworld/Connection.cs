@@ -79,7 +79,6 @@ namespace BlasphemousMultiworld
                 session.Socket.Disconnect();
                 connected = false;
                 session = null;
-                Main.Randomizer.Log("Disconnecting from multiworld server");
             }
         }
 
@@ -146,7 +145,10 @@ namespace BlasphemousMultiworld
         // Sends player death to the server
         public void sendDeathLink()
         {
-            deathLink.SendDeathLink(new DeathLink(Main.Multiworld.gameData.playerName));
+            if (connected)
+            {
+                deathLink.SendDeathLink(new DeathLink(Main.Multiworld.gameData.playerName));
+            }
         }
 
         // Recieves a new item from the server
@@ -166,7 +168,6 @@ namespace BlasphemousMultiworld
         // Got disconnected from server
         private void disconnected(string reason)
         {
-            Main.Randomizer.LogDisplay("Disconnected from multiworld server!");
             Main.Multiworld.onDisconnect();
             connected = false;
             session = null;

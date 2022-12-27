@@ -102,8 +102,7 @@ namespace BlasphemousMultiworld
             }
 
             // If you received a deathlink & are able to die
-            bool canKill = gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*");
-            if (deathlink == DeathLinkStatus.Queued && canKill)
+            if (gameData.deathLinkEnabled && deathlink == DeathLinkStatus.Queued && gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*"))
             {
                 deathlink = DeathLinkStatus.Killing;
                 Core.Logic.Penitent.KillInstanteneously();
@@ -162,6 +161,7 @@ namespace BlasphemousMultiworld
 
         public void onDisconnect()
         {
+            Main.Randomizer.LogDisplay("Disconnected from multiworld server!");
             sentLocations = false;
         }
         
@@ -260,6 +260,14 @@ namespace BlasphemousMultiworld
                 Main.Randomizer.Log("Received death link!");
                 deathlink = DeathLinkStatus.Queued;
             }
+        }
+
+        public bool toggleDeathLink()
+        {
+            gameData.deathLinkEnabled = !gameData.deathLinkEnabled;
+            connection.setDeathLinkStatus(gameData.deathLinkEnabled);
+            Main.Randomizer.Log("Setting deathlink status to " + gameData.deathLinkEnabled.ToString());
+            return gameData.deathLinkEnabled;
         }
 
         public void processItems(bool ignoreLoadingCheck)
