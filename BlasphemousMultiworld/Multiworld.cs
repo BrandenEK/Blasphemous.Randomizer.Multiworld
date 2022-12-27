@@ -18,6 +18,7 @@ namespace BlasphemousMultiworld
         // Connection
         public Connection connection { get; private set; }
         private bool gameStatus;
+        private bool sentLocations;
         private List<QueuedItem> queuedItems;
         public string receivedPlayer;
 
@@ -83,6 +84,7 @@ namespace BlasphemousMultiworld
         {
             gameStatus = newLevel.LevelName != "MainMenu";
             processItems(true);
+            sendAllLocations();
         }
         
         public void update()
@@ -147,6 +149,12 @@ namespace BlasphemousMultiworld
 
             // newItems has been filled with new shuffled items
             Main.Randomizer.Log("Game variables have been loaded from multiworld!");
+            sendAllLocations();
+        }
+
+        public void onDisconnect()
+        {
+            sentLocations = false;
         }
         
         private Item itemExists(string descriptiveName)
@@ -177,6 +185,26 @@ namespace BlasphemousMultiworld
                 connection.sendLocation(apLocationIds[location]);
             else
                 Main.Randomizer.Log("Location " + location + " does not exist in the multiworld!");
+        }
+
+        public void sendAllLocations()
+        {
+            if (sentLocations || !gameStatus)
+            {
+                return;
+            }
+
+            // Send list of all locations already checked
+            List<long> checkedLocations = new List<long>();
+            foreach (string location in Main.Randomizer.data.itemLocations.Keys)
+            {
+                if (Core.Events.GetFlag("LOCATION_" + location))
+                    checkedLocations.Add(apLocationIds[location]);
+            }
+
+            Main.Randomizer.Log($"Sending all locations ({checkedLocations.Count})");
+            connection.sendLocations(checkedLocations.ToArray());
+            sentLocations = true;
         }
 
         public void sendGoal(int ending)

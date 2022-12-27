@@ -104,6 +104,13 @@ namespace BlasphemousMultiworld
                 session.Locations.CompleteLocationChecks(apLocationId);
             }
         }
+        public void sendLocations(long[] apLocationIds)
+        {
+            if (connected)
+            {
+                session.Locations.CompleteLocationChecks(apLocationIds);
+            }
+        }
 
         // Sends goal completion to the server
         public void sendGoal()
@@ -128,6 +135,7 @@ namespace BlasphemousMultiworld
         private void disconnected(string reason)
         {
             Main.Randomizer.LogDisplay("Disconnected from multiworld server!");
+            Main.Multiworld.onDisconnect();
             connected = false;
             session = null;
         }
