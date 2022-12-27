@@ -226,6 +226,7 @@ namespace BlasphemousMultiworld
 
         public void sendDeathLink()
         {
+            if (!gameData.deathLinkEnabled) return;
             if (deathlink == DeathLinkStatus.Killing)
             {
                 deathlink = DeathLinkStatus.Nothing;
@@ -253,8 +254,12 @@ namespace BlasphemousMultiworld
 
         public void receiveDeathLink()
         {
-            Main.Randomizer.Log("Received death link!");
-            deathlink = DeathLinkStatus.Queued;
+            if (!gameData.deathLinkEnabled) return;
+            if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
+            {
+                Main.Randomizer.Log("Received death link!");
+                deathlink = DeathLinkStatus.Queued;
+            }
         }
 
         public void processItems(bool ignoreLoadingCheck)

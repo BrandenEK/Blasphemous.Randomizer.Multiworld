@@ -7,5 +7,6 @@ namespace BlasphemousMultiworld.Structures
         public MainConfig gameConfig;
         public string playerName;
         public int chosenEnding;
+        public bool deathLinkEnabled;
     }
 }

@@ -60,12 +60,13 @@ namespace BlasphemousMultiworld
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             data.gameConfig = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
             data.chosenEnding = int.Parse(login.SlotData["ending"].ToString());
+            data.deathLinkEnabled = false; // load from slot data
             data.playerName = player;
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
-            deathLink.OnDeathLinkReceived += receiveDeathLink; // Enable or disable it based on settings
-            deathLink.EnableDeathLink();
+            deathLink.OnDeathLinkReceived += receiveDeathLink;
+            setDeathLinkStatus(data.deathLinkEnabled);
 
             Main.Multiworld.onConnect(locations, data);
             return resultMessage;
@@ -104,6 +105,15 @@ namespace BlasphemousMultiworld
                 return session.Socket.Uri.ToString();
             }
             return "";
+        }
+
+        public void setDeathLinkStatus(bool enabled)
+        {
+            if (connected)
+            {
+                if (enabled) deathLink.EnableDeathLink();
+                else deathLink.DisableDeathLink();
+            }
         }
 
         // Sends a new location check to the server
