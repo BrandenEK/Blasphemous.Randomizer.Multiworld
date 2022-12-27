@@ -11,11 +11,13 @@ namespace BlasphemousMultiworld
     {
         public static Multiworld Multiworld;
         public static Randomizer Randomizer;
+        private static Main instance;
 
         private void Awake()
         {
             Randomizer = BlasphemousRandomizer.Main.Randomizer;
             Multiworld = new Multiworld();
+            instance = this;
             Patch();
         }
 
@@ -28,6 +30,15 @@ namespace BlasphemousMultiworld
         {
             Harmony harmony = new Harmony("com.damocles.blasphemous.multiworld");
             harmony.PatchAll();
+        }
+
+        private void Log(string message)
+        {
+            Logger.LogMessage(message);
+        }
+        public static void UnityLog(string message)
+        {
+            instance.Log(message);
         }
     }
 }

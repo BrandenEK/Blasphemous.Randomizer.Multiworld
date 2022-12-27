@@ -11,15 +11,17 @@ namespace BlasphemousMultiworld
 {
     public class Multiworld : PersistentInterface
     {
+        enum DeathLinkStatus { Nothing, Queued, Killing }
+
         // Data
         private Dictionary<string, long> apLocationIds;
         private Sprite[] multiworldImages;
 
         // Connection
         public Connection connection { get; private set; }
+        private DeathLinkStatus deathlink;
         private bool gameStatus;
         private bool sentLocations;
-        private bool currentlyInDeathLink;
         private List<QueuedItem> queuedItems;
         public string receivedPlayer;
 
@@ -97,6 +99,14 @@ namespace BlasphemousMultiworld
             else if (Input.GetKeyDown(KeyCode.Equals))
             {
 
+            }
+
+            // If you received a deathlink & are able to die
+            bool canKill = gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*");
+            if (deathlink == DeathLinkStatus.Queued && canKill)
+            {
+                deathlink = DeathLinkStatus.Killing;
+                Core.Logic.Penitent.KillInstanteneously();
             }
         }
 
@@ -216,9 +226,9 @@ namespace BlasphemousMultiworld
 
         public void sendDeathLink()
         {
-            if (currentlyInDeathLink)
+            if (deathlink == DeathLinkStatus.Killing)
             {
-                currentlyInDeathLink = false;
+                deathlink = DeathLinkStatus.Nothing;
                 return;
             }
 
@@ -244,8 +254,7 @@ namespace BlasphemousMultiworld
         public void receiveDeathLink()
         {
             Main.Randomizer.Log("Received death link!");
-            currentlyInDeathLink = true;
-            Core.Logic.Penitent.KillInstanteneously(); // Needs testing
+            deathlink = DeathLinkStatus.Queued;
         }
 
         public void processItems(bool ignoreLoadingCheck)

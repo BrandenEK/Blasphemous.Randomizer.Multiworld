@@ -27,13 +27,8 @@ namespace BlasphemousMultiworld
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
-                deathLink = session.CreateDeathLinkService();
-
                 session.Items.ItemReceived += recieveItem;
                 session.Socket.SocketClosed += disconnected;
-                deathLink.OnDeathLinkReceived += receiveDeathLink; // Enable or disable it based on settings
-                deathLink.EnableDeathLink();
-
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password == "" ? null : password);
             }
             catch (Exception e)
@@ -66,6 +61,11 @@ namespace BlasphemousMultiworld
             data.gameConfig = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
             data.chosenEnding = int.Parse(login.SlotData["ending"].ToString());
             data.playerName = player;
+
+            // Set up deathlink
+            deathLink = session.CreateDeathLinkService();
+            deathLink.OnDeathLinkReceived += receiveDeathLink; // Enable or disable it based on settings
+            deathLink.EnableDeathLink();
 
             Main.Multiworld.onConnect(locations, data);
             return resultMessage;

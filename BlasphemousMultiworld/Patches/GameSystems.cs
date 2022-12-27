@@ -86,6 +86,21 @@ namespace BlasphemousMultiworld
         }
     }
 
+    // Check if there are any input blockers
+    [HarmonyPatch(typeof(InputManager), "HasBlocker")]
+    public class InputManager_Patch
+    {
+        public static bool Prefix(string name, ref bool __result, List<string> ___inputBlockers)
+        {
+            if (name == "*")
+            {
+                __result = ___inputBlockers.Count > 0 && ___inputBlockers[0] != "PLAYER_LOGIC";
+                return false;
+            }
+            return true;
+        }
+    }
+
     // Initialize Multiworld class
     [HarmonyPatch(typeof(AchievementsManager), "AllInitialized")]
     public class AchievementsManager_InitializePatch
