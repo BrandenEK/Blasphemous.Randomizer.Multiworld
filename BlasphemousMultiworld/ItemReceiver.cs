@@ -27,14 +27,14 @@ namespace BlasphemousMultiworld
         Vector2 hiddenPosition;
         Vector2 visiblePosition;
         float moveFrames = 70;
-        float showTime = 2.5f;
+        float showTime = 2f;
         float endTime = 0.2f;
 
         public ItemReceiver()
         {
             queue = new Queue<QueuedItem>();
-            hiddenPosition = new Vector2(-80, -100);
-            visiblePosition = new Vector2(60, -100);
+            hiddenPosition = new Vector2(-80, -98);
+            visiblePosition = new Vector2(55, -98);
             isShowing = false;
         }
 
@@ -66,7 +66,7 @@ namespace BlasphemousMultiworld
                 // Regular item
                 itemImage.sprite = item.item.getRewardInfo(false).sprite;
             }
-            receivedText.text = "Rec. from:\n" + item.player;
+            receivedText.text = "Found by:\n" + item.player;
             notificationBox.anchoredPosition = hiddenPosition;
             float moveAmount = (visiblePosition.x - hiddenPosition.x) / moveFrames;
 
@@ -79,7 +79,7 @@ namespace BlasphemousMultiworld
 
             // Fully visible
             notificationBox.anchoredPosition = visiblePosition;
-            yield return new WaitForSeconds(showTime);
+            yield return new WaitForSecondsRealtime(showTime);
 
             // Start at visible and move towards hidden
             for (int i = 0; i < moveFrames; i++)
@@ -90,7 +90,7 @@ namespace BlasphemousMultiworld
 
             // Fully hidden
             notificationBox.anchoredPosition = hiddenPosition;
-            yield return new WaitForSeconds(endTime);
+            yield return new WaitForSecondsRealtime(endTime);
 
             if (queue.Count > 0)
             {

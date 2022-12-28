@@ -2,6 +2,7 @@
 using Tools.Playmaker2.Action;
 using Gameplay.GameControllers.Entities;
 using Gameplay.GameControllers.Penitent;
+using Framework.Managers;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -24,14 +25,32 @@ namespace BlasphemousMultiworld.Patches
         }
     }
 
-    // Send deathlink when dead
-    [HarmonyPatch(typeof(Penitent), "OnEntityDead")]
-    public class Penitent_Patch
+    // Send deathlink & prevent dropping guilt fragment
+    [HarmonyPatch(typeof(GuiltManager), "OnPenitentDead")]
+    public class GuiltManager_Patch
     {
-        public static void Postfix(Entity entity)
+        public static void Prefix(ref bool __state)
         {
-            if (entity is Penitent)
+            __state = Core.Logic.Penitent.GuiltDrop;
+            if (Main.Multiworld.deathlink == Multiworld.DeathLinkStatus.Killing)
+            {
+                Core.Logic.Penitent.GuiltDrop = false;
+            }
+        }
+
+        public static void Postfix(bool __state)
+        {
+            Core.Logic.Penitent.GuiltDrop = __state;
+
+            // Send deathlink
+            if (Main.Multiworld.deathlink == Multiworld.DeathLinkStatus.Nothing)
+            {
                 Main.Multiworld.sendDeathLink();
+            }
+            else if (Main.Multiworld.deathlink == Multiworld.DeathLinkStatus.Killing)
+            {
+                Main.Multiworld.deathlink = Multiworld.DeathLinkStatus.Nothing;
+            }
         }
     }
 }

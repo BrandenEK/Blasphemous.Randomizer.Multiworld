@@ -11,7 +11,7 @@ namespace BlasphemousMultiworld
 {
     public class Multiworld : PersistentInterface
     {
-        enum DeathLinkStatus { Nothing, Queued, Killing }
+        public enum DeathLinkStatus { Nothing, Queued, Killing }
 
         // Data
         private Dictionary<string, long> apLocationIds;
@@ -20,7 +20,7 @@ namespace BlasphemousMultiworld
         // Connection
         public Connection connection { get; private set; }
         public ItemReceiver itemReceiver;
-        private DeathLinkStatus deathlink;
+        public DeathLinkStatus deathlink;
         private List<QueuedItem> queuedItems;
 
         // Game
@@ -232,11 +232,6 @@ namespace BlasphemousMultiworld
         public void sendDeathLink()
         {
             if (!gameData.deathLinkEnabled) return;
-            if (deathlink == DeathLinkStatus.Killing)
-            {
-                deathlink = DeathLinkStatus.Nothing;
-                return;
-            }
 
             Main.Randomizer.Log("Sending death link!");
             connection.sendDeathLink();
