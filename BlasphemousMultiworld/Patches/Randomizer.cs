@@ -86,18 +86,4 @@ namespace BlasphemousMultiworld.Patches
             Core.Events.SetFlag("MULTIWORLD", true, false);
         }
     }
-
-    // Show different notification when receiving an item
-    [HarmonyPatch(typeof(Item), "getRewardInfo")]
-    public class Item_Patch
-    {
-        public static void Postfix(ref RewardInfo __result)
-        {
-            if (Main.Multiworld.receivedPlayer != "")
-            {
-                __result.notification = "Receieved from " + Main.Multiworld.receivedPlayer + "!";
-                Main.Multiworld.receivedPlayer = "";
-            }
-        }
-    }
 }

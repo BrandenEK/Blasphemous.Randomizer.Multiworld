@@ -19,16 +19,23 @@ namespace BlasphemousMultiworld
 
         // Connection
         public Connection connection { get; private set; }
+        public ItemReceiver itemReceiver;
         private DeathLinkStatus deathlink;
-        private bool gameStatus;
-        private bool sentLocations;
         private List<QueuedItem> queuedItems;
-        public string receivedPlayer;
 
         // Game
         private Dictionary<string, Item> newItems;
         public GameData gameData;
+        private bool gameStatus;
+        private bool sentLocations;
         private int itemsReceived;
+
+        public Multiworld()
+        {
+            // Set basic initialization for awake
+            gameData = new GameData();
+            itemReceiver = new ItemReceiver();
+        }
 
         public void Initialize()
         {
@@ -36,13 +43,11 @@ namespace BlasphemousMultiworld
             connection = new Connection();
             LevelManager.OnLevelLoaded += onLevelLoaded;
             Core.Persistence.AddPersistentManager(this);
-            receivedPlayer = "";
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
             newItems = new Dictionary<string, Item>();
             queuedItems = new List<QueuedItem>();
-            gameData = new GameData();
 
             // Load external data
             if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, true, out multiworldImages))
@@ -94,13 +99,13 @@ namespace BlasphemousMultiworld
         {
             if (Input.GetKeyDown(KeyCode.Keypad9))
             {
-
+                
             }
             else if (Input.GetKeyDown(KeyCode.Equals))
             {
 
             }
-
+            Main.UnityLog(sentLocations.ToString());
             // If you received a deathlink & are able to die
             if (gameData.deathLinkEnabled && deathlink == DeathLinkStatus.Queued && gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*"))
             {
@@ -282,8 +287,7 @@ namespace BlasphemousMultiworld
                 if (queuedItems[i].index > itemsReceived)
                 {
                     queuedItems[i].item.addToInventory();
-                    receivedPlayer = queuedItems[i].player;
-                    Main.Randomizer.itemShuffler.showItemPopUp(queuedItems[i].item);
+                    itemReceiver.receiveItem(queuedItems[i]);
                     itemsReceived++;
                 }
             }

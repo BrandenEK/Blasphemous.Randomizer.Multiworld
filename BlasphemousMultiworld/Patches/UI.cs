@@ -7,6 +7,7 @@ using BlasphemousRandomizer.UI;
 using Framework.Managers;
 using Gameplay.UI.Widgets;
 using Gameplay.UI.Others;
+using Gameplay.UI.Others.MenuLogic;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -84,6 +85,25 @@ namespace BlasphemousMultiworld.Patches
         public static bool Prefix()
         {
             return false;
+        }
+    }
+
+    // Send receive notification data to the item receiver
+    [HarmonyPatch(typeof(PopupAchievementWidget), "Awake")]
+    public class PopupAchievementWidget_Patch
+    {
+        public static void Postfix(RectTransform ___PopUp)
+        {
+            Main.Multiworld.itemReceiver.backgroundSprite = ___PopUp.GetComponent<Image>().sprite;
+            Main.Multiworld.itemReceiver.textFont = ___PopUp.GetChild(1).GetComponent<Text>().font;
+        }
+    }
+    [HarmonyPatch(typeof(NewInventory_GridItem), "Awake")]
+    public class InvGridItem_Patch
+    {
+        public static void Postfix(Sprite ___backEquipped)
+        {
+            Main.Multiworld.itemReceiver.boxSprite = ___backEquipped;
         }
     }
 }
