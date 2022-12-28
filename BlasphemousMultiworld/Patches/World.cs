@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
 using Tools.Playmaker2.Action;
-using Gameplay.GameControllers.Entities;
-using Gameplay.GameControllers.Penitent;
 using Framework.Managers;
 
 namespace BlasphemousMultiworld.Patches
