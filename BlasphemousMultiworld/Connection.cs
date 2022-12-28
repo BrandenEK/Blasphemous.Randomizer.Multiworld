@@ -60,7 +60,7 @@ namespace BlasphemousMultiworld
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             data.gameConfig = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
             data.chosenEnding = int.Parse(login.SlotData["ending"].ToString());
-            data.deathLinkEnabled = false; // load from slot data
+            data.deathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
             data.playerName = player;
 
             // Set up deathlink
@@ -162,7 +162,7 @@ namespace BlasphemousMultiworld
         // Receives a death link from the server
         private void receiveDeathLink(DeathLink link)
         {
-            Main.Multiworld.receiveDeathLink();
+            Main.Multiworld.receiveDeathLink(link.Source);
         }
 
         // Got disconnected from server

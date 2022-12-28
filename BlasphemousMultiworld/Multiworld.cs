@@ -50,7 +50,7 @@ namespace BlasphemousMultiworld
             queuedItems = new List<QueuedItem>();
 
             // Load external data
-            if (!FileUtil.loadImages("multiworld_item.png", 32, 32, 0, true, out multiworldImages))
+            if (!FileUtil.loadImages("multiworld_images.png", 32, 32, 0, true, out multiworldImages))
                 Main.Randomizer.LogError("Error: Multiworld images could not be loaded!");
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
             if (cherub != null) cherub.name = "Child of Moonlight";
@@ -105,7 +105,7 @@ namespace BlasphemousMultiworld
             {
 
             }
-            Main.UnityLog(sentLocations.ToString());
+            
             // If you received a deathlink & are able to die
             if (gameData.deathLinkEnabled && deathlink == DeathLinkStatus.Queued && gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*"))
             {
@@ -202,7 +202,7 @@ namespace BlasphemousMultiworld
 
         public void sendAllLocations()
         {
-            if (sentLocations || !gameStatus)
+            if (sentLocations || !gameStatus || !connection.connected)
             {
                 return;
             }
@@ -257,13 +257,14 @@ namespace BlasphemousMultiworld
             }
         }
 
-        public void receiveDeathLink()
+        public void receiveDeathLink(string player)
         {
             if (!gameData.deathLinkEnabled) return;
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {
                 Main.Randomizer.Log("Received death link!");
                 deathlink = DeathLinkStatus.Queued;
+                itemReceiver.receiveItem(new QueuedItem(null, 0, player));
             }
         }
 

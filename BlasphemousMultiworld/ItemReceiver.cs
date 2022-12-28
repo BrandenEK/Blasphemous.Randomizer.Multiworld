@@ -56,7 +56,16 @@ namespace BlasphemousMultiworld
         private IEnumerator showReceivedItem(QueuedItem item)
         {
             isShowing = true;
-            itemImage.sprite = item.item.getRewardInfo(false).sprite;
+            if (item.item == null)
+            {
+                // Deathlink
+                itemImage.sprite = Main.Multiworld.getImage(1);
+            }
+            else
+            {
+                // Regular item
+                itemImage.sprite = item.item.getRewardInfo(false).sprite;
+            }
             receivedText.text = "Rec. from:\n" + item.player;
             notificationBox.anchoredPosition = hiddenPosition;
             float moveAmount = (visiblePosition.x - hiddenPosition.x) / moveFrames;
