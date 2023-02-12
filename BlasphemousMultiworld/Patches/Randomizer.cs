@@ -42,7 +42,7 @@ namespace BlasphemousMultiworld.Patches
 
     // Change hint text for other player's items
     [HarmonyPatch(typeof(HintShuffle), "getHintText")]
-    public class HintFillerText_Patch
+    public class HintShuffleText_Patch
     {
         public static void Postfix(ref string __result, string location)
         {

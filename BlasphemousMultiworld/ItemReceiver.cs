@@ -26,8 +26,8 @@ namespace BlasphemousMultiworld
         // Data
         Vector2 hiddenPosition;
         Vector2 visiblePosition;
-        float moveTime = 0.4f;
-        float showTime = 2f;
+        float moveTime = 0.5f;
+        float showTime = 1.8f;
         float endTime = 0.2f;
 
         public ItemReceiver()
@@ -73,7 +73,7 @@ namespace BlasphemousMultiworld
             // Start at hidden and move towards visible
             for (float i = 0; i < moveTime; i += Time.unscaledDeltaTime)
             {
-                notificationBox.anchoredPosition = new Vector2(hiddenPosition.x + positionDifference * i, hiddenPosition.y);
+                notificationBox.anchoredPosition = new Vector2(hiddenPosition.x + positionDifference * (i / moveTime), hiddenPosition.y);
                 yield return new WaitForEndOfFrame();
             }
 
@@ -84,7 +84,7 @@ namespace BlasphemousMultiworld
             // Start at visible and move towards hidden
             for (float i = 0; i < moveTime; i += Time.unscaledDeltaTime)
             {
-                notificationBox.anchoredPosition = new Vector2(visiblePosition.x - positionDifference * i, visiblePosition.y);
+                notificationBox.anchoredPosition = new Vector2(visiblePosition.x - positionDifference * (i / moveTime), visiblePosition.y);
                 yield return new WaitForEndOfFrame();
             }
 
