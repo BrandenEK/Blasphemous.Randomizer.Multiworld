@@ -26,7 +26,7 @@ namespace BlasphemousMultiworld
         // Data
         Vector2 hiddenPosition;
         Vector2 visiblePosition;
-        float moveFrames = 70;
+        float moveTime = 0.4f;
         float showTime = 2f;
         float endTime = 0.2f;
 
@@ -68,12 +68,12 @@ namespace BlasphemousMultiworld
             }
             receivedText.text = "Found by:\n" + item.player;
             notificationBox.anchoredPosition = hiddenPosition;
-            float moveAmount = (visiblePosition.x - hiddenPosition.x) / moveFrames;
+            float positionDifference = visiblePosition.x - hiddenPosition.x;
 
             // Start at hidden and move towards visible
-            for (int i = 0; i < moveFrames; i++)
+            for (float i = 0; i < moveTime; i += Time.unscaledDeltaTime)
             {
-                notificationBox.anchoredPosition = new Vector2(hiddenPosition.x + moveAmount * i, hiddenPosition.y);
+                notificationBox.anchoredPosition = new Vector2(hiddenPosition.x + positionDifference * i, hiddenPosition.y);
                 yield return new WaitForEndOfFrame();
             }
 
@@ -82,9 +82,9 @@ namespace BlasphemousMultiworld
             yield return new WaitForSecondsRealtime(showTime);
 
             // Start at visible and move towards hidden
-            for (int i = 0; i < moveFrames; i++)
+            for (float i = 0; i < moveTime; i += Time.unscaledDeltaTime)
             {
-                notificationBox.anchoredPosition = new Vector2(visiblePosition.x - moveAmount * i, visiblePosition.y);
+                notificationBox.anchoredPosition = new Vector2(visiblePosition.x - positionDifference * i, visiblePosition.y);
                 yield return new WaitForEndOfFrame();
             }
 
