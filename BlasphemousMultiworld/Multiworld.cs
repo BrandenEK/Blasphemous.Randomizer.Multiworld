@@ -4,12 +4,12 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.Structures;
 using BlasphemousRandomizer.Config;
 using BlasphemousMultiworld.Structures;
-using Framework.FrameworkCore;
 using Framework.Managers;
+using ModdingAPI;
 
 namespace BlasphemousMultiworld
 {
-    public class Multiworld : PersistentInterface
+    public class Multiworld : PersistentMod
     {
         public enum DeathLinkStatus { Nothing, Queued, Killing }
 
@@ -19,6 +19,9 @@ namespace BlasphemousMultiworld
 
         // Connection
         public Connection connection { get; private set; }
+
+        public override string PersistentID { get { return "ID_MULTIWORLD"; } }
+
         public ItemReceiver itemReceiver;
         public DeathLinkStatus deathlink;
         private List<QueuedItem> queuedItems;
@@ -30,19 +33,20 @@ namespace BlasphemousMultiworld
         private bool sentLocations;
         private int itemsReceived;
 
-        public Multiworld()
+        public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion)
         {
             // Set basic initialization for awake
             gameData = new GameData();
             itemReceiver = new ItemReceiver();
         }
 
-        public void Initialize()
+        protected override void Initialize()
         {
+            base.Initialize();
+            RegisterCommand(new MultiworldCommand());
+
             // Create new connection
             connection = new Connection();
-            LevelManager.OnLevelLoaded += onLevelLoaded;
-            Core.Persistence.AddPersistentManager(this);
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
@@ -50,7 +54,7 @@ namespace BlasphemousMultiworld
             queuedItems = new List<QueuedItem>();
 
             // Load external data
-            if (!FileUtil.loadImages("multiworld_images.png", 32, 32, 0, true, out multiworldImages))
+            if (!FileUtil.loadDataImages("multiworld_images.png", 32, 32, 0, true, out multiworldImages))
                 Main.Randomizer.LogError("Error: Multiworld images could not be loaded!");
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
             if (cherub != null) cherub.name = "Child of Moonlight";
@@ -58,13 +62,7 @@ namespace BlasphemousMultiworld
             Main.Randomizer.Log("Multiworld has been initialized!");
         }
 
-        public void Dispose()
-        {
-            LevelManager.OnLevelLoaded -= onLevelLoaded;
-        }
-
-        // Save game data
-        public PersistentManager.PersistentData GetCurrentPersistentState(string dataPath, bool fullSave)
+        public override ModPersistentData SaveGame()
         {
             return new MultiworldPersistenceData
             {
@@ -72,8 +70,7 @@ namespace BlasphemousMultiworld
             };
         }
 
-        // Load game data
-        public void SetCurrentPersistentState(PersistentManager.PersistentData data, bool isloading, string dataPath)
+        public override void LoadGame(ModPersistentData data)
         {
             MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
             if (multiworldData != null)
@@ -82,20 +79,21 @@ namespace BlasphemousMultiworld
             }
         }
 
-        // Load new game
-        public void newGame()
+        public override void NewGame()
         {
             itemsReceived = 0;
         }
 
-        private void onLevelLoaded(Level oldLevel, Level newLevel)
+        public override void ResetGame() { }
+
+        protected override void LevelLoaded(string oldLevel, string newLevel)
         {
-            gameStatus = newLevel.LevelName != "MainMenu";
+            gameStatus = newLevel != "MainMenu";
             processItems(true);
             sendAllLocations();
         }
         
-        public void update()
+        protected override void Update()
         {
             if (Input.GetKeyDown(KeyCode.Keypad9))
             {
@@ -294,12 +292,5 @@ namespace BlasphemousMultiworld
         {
             return idx >= 0 && idx < multiworldImages.Length ? multiworldImages[idx] : null;
         }
-
-        public string GetPersistenID() { return "ID_MULTIWORLD"; }
-
-        public int GetOrder() { return 0; }
-
-        public void ResetPersistence() { }
-
     }
 }

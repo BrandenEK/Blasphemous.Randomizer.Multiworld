@@ -1,10 +1,10 @@
 ﻿using System;
-using Framework.Managers;
+using ModdingAPI;
 
 namespace BlasphemousMultiworld
 {
     [Serializable]
-    public class MultiworldPersistenceData : PersistentManager.PersistentData
+    public class MultiworldPersistenceData : ModPersistentData
     {
         public MultiworldPersistenceData() : base("ID_MULTIWORLD") { }
 

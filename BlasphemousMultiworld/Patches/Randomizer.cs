@@ -57,16 +57,6 @@ namespace BlasphemousMultiworld.Patches
         }
     }
 
-    // Load data on new game
-    [HarmonyPatch(typeof(Randomizer), "newGame")]
-    public class RandomizerNew_Patch
-    {
-        public static void Postfix()
-        {
-            Main.Multiworld.newGame();
-        }
-    }
-
     // Send location check when giving item
     [HarmonyPatch(typeof(ItemShuffle), "giveItem")]
     public class ItemShuffleLocation_Patch

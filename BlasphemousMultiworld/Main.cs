@@ -1,44 +1,25 @@
 ﻿using BepInEx;
-using HarmonyLib;
 using BlasphemousRandomizer;
 
 namespace BlasphemousMultiworld
 {
-    [BepInPlugin("com.damocles.blasphemous.multiworld", "Blasphemous Multiworld", PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("com.damocles.blasphemous.randomizer", "1.2.1")]
+    [BepInPlugin(MOD_ID, MOD_NAME, MOD_VERSION)]
+    [BepInDependency("com.damocles.blasphemous.modding-api", "1.0.0")]
+    [BepInDependency("com.damocles.blasphemous.randomizer", "1.3.0")]
     [BepInProcess("Blasphemous.exe")]
     public class Main : BaseUnityPlugin
     {
+        public const string MOD_ID = "com.damocles.blasphemous.multiworld";
+        public const string MOD_NAME = "Multiworld";
+        public const string MOD_VERSION = "1.0.0";
+
         public static Multiworld Multiworld;
         public static Randomizer Randomizer;
-        private static Main instance;
 
-        private void Awake()
+        private void Start()
         {
             Randomizer = BlasphemousRandomizer.Main.Randomizer;
-            Multiworld = new Multiworld();
-            instance = this;
-            Patch();
-        }
-
-        private void Update()
-        {
-            Multiworld.update();
-        }
-
-        private void Patch()
-        {
-            Harmony harmony = new Harmony("com.damocles.blasphemous.multiworld");
-            harmony.PatchAll();
-        }
-
-        private void Log(string message)
-        {
-            Logger.LogMessage(message);
-        }
-        public static void UnityLog(string message)
-        {
-            instance.Log(message);
+            Multiworld = new Multiworld(MOD_ID, MOD_NAME, MOD_VERSION);
         }
     }
 }

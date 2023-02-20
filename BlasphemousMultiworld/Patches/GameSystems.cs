@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 using Gameplay.UI.Widgets;
-using Gameplay.UI.Console;
 using Gameplay.UI.Others.MenuLogic;
 using BlasphemousRandomizer.UI;
 using Framework.Managers;
@@ -9,16 +8,6 @@ using UnityEngine.UI;
 
 namespace BlasphemousMultiworld
 {
-    // Add multiworld commands to console
-    [HarmonyPatch(typeof(ConsoleWidget), "InitializeCommands")]
-    public class Console_Patch
-    {
-        public static void Postfix(List<ConsoleCommand> ___commands)
-        {
-            ___commands.Add(new MultiworldCommand());
-        }
-    }
-
     // Show whether a save file was started in multiworld
     [HarmonyPatch(typeof(SelectSaveSlots), "SetAllData")]
     public class SelectSaveSlotsData_Patch
@@ -98,25 +87,6 @@ namespace BlasphemousMultiworld
                 return false;
             }
             return true;
-        }
-    }
-
-    // Initialize Multiworld class
-    [HarmonyPatch(typeof(AchievementsManager), "AllInitialized")]
-    public class AchievementsManager_InitializePatch
-    {
-        public static void Postfix()
-        {
-            Main.Multiworld.Initialize();
-        }
-    }
-    // Dispose Multiworld class
-    [HarmonyPatch(typeof(AchievementsManager), "Dispose")]
-    public class AchievementsManager_DisposePatch
-    {
-        public static void Postfix()
-        {
-            Main.Multiworld.Dispose();
         }
     }
 }
