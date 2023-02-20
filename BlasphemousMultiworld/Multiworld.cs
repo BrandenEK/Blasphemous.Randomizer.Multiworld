@@ -20,7 +20,7 @@ namespace BlasphemousMultiworld
         // Connection
         public Connection connection { get; private set; }
 
-        public override string PersistentID { get { return "ID_MULTIWORLD"; } }
+        public override string PersistentID => "ID_MULTIWORLD";
 
         public ItemReceiver itemReceiver;
         public DeathLinkStatus deathlink;
@@ -42,7 +42,6 @@ namespace BlasphemousMultiworld
 
         protected override void Initialize()
         {
-            base.Initialize();
             RegisterCommand(new MultiworldCommand());
 
             // Create new connection
