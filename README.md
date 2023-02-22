@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-- [Installation]()
-- [Available commands]()
+- [Installation](https://github.com/BrandenEK/Blasphemous-Multiworld#installation)
+- [Available commands](https://github.com/BrandenEK/Blasphemous-Multiworld#available-commands)
 
 ---
 
