@@ -13,8 +13,8 @@
 2. Follow the instructions there on how to install the api
 3. Download the latest release of the Randomizer from https://github.com/BrandenEK/Blasphemous-Randomizer/releases
 4. Follow the instructions there on how to install the randomizer
-5. Download the latest release of the Multiworld client from the releases page
-6. Extract the contents of the zip file into the "Modding" folder
+5. Download the latest release of the Multiworld client from the [Releases](https://github.com/BrandenEK/Blasphemous-Multiworld/releases) page
+6. Extract the contents of the BlasphemousMultiworld.zip file into the "Modding" folder
 
 ---
 
