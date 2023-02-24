@@ -22,7 +22,7 @@ namespace BlasphemousMultiworld.Patches
         public static void Postfix(ref Text ___descriptionText, GameObject ___settingsMenu, bool ___menuActive)
         {
             if (___settingsMenu != null && ___menuActive)
-                ___descriptionText.text = "Configuration settings have been determined by Multiworld";
+                ___descriptionText.text = Main.Multiworld.Localize("config");
         }
     }
     [HarmonyPatch(typeof(SettingsMenu), "processKeyInput")]

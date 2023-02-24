@@ -21,11 +21,11 @@ namespace BlasphemousMultiworld
                     continue;
 
                 // Check if this save file was played in multiworld
-                string type = "(Vanilla)";
+                string type = $"({Main.Multiworld.Localize("vandis")})";
                 if (slotData.flags.flags.ContainsKey("MULTIWORLD"))
-                    type = "(Multiworld)";
+                    type = $"({Main.Multiworld.Localize("muldis")})";
                 else if (slotData.flags.flags.ContainsKey("RANDOMIZED"))
-                    type = "(Singleworld)";
+                    type = $"({Main.Multiworld.Localize("sindis")})";
 
                 // Send extra info to the slot
                 ___slots[i].SetData("ignorealso", type, 0, false, false, false, 0, SelectSaveSlots.SlotsModes.Normal);
@@ -55,7 +55,7 @@ namespace BlasphemousMultiworld
         {
             if (!Main.Multiworld.connection.connected)
             {
-                Main.Randomizer.LogDisplay("Not connected to a multiworld server!");
+                Main.Randomizer.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;
             }
             return true;
@@ -68,7 +68,7 @@ namespace BlasphemousMultiworld
         {
             if (!Main.Multiworld.connection.connected)
             {
-                Main.Randomizer.LogDisplay("Not connected to a multiworld server!");
+                Main.Randomizer.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;
             }
             return true;

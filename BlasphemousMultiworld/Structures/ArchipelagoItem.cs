@@ -18,7 +18,7 @@ namespace BlasphemousMultiworld.Structures
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {
-            return new RewardInfo(name, "An item that belongs to " + playerName + ".", "Sending to " + playerName + "!", Main.Multiworld.getImage(0));
+            return new RewardInfo(name, $"{Main.Multiworld.Localize("ardesc")} {playerName}.", $"{Main.Multiworld.Localize("arnot")} {playerName}!", Main.Multiworld.getImage(0));
         }
     }
 }

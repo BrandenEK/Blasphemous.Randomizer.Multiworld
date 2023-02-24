@@ -1,0 +1,2 @@
+keys: found~ardesc~arnot~vandis~muldis~sindis~conerr~config
+en: Found by~An item that belongs to~Sending to~Vanilla~Multiworld~Singleworld~Not connected to a multiworld server~Configuration settings have been determined by Multiworld

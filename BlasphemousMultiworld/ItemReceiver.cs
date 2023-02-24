@@ -66,7 +66,7 @@ namespace BlasphemousMultiworld
                 // Regular item
                 itemImage.sprite = item.item.getRewardInfo(false).sprite;
             }
-            receivedText.text = "Found by:\n" + item.player;
+            receivedText.text = Main.Multiworld.Localize("found") + ":\n" + item.player;
             notificationBox.anchoredPosition = hiddenPosition;
             float positionDifference = visiblePosition.x - hiddenPosition.x;
 
