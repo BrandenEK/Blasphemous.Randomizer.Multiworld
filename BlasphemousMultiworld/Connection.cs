@@ -29,7 +29,7 @@ namespace BlasphemousMultiworld
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += recieveItem;
                 session.Socket.SocketClosed += disconnected;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password == "" ? null : password);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password);
             }
             catch (Exception e)
             {

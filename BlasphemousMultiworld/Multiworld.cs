@@ -113,11 +113,6 @@ namespace BlasphemousMultiworld
 
         public string tryConnect(string server, string playerName, string password)
         {
-            // Check if not in game & not connected
-            if (connection.connected)
-            {
-                return "Already connected to a server!";
-            }
             string result = connection.Connect(server, playerName, password); // Check if not in game first ?
             Main.Randomizer.Log(result);
             return result;
