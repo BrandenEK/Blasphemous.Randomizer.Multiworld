@@ -155,6 +155,8 @@ namespace BlasphemousMultiworld
         private void recieveItem(ReceivedItemsHelper helper)
         {
             string player = session.Players.GetPlayerName(helper.PeekItem().Player);
+            if (player == null || player == "") player = "Server";
+
             Main.Multiworld.receiveItem(helper.PeekItemName(), helper.Index, player);
             helper.DequeueItem();
         }

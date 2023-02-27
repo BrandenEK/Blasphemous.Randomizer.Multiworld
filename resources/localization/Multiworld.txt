@@ -1,2 +1,3 @@
-keys: found~ardesc~arnot~vandis~muldis~sindis~conerr~config
-en: Found by~An item that belongs to~Sending to~Vanilla~Multiworld~Singleworld~Not connected to a multiworld server~Configuration settings have been determined by Multiworld
+keys:found~ardesc~arnot~vandis~muldis~sindis~conerr~config
+en:Found by~An item that belongs to~Sending to~Vanilla~Multiworld~Singleworld~Not connected to a multiworld server~Configuration settings have been determined by Multiworld
+zh:发现者~该物品的所有者为~给予~原版~多世界~单世界~未连接至多世界服务器~设置已被多世界服务器决定
