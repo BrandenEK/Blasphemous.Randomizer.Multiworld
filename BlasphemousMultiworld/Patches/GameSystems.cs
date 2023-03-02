@@ -55,7 +55,7 @@ namespace BlasphemousMultiworld
         {
             if (!Main.Multiworld.connection.connected)
             {
-                Main.Randomizer.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
+                Main.Multiworld.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;
             }
             return true;
@@ -68,7 +68,7 @@ namespace BlasphemousMultiworld
         {
             if (!Main.Multiworld.connection.connected)
             {
-                Main.Randomizer.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
+                Main.Multiworld.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;
             }
             return true;

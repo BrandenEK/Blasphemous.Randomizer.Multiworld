@@ -4,7 +4,7 @@ using BlasphemousRandomizer;
 namespace BlasphemousMultiworld
 {
     [BepInPlugin(MOD_ID, MOD_NAME, MOD_VERSION)]
-    [BepInDependency("com.damocles.blasphemous.modding-api", "1.1.0")]
+    [BepInDependency("com.damocles.blasphemous.modding-api", "1.1.1")]
     [BepInDependency("com.damocles.blasphemous.randomizer", "1.4.0")]
     [BepInProcess("Blasphemous.exe")]
     public class Main : BaseUnityPlugin

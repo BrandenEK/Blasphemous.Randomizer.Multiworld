@@ -54,11 +54,11 @@ namespace BlasphemousMultiworld
 
             // Load external data
             if (!FileUtil.loadDataImages("multiworld_images.png", 32, 32, 0, true, out multiworldImages))
-                Main.Randomizer.LogError("Error: Multiworld images could not be loaded!");
+                Main.Multiworld.LogError("Error: Multiworld images could not be loaded!");
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
             if (cherub != null) cherub.name = "Child of Moonlight";
 
-            Main.Randomizer.Log("Multiworld has been initialized!");
+            Main.Multiworld.Log("Multiworld has been initialized!");
         }
 
         public override ModPersistentData SaveGame()
@@ -114,7 +114,7 @@ namespace BlasphemousMultiworld
         public string tryConnect(string server, string playerName, string password)
         {
             string result = connection.Connect(server, playerName, password); // Check if not in game first ?
-            Main.Randomizer.Log(result);
+            Main.Multiworld.Log(result);
             return result;
         }
 
@@ -140,7 +140,7 @@ namespace BlasphemousMultiworld
                         newItems.Add(locations[i].id, item);
                     else
                     {
-                        Main.Randomizer.LogError("Item " + locations[i].name + " doesn't exist!");
+                        Main.Multiworld.LogError("Item " + locations[i].name + " doesn't exist!");
                         continue;
                     }
                 }
@@ -152,13 +152,13 @@ namespace BlasphemousMultiworld
             }
 
             // newItems has been filled with new shuffled items
-            Main.Randomizer.Log("Game variables have been loaded from multiworld!");
+            Main.Multiworld.Log("Game variables have been loaded from multiworld!");
             sendAllLocations();
         }
 
         public void onDisconnect()
         {
-            Main.Randomizer.LogDisplay("Disconnected from multiworld server!");
+            Main.Multiworld.LogDisplay("Disconnected from multiworld server!");
             sentLocations = false;
         }
         
@@ -189,7 +189,7 @@ namespace BlasphemousMultiworld
             if (apLocationIds.ContainsKey(location))
                 connection.sendLocation(apLocationIds[location]);
             else
-                Main.Randomizer.Log("Location " + location + " does not exist in the multiworld!");
+                Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
         }
 
         public void sendAllLocations()
@@ -207,7 +207,7 @@ namespace BlasphemousMultiworld
                     checkedLocations.Add(apLocationIds[location]);
             }
 
-            Main.Randomizer.Log($"Sending all locations ({checkedLocations.Count})");
+            Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count})");
             connection.sendLocations(checkedLocations.ToArray());
             sentLocations = true;
         }
@@ -216,7 +216,7 @@ namespace BlasphemousMultiworld
         {
             if (ending >= gameData.chosenEnding)
             {
-                Main.Randomizer.Log($"Completing goal {gameData.chosenEnding} with ending {ending}!");
+                Main.Multiworld.Log($"Completing goal {gameData.chosenEnding} with ending {ending}!");
                 connection.sendGoal();
             }
         }
@@ -225,13 +225,13 @@ namespace BlasphemousMultiworld
         {
             if (!gameData.deathLinkEnabled) return;
 
-            Main.Randomizer.Log("Sending death link!");
+            Main.Multiworld.Log("Sending death link!");
             connection.sendDeathLink();
         }
 
         public void receiveItem(string itemName, int index, string player)
         {
-            Main.Randomizer.Log("Receiving item: " + itemName);
+            Main.Multiworld.Log("Receiving item: " + itemName);
             Item item = itemExists(itemName);
             if (item != null)
             {
@@ -240,7 +240,7 @@ namespace BlasphemousMultiworld
             }
             else
             {
-                Main.Randomizer.LogDisplay("Error: " + itemName + " doesn't exist!");
+                Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
             }
         }
 
@@ -249,7 +249,7 @@ namespace BlasphemousMultiworld
             if (!gameData.deathLinkEnabled) return;
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {
-                Main.Randomizer.Log("Received death link!");
+                Main.Multiworld.Log("Received death link!");
                 deathlink = DeathLinkStatus.Queued;
                 itemReceiver.receiveItem(new QueuedItem(null, 0, player));
             }
@@ -259,7 +259,7 @@ namespace BlasphemousMultiworld
         {
             gameData.deathLinkEnabled = !gameData.deathLinkEnabled;
             connection.setDeathLinkStatus(gameData.deathLinkEnabled);
-            Main.Randomizer.Log("Setting deathlink status to " + gameData.deathLinkEnabled.ToString());
+            Main.Multiworld.Log("Setting deathlink status to " + gameData.deathLinkEnabled.ToString());
             return gameData.deathLinkEnabled;
         }
 
@@ -271,7 +271,7 @@ namespace BlasphemousMultiworld
 
             for (int i = 0; i < queuedItems.Count; i++)
             {
-                Main.Randomizer.Log($"Item '{queuedItems[i].item.id}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
+                Main.Multiworld.Log($"Item '{queuedItems[i].item.id}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
                 if (queuedItems[i].index > itemsReceived)
                 {
                     queuedItems[i].item.addToInventory();

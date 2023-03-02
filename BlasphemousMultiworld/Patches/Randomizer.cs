@@ -35,7 +35,7 @@ namespace BlasphemousMultiworld.Patches
         {
             Main.Multiworld.modifyNewItems(ref ___newItems);
             Main.Randomizer.totalItems = ___newItems.Count;
-            Main.Randomizer.Log(___newItems.Count + " items have been inserted from multiworld!");
+            Main.Multiworld.Log(___newItems.Count + " items have been inserted from multiworld!");
             return false;
         }
     }

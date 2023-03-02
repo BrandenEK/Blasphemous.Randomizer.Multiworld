@@ -106,7 +106,7 @@ namespace BlasphemousMultiworld
         {
             if (backgroundSprite == null || boxSprite == null || textFont == null)
                 return;
-            Main.Randomizer.Log("Creating item receiver notification box!");
+            Main.Multiworld.Log("Creating item receiver notification box!");
 
             // Find correct canvas
             Transform parent = null;
