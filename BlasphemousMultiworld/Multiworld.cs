@@ -22,7 +22,7 @@ namespace BlasphemousMultiworld
 
         public override string PersistentID => "ID_MULTIWORLD";
 
-        public ItemReceiver itemReceiver;
+        public ItemReceiver itemReceiver { get; private set; }
         public DeathLinkStatus deathlink;
         private List<QueuedItem> queuedItems;
 
@@ -53,7 +53,7 @@ namespace BlasphemousMultiworld
             queuedItems = new List<QueuedItem>();
 
             // Load external data
-            if (!FileUtil.loadDataImages("multiworld_images.png", 32, 32, 0, true, out multiworldImages))
+            if (!FileUtil.loadDataImages("multiworld_images.png", 32, 32, 32, 0, true, out multiworldImages))
                 Main.Multiworld.LogError("Error: Multiworld images could not be loaded!");
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
             if (cherub != null) cherub.name = "Child of Moonlight";

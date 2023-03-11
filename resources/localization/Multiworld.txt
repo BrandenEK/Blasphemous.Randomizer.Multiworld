@@ -1,3 +1,29 @@
-keys:found~ardesc~arnot~vandis~muldis~sindis~conerr~config
-en:Found by~An item that belongs to~Sending to~Vanilla~Multiworld~Singleworld~Not connected to a multiworld server~Configuration settings have been determined by Multiworld
-zh:发现者~该物品的所有者为~给予~原版~多世界~单世界~未连接至多世界服务器~设置已被多世界服务器决定
+lang: en
+found: Found by
+ardesc: An item that belongs to
+arnot: Sending to
+vandis: Vanilla
+muldis: Multiworld
+sindis: Singleworld
+conerr: Not connected to a multiworld server
+config: Configuration settings have been determined by Multiworld
+
+lang: es
+found: Encontrado por
+ardesc: Un objeto que pertenece a
+arnot: Enviando a
+vandis: Vanilla
+muldis: Multimundo
+sindis: Mundo Un jugador
+conerr: No te has conectado a un servidor multijugador
+config: El Multimundo ha establecido los ajustes
+
+lang: zh
+found: 发现者
+ardesc: 该物品的所有者为
+arnot: 给予
+vandis: 原版
+muldis: 多世界
+sindis: 单世界
+conerr: 未连接至多世界服务器
+config: 设置已被多世界服务器决定
