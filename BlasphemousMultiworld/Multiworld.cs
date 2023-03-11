@@ -23,12 +23,12 @@ namespace BlasphemousMultiworld
         public override string PersistentID => "ID_MULTIWORLD";
 
         public ItemReceiver itemReceiver { get; private set; }
+        public GameData gameData { get; private set; }
         public DeathLinkStatus deathlink;
         private List<QueuedItem> queuedItems;
 
         // Game
         private Dictionary<string, Item> newItems;
-        public GameData gameData;
         private bool gameStatus;
         private bool sentLocations;
         private int itemsReceived;
