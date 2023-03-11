@@ -4,6 +4,7 @@
 
 - [Installation](https://github.com/BrandenEK/Blasphemous-Multiworld#installation)
 - [Available commands](https://github.com/BrandenEK/Blasphemous-Multiworld#available-commands)
+- [Translations](https://github.com/BrandenEK/Blasphemous-Multiworld#translations)
 
 ---
 
@@ -30,3 +31,11 @@
 | `multiworld disconnect` | none | Disconnect from current server |
 | `multiworld deathlink` | none | Toggles deathlink on/off |
 | `multiworld players` | none | List all players in this multiworld |
+
+---
+
+## Translations
+
+This mod is available in these other languages in addition to English:
+- Spanish (Thanks to Rodol J. "ConanCimmerio" Pérez (Ro))
+- Chinese (Thanks to NewbieElton)
