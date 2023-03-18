@@ -27,3 +27,13 @@ muldis: 多世界
 sindis: 单世界
 conerr: 未连接至多世界服务器
 config: 设置已被多世界服务器决定
+
+lang: fr
+found: Créé par
+ardesc: Un objet appartenant à
+arnot: Envoi à
+vandis: Vanilla
+muldis: Multi-monde
+sindis: Mono-monde
+conerr: Non connecté à un serveur multi-monde
+config: Les paramètres de configuration ont été déterminées par Multi-monde
