@@ -78,7 +78,7 @@ namespace BlasphemousMultiworld
             }
         }
 
-        public override void NewGame()
+        public override void NewGame(bool NGPlus)
         {
             itemsReceived = 0;
         }
