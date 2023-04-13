@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Installation](https://github.com/BrandenEK/Blasphemous-Multiworld#installation)
+- [Connecting to Archipelago](https://github.com/BrandenEK/Blasphemous-Multiworld#connecting-to-archipelago)
 - [Available commands](https://github.com/BrandenEK/Blasphemous-Multiworld#available-commands)
 - [Translations](https://github.com/BrandenEK/Blasphemous-Multiworld#translations)
 
@@ -16,6 +17,13 @@
 4. Follow the instructions there on how to install the randomizer
 5. Download the latest release of the Multiworld client from the [Releases](https://github.com/BrandenEK/Blasphemous-Multiworld/releases) page
 6. Extract the contents of the BlasphemousMultiworld.zip file into the "Modding" folder
+
+---
+
+## Connecting to Archipelago
+1. On the main menu screen, press 'backslash' to open up the debug console
+2. Use the connect command to connect to the archipelago server
+    - Example command: ```multiworld connect archipelago.gg:58604 TestName```
 
 ---
 
