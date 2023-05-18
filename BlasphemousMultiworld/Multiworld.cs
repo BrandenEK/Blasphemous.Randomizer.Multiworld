@@ -174,7 +174,7 @@ namespace BlasphemousMultiworld
         public void sendLocation(string location)
         {
             if (apLocationIds.ContainsKey(location))
-                connection.sendLocation(apLocationIds[location]);
+                connection.SendLocation(apLocationIds[location]);
             else
                 Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
         }
@@ -195,7 +195,7 @@ namespace BlasphemousMultiworld
             }
 
             Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count})");
-            connection.sendLocations(checkedLocations.ToArray());
+            connection.SendMultipleLocations(checkedLocations.ToArray());
             sentLocations = true;
         }
 
@@ -219,7 +219,7 @@ namespace BlasphemousMultiworld
             if (!MultiworldSettings.DeathLinkEnabled) return;
 
             Main.Multiworld.Log("Sending death link!");
-            connection.sendDeathLink();
+            connection.SendDeath();
         }
 
         public void receiveDeathLink(string player)
@@ -238,7 +238,7 @@ namespace BlasphemousMultiworld
         {
             bool newDeathLinkEnabled = !MultiworldSettings.DeathLinkEnabled;
             MultiworldSettings.DeathLinkEnabled = newDeathLinkEnabled;
-            connection.setDeathLinkStatus(newDeathLinkEnabled);
+            connection.SetDeathLinkStatus(newDeathLinkEnabled);
             Main.Multiworld.Log("Setting deathlink status to " + newDeathLinkEnabled.ToString());
             return newDeathLinkEnabled;
         }
@@ -270,7 +270,7 @@ namespace BlasphemousMultiworld
             if (ending >= MultiworldSettings.RequiredEnding)
             {
                 Main.Multiworld.Log($"Completing goal {MultiworldSettings.RequiredEnding} with ending {ending}!");
-                connection.sendGoal();
+                connection.SendGoal();
             }
         }
 

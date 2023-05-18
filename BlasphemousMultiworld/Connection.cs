@@ -17,6 +17,8 @@ namespace BlasphemousMultiworld
 
         public bool connected { get; private set; }
 
+        public string ServerAddress => connected ? session.Socket.Uri.ToString() : string.Empty;
+
         public string Connect(string server, string player, string password)
         {
             // Create login
@@ -27,8 +29,8 @@ namespace BlasphemousMultiworld
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
-                session.Items.ItemReceived += recieveItem;
-                session.Socket.SocketClosed += disconnected;
+                session.Items.ItemReceived += ReceiveItem;
+                session.Socket.SocketClosed += OnDisconnect;
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password);
             }
             catch (Exception e)
@@ -65,8 +67,8 @@ namespace BlasphemousMultiworld
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
-            deathLink.OnDeathLinkReceived += receiveDeathLink;
-            setDeathLinkStatus(data.DeathLinkEnabled);
+            deathLink.OnDeathLinkReceived += ReceiveDeath;
+            SetDeathLinkStatus(data.DeathLinkEnabled);
 
             Main.Multiworld.onConnect(locations, data);
             return resultMessage;
@@ -82,48 +84,24 @@ namespace BlasphemousMultiworld
             }
         }
 
-        // Returns a list of player names, or if unconnected then an empty list
-        public string[] getPlayers()
+        private void OnDisconnect(string reason)
         {
-            //if (connected)
-            //{
-            //    string[] players = new string[session.Players.AllPlayers.Count];
-            //    for (int i = 0; i < session.Players.AllPlayers.Count; i++)
-            //    {
-            //        players[i] = session.Players.AllPlayers[i].Name;
-            //    }
-            //    return players;
-            //}
-            return new string[0];
+            Main.Multiworld.onDisconnect();
+            connected = false;
+            session = null;
         }
 
-        public string getServer()
-        {
-            if (connected)
-            {
-                return session.Socket.Uri.ToString();
-            }
-            return "";
-        }
+        #region Locations, items, & goal
 
-        public void setDeathLinkStatus(bool enabled)
-        {
-            if (connected)
-            {
-                if (enabled) deathLink.EnableDeathLink();
-                else deathLink.DisableDeathLink();
-            }
-        }
-
-        // Sends a new location check to the server
-        public void sendLocation(long apLocationId)
+        public void SendLocation(long apLocationId)
         {
             if (connected)
             {
                 session.Locations.CompleteLocationChecks(apLocationId);
             }
         }
-        public void sendLocations(long[] apLocationIds)
+
+        public void SendMultipleLocations(long[] apLocationIds)
         {
             if (connected)
             {
@@ -131,8 +109,16 @@ namespace BlasphemousMultiworld
             }
         }
 
-        // Sends goal completion to the server
-        public void sendGoal()
+        private void ReceiveItem(ReceivedItemsHelper helper)
+        {
+            string player = session.Players.GetPlayerName(helper.PeekItem().Player);
+            if (player == null || player == string.Empty) player = "Server";
+
+            Main.Multiworld.receiveItem(helper.PeekItemName(), helper.Index, player);
+            helper.DequeueItem();
+        }
+
+        public void SendGoal()
         {
             if (connected)
             {
@@ -142,8 +128,11 @@ namespace BlasphemousMultiworld
             }
         }
 
-        // Sends player death to the server
-        public void sendDeathLink()
+        #endregion Locations, items, & goal
+
+        #region Death link
+
+        public void SendDeath()
         {
             if (connected)
             {
@@ -151,28 +140,20 @@ namespace BlasphemousMultiworld
             }
         }
 
-        // Recieves a new item from the server
-        private void recieveItem(ReceivedItemsHelper helper)
-        {
-            string player = session.Players.GetPlayerName(helper.PeekItem().Player);
-            if (player == null || player == "") player = "Server";
-
-            Main.Multiworld.receiveItem(helper.PeekItemName(), helper.Index, player);
-            helper.DequeueItem();
-        }
-
-        // Receives a death link from the server
-        private void receiveDeathLink(DeathLink link)
+        private void ReceiveDeath(DeathLink link)
         {
             Main.Multiworld.receiveDeathLink(link.Source);
         }
 
-        // Got disconnected from server
-        private void disconnected(string reason)
+        public void SetDeathLinkStatus(bool enabled)
         {
-            Main.Multiworld.onDisconnect();
-            connected = false;
-            session = null;
+            if (connected)
+            {
+                if (enabled) deathLink.EnableDeathLink();
+                else deathLink.DisableDeathLink();
+            }
         }
+
+        #endregion Death link
     }
 }

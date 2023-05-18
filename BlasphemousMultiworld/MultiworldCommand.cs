@@ -19,7 +19,7 @@ namespace BlasphemousMultiworld
                 { "connect", Connect },
                 { "disconnect", Disconnect },
                 { "deathlink", Deathlink },
-                { "players", Players }
+                //{ "players", Players }
             };
         }
 
@@ -32,15 +32,15 @@ namespace BlasphemousMultiworld
             Write("multiworld connect SERVER NAME [PASSWORD]: Connect to SERVER with player name as NAME with optional PASSWORD");
             Write("multiworld disconnect: Disconnect from current server");
             Write("multiworld deathlink: Toggles deathlink on/off");
-            Write("multiworld players : List all players in this multiworld");
+            //Write("multiworld players : List all players in this multiworld");
         }
 
         private void Status(string[] parameters)
         {
             if (!ValidateParameterList(parameters, 0)) return;
 
-            string server = Main.Multiworld.connection.getServer();
-            if (server == "")
+            string server = Main.Multiworld.connection.ServerAddress;
+            if (server == string.Empty)
                 Write("Not connected to any server");
             else
                 Write($"Connected to {server}");
@@ -144,21 +144,21 @@ namespace BlasphemousMultiworld
                 Write("Not connected to any server!");
         }
 
-        private void Players(string[] parameters)
-        {
-            if (!ValidateParameterList(parameters, 0)) return;
+        //private void Players(string[] parameters)
+        //{
+        //    if (!ValidateParameterList(parameters, 0)) return;
 
-            string[] players = Main.Multiworld.connection.getPlayers();
-            if (players.Length == 0)
-            {
-                Write("Not connected to any server!");
-                return;
-            }
+        //    string[] players = Main.Multiworld.connection.getPlayers();
+        //    if (players.Length == 0)
+        //    {
+        //        Write("Not connected to any server!");
+        //        return;
+        //    }
 
-            string output = "Multiworld players: ";
-            foreach (string player in players)
-                output += player + ", ";
-            Write(output.Substring(0, output.Length - 2));
-        }
+        //    string output = "Multiworld players: ";
+        //    foreach (string player in players)
+        //        output += player + ", ";
+        //    Write(output.Substring(0, output.Length - 2));
+        //}
     }
 }
