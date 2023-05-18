@@ -1,4 +1,5 @@
-﻿using BlasphemousRandomizer.Structures;
+﻿using BlasphemousRandomizer.ItemRando;
+using BlasphemousRandomizer.Notifications;
 
 namespace BlasphemousMultiworld.Structures
 {
@@ -18,7 +19,7 @@ namespace BlasphemousMultiworld.Structures
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {
-            return new RewardInfo(name, $"{Main.Multiworld.Localize("ardesc")} {playerName}.", $"{Main.Multiworld.Localize("arnot")} {playerName}!", Main.Multiworld.getImage(0));
+            return new RewardInfo(name, $"{Main.Multiworld.Localize("ardesc")} {playerName}.", $"{Main.Multiworld.Localize("arnot")} {playerName}!", Main.Multiworld.ImageAP);
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Gameplay.UI.Widgets;
 using Gameplay.UI.Others.MenuLogic;
-using BlasphemousRandomizer.UI;
+using BlasphemousRandomizer.Settings;
 using Framework.Managers;
 using UnityEngine.UI;
 

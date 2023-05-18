@@ -4,8 +4,8 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
-using BlasphemousRandomizer.Config;
 using Newtonsoft.Json.Linq;
+using BlasphemousRandomizer;
 using BlasphemousMultiworld.Structures;
 
 namespace BlasphemousMultiworld
@@ -58,15 +58,15 @@ namespace BlasphemousMultiworld
             // Retrieve server slot data
             GameData data = new GameData();
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
-            data.gameConfig = ((JObject)login.SlotData["cfg"]).ToObject<MainConfig>();
-            data.chosenEnding = int.Parse(login.SlotData["ending"].ToString());
-            data.deathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
-            data.playerName = player;
+            data.Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>();
+            data.RequiredEnding = int.Parse(login.SlotData["ending"].ToString());
+            data.DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
+            data.PlayerName = player;
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
             deathLink.OnDeathLinkReceived += receiveDeathLink;
-            setDeathLinkStatus(data.deathLinkEnabled);
+            setDeathLinkStatus(data.DeathLinkEnabled);
 
             Main.Multiworld.onConnect(locations, data);
             return resultMessage;
@@ -85,15 +85,15 @@ namespace BlasphemousMultiworld
         // Returns a list of player names, or if unconnected then an empty list
         public string[] getPlayers()
         {
-            if (connected)
-            {
-                string[] players = new string[session.Players.AllPlayers.Count];
-                for (int i = 0; i < session.Players.AllPlayers.Count; i++)
-                {
-                    players[i] = session.Players.AllPlayers[i].Name;
-                }
-                return players;
-            }
+            //if (connected)
+            //{
+            //    string[] players = new string[session.Players.AllPlayers.Count];
+            //    for (int i = 0; i < session.Players.AllPlayers.Count; i++)
+            //    {
+            //        players[i] = session.Players.AllPlayers[i].Name;
+            //    }
+            //    return players;
+            //}
             return new string[0];
         }
 
@@ -147,7 +147,7 @@ namespace BlasphemousMultiworld
         {
             if (connected)
             {
-                deathLink.SendDeathLink(new DeathLink(Main.Multiworld.gameData.playerName));
+                deathLink.SendDeathLink(new DeathLink(Main.Multiworld.MultiworldSettings.PlayerName));
             }
         }
 

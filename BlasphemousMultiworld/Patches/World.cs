@@ -14,11 +14,11 @@ namespace BlasphemousMultiworld.Patches
             {
                 string name = __instance.cutscene.name;
                 if (name == "CTS10-EndingA")
-                    Main.Multiworld.sendGoal(1);
+                    Main.Multiworld.ReachedEnding(1);
                 else if (name == "CTS09-EndingB")
-                    Main.Multiworld.sendGoal(0);
+                    Main.Multiworld.ReachedEnding(0);
                 else if (name == "CTS301-EndingC")
-                    Main.Multiworld.sendGoal(2);
+                    Main.Multiworld.ReachedEnding(2);
             }
         }
     }

@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
-using BlasphemousRandomizer.Config;
-using BlasphemousRandomizer.UI;
+using BlasphemousRandomizer;
+using BlasphemousRandomizer.Settings;
 using Gameplay.UI.Others.MenuLogic;
 
 namespace BlasphemousMultiworld.Patches
@@ -11,9 +11,9 @@ namespace BlasphemousMultiworld.Patches
     [HarmonyPatch(typeof(SettingsMenu), "setConfigSettings")]
     public class SettingsMenuConfig_Patch
     {
-        public static void Prefix(ref MainConfig config)
+        public static void Prefix(ref Config config)
         {
-            Main.Multiworld.modifyGameConfig(config);
+            config = Main.Multiworld.MultiworldSettings.Config;
         }
     }
     [HarmonyPatch(typeof(SettingsMenu), "update")]
@@ -48,8 +48,8 @@ namespace BlasphemousMultiworld.Patches
     {
         public static void Postfix(RectTransform ___PopUp)
         {
-            Main.Multiworld.itemReceiver.backgroundSprite = ___PopUp.GetComponent<Image>().sprite;
-            Main.Multiworld.itemReceiver.textFont = ___PopUp.GetChild(1).GetComponent<Text>().font;
+            Main.Multiworld.itemReceiver.ImageBackground = ___PopUp.GetComponent<Image>().sprite;
+            Main.Multiworld.itemReceiver.TextFont = ___PopUp.GetChild(1).GetComponent<Text>().font;
         }
     }
     [HarmonyPatch(typeof(NewInventory_GridItem), "Awake")]
@@ -57,7 +57,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static void Postfix(Sprite ___backEquipped)
         {
-            Main.Multiworld.itemReceiver.boxSprite = ___backEquipped;
+            Main.Multiworld.itemReceiver.ImageBox = ___backEquipped;
         }
     }
 }

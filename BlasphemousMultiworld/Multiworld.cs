@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using BlasphemousRandomizer;
-using BlasphemousRandomizer.Structures;
-using BlasphemousRandomizer.Config;
+using BlasphemousRandomizer.ItemRando;
+using BlasphemousRandomizer.Settings;
 using BlasphemousMultiworld.Structures;
 using Framework.Managers;
 using ModdingAPI;
@@ -16,6 +16,8 @@ namespace BlasphemousMultiworld
         // Data
         private Dictionary<string, long> apLocationIds;
         private Sprite[] multiworldImages;
+        public Sprite ImageAP => multiworldImages[0];
+        public Sprite ImageDeathlink => multiworldImages[1];
 
         // Connection
         public Connection connection { get; private set; }
@@ -23,12 +25,12 @@ namespace BlasphemousMultiworld
         public override string PersistentID => "ID_MULTIWORLD";
 
         public ItemReceiver itemReceiver { get; private set; }
-        public GameData gameData { get; private set; }
         public DeathLinkStatus deathlink;
         private List<QueuedItem> queuedItems;
 
         // Game
-        private Dictionary<string, Item> newItems;
+        public GameData MultiworldSettings { get; private set; }
+        private Dictionary<string, string> multiworldMap;
         private bool gameStatus;
         private bool sentLocations;
         private int itemsReceived;
@@ -36,7 +38,7 @@ namespace BlasphemousMultiworld
         public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion)
         {
             // Set basic initialization for awake
-            gameData = new GameData();
+            MultiworldSettings = new GameData();
             itemReceiver = new ItemReceiver();
         }
 
@@ -49,7 +51,6 @@ namespace BlasphemousMultiworld
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
-            newItems = new Dictionary<string, Item>();
             queuedItems = new List<QueuedItem>();
 
             // Load external data
@@ -80,10 +81,13 @@ namespace BlasphemousMultiworld
 
         public override void NewGame(bool NGPlus)
         {
-            itemsReceived = 0;
+            Core.Events.SetFlag("MULTIWORLD", true, false);
         }
 
-        public override void ResetGame() { }
+        public override void ResetGame()
+        {
+            itemsReceived = 0;
+        }
 
         protected override void LevelLoaded(string oldLevel, string newLevel)
         {
@@ -104,7 +108,7 @@ namespace BlasphemousMultiworld
             }
             
             // If you received a deathlink & are able to die
-            if (gameData.deathLinkEnabled && deathlink == DeathLinkStatus.Queued && gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*"))
+            if (MultiworldSettings.DeathLinkEnabled && deathlink == DeathLinkStatus.Queued && gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*"))
             {
                 deathlink = DeathLinkStatus.Killing;
                 Core.Logic.Penitent.KillInstanteneously();
@@ -118,12 +122,12 @@ namespace BlasphemousMultiworld
             return result;
         }
 
-        public void onConnect(ArchipelagoLocation[] locations, GameData data)
+        public void onConnect(ArchipelagoLocation[] locations, GameData serverSettings)
         {
             // Init
             apLocationIds.Clear();
-            newItems.Clear();
-            gameData = data;
+            multiworldMap = new Dictionary<string, string>();
+            MultiworldSettings = serverSettings;
 
             // Process locations
             for (int i = 0; i < locations.Length; i++)
@@ -132,12 +136,13 @@ namespace BlasphemousMultiworld
                 apLocationIds.Add(locations[i].id, locations[i].ap_id);
 
                 // Add to new list of random items
-                if (locations[i].player_name == data.playerName)
+                if (locations[i].player_name == serverSettings.PlayerName)
                 {
                     // This is an item for this player
-                    Item item = itemExists(locations[i].name);
-                    if (item != null)
-                        newItems.Add(locations[i].id, item);
+                    if (ItemNameExists(locations[i].name, out string itemId))
+                    {
+                        multiworldMap.Add(locations[i].id, itemId);
+                    }
                     else
                     {
                         Main.Multiworld.LogError("Item " + locations[i].name + " doesn't exist!");
@@ -147,7 +152,8 @@ namespace BlasphemousMultiworld
                 else
                 {
                     // This is an item to a different game
-                    newItems.Add(locations[i].id, new ArchipelagoItem(locations[i].name, locations[i].player_name));
+                    multiworldMap.Add(locations[i].id, "AP");
+                    //newItems.Add(locations[i].id, new ArchipelagoItem(locations[i].name, locations[i].player_name));
                 }
             }
 
@@ -159,30 +165,11 @@ namespace BlasphemousMultiworld
         public void onDisconnect()
         {
             Main.Multiworld.LogDisplay("Disconnected from multiworld server!");
+            multiworldMap = null;
             sentLocations = false;
         }
-        
-        private Item itemExists(string descriptiveName)
-        {
-            foreach (Item item in Main.Randomizer.data.items.Values)
-            {
-                if (item.name == descriptiveName)
-                    return item;
-            }
-            return null;
-        }
 
-        // Set randomizer data to updated multiworld data
-        public void modifyNewItems(ref Dictionary<string, Item> shufflerItems)
-        {
-            shufflerItems = newItems;
-        }
-        public void modifyGameConfig(MainConfig config)
-        {
-            config.general = gameData.gameConfig.general;
-            config.items = gameData.gameConfig.items;
-            config.enemies = gameData.gameConfig.enemies;
-        }
+        public Dictionary<string, string> LoadMultiworldItems() => multiworldMap;
 
         public void sendLocation(string location)
         {
@@ -212,30 +199,12 @@ namespace BlasphemousMultiworld
             sentLocations = true;
         }
 
-        public void sendGoal(int ending)
-        {
-            if (ending >= gameData.chosenEnding)
-            {
-                Main.Multiworld.Log($"Completing goal {gameData.chosenEnding} with ending {ending}!");
-                connection.sendGoal();
-            }
-        }
-
-        public void sendDeathLink()
-        {
-            if (!gameData.deathLinkEnabled) return;
-
-            Main.Multiworld.Log("Sending death link!");
-            connection.sendDeathLink();
-        }
-
         public void receiveItem(string itemName, int index, string player)
         {
             Main.Multiworld.Log("Receiving item: " + itemName);
-            Item item = itemExists(itemName);
-            if (item != null)
+            if (ItemNameExists(itemName, out string itemId))
             {
-                queuedItems.Add(new QueuedItem(item, index, player));
+                queuedItems.Add(new QueuedItem(itemId, index, player));
                 processItems(false);
             }
             else
@@ -244,23 +213,34 @@ namespace BlasphemousMultiworld
             }
         }
 
+        // Move these into separate class
+        public void sendDeathLink()
+        {
+            if (!MultiworldSettings.DeathLinkEnabled) return;
+
+            Main.Multiworld.Log("Sending death link!");
+            connection.sendDeathLink();
+        }
+
         public void receiveDeathLink(string player)
         {
-            if (!gameData.deathLinkEnabled) return;
+            if (!MultiworldSettings.DeathLinkEnabled) return;
+
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {
                 Main.Multiworld.Log("Received death link!");
                 deathlink = DeathLinkStatus.Queued;
-                itemReceiver.receiveItem(new QueuedItem(null, 0, player));
+                itemReceiver.receiveItem(new QueuedItem("Death", 0, player));
             }
         }
 
         public bool toggleDeathLink()
         {
-            gameData.deathLinkEnabled = !gameData.deathLinkEnabled;
-            connection.setDeathLinkStatus(gameData.deathLinkEnabled);
-            Main.Multiworld.Log("Setting deathlink status to " + gameData.deathLinkEnabled.ToString());
-            return gameData.deathLinkEnabled;
+            bool newDeathLinkEnabled = !MultiworldSettings.DeathLinkEnabled;
+            MultiworldSettings.DeathLinkEnabled = newDeathLinkEnabled;
+            connection.setDeathLinkStatus(newDeathLinkEnabled);
+            Main.Multiworld.Log("Setting deathlink status to " + newDeathLinkEnabled.ToString());
+            return newDeathLinkEnabled;
         }
 
         public void processItems(bool ignoreLoadingCheck)
@@ -271,10 +251,10 @@ namespace BlasphemousMultiworld
 
             for (int i = 0; i < queuedItems.Count; i++)
             {
-                Main.Multiworld.Log($"Item '{queuedItems[i].item.id}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
+                Main.Multiworld.Log($"Item '{queuedItems[i].itemId}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
                 if (queuedItems[i].index > itemsReceived)
                 {
-                    queuedItems[i].item.addToInventory();
+                    Main.Randomizer.data.items[queuedItems[i].itemId].addToInventory();
                     itemReceiver.receiveItem(queuedItems[i]);
                     itemsReceived++;
                 }
@@ -282,9 +262,30 @@ namespace BlasphemousMultiworld
             queuedItems.Clear();
         }
 
-        public Sprite getImage(int idx)
+
+
+
+        public void ReachedEnding(int ending)
         {
-            return idx >= 0 && idx < multiworldImages.Length ? multiworldImages[idx] : null;
+            if (ending >= MultiworldSettings.RequiredEnding)
+            {
+                Main.Multiworld.Log($"Completing goal {MultiworldSettings.RequiredEnding} with ending {ending}!");
+                connection.sendGoal();
+            }
+        }
+
+        private bool ItemNameExists(string itemName, out string itemId)
+        {
+            foreach (Item item in Main.Randomizer.data.items.Values)
+            {
+                if (item.name == itemName)
+                {
+                    itemId = item.id;
+                    return true;
+                }
+            }
+            itemId = null;
+            return false;
         }
     }
 }

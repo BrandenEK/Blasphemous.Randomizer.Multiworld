@@ -1,12 +1,9 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 using BlasphemousRandomizer;
-using BlasphemousRandomizer.Fillers;
-using BlasphemousRandomizer.Shufflers;
-using BlasphemousRandomizer.Structures;
+using BlasphemousRandomizer.ItemRando;
+using BlasphemousRandomizer.HintRando;
 using BlasphemousMultiworld.Structures;
-using Framework.FrameworkCore;
-using Framework.Managers;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -18,24 +15,15 @@ namespace BlasphemousMultiworld.Patches
         {
             if (Main.Multiworld.connection.connected)
             {
-                // Door shuffle
-                __instance.itemShuffler.Shuffle(___seed); // Patch inserts multiworld locations
+                Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
+
+                __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
+                __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
                 __instance.hintShuffler.Shuffle(___seed); // Uses built-in hint filler based on multiworld items
                 __instance.enemyShuffler.Shuffle(___seed); // Uses built-in enemy shuffle
-            }
-            return false;
-        }
-    }
 
-    // Load new item locations into item shuffler
-    [HarmonyPatch(typeof(ItemShuffle), "Shuffle")]
-    public class ItemShuffleShuffle_Patch
-    {
-        public static bool Prefix(ItemShuffle __instance, ref Dictionary<string, Item> ___newItems)
-        {
-            Main.Multiworld.modifyNewItems(ref ___newItems);
-            Main.Randomizer.totalItems = ___newItems.Count;
-            Main.Multiworld.Log(___newItems.Count + " items have been inserted from multiworld!");
+                Main.Multiworld.Log(mappedItems.Count + " items have been inserted from multiworld!");
+            }
             return false;
         }
     }
@@ -64,16 +52,6 @@ namespace BlasphemousMultiworld.Patches
         public static void Postfix(string locationId)
         {
             Main.Multiworld.sendLocation(locationId);
-        }
-    }
-
-    // Set multiworld flag when starting new game
-    [HarmonyPatch(typeof(Randomizer), "setUpExtras")]
-    public class RandomizerSetup_Patch
-    {
-        public static void Postfix()
-        {
-            Core.Events.SetFlag("MULTIWORLD", true, false);
         }
     }
 }

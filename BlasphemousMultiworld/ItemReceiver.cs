@@ -9,11 +9,6 @@ namespace BlasphemousMultiworld
 {
     public class ItemReceiver
     {
-        // Set by other objects on awake
-        public Sprite backgroundSprite;
-        public Sprite boxSprite;
-        public Font textFont;
-
         // UI elements
         RectTransform notificationBox;
         Image itemImage;
@@ -56,15 +51,15 @@ namespace BlasphemousMultiworld
         private IEnumerator showReceivedItem(QueuedItem item)
         {
             isShowing = true;
-            if (item.item == null)
+            if (item.itemId == "Death")
             {
                 // Deathlink
-                itemImage.sprite = Main.Multiworld.getImage(1);
+                itemImage.sprite = Main.Multiworld.ImageDeathlink;
             }
             else
             {
                 // Regular item
-                itemImage.sprite = item.item.getRewardInfo(false).sprite;
+                itemImage.sprite = Main.Randomizer.data.items[item.itemId].getRewardInfo(false).sprite;
             }
             receivedText.text = Main.Multiworld.Localize("found") + ":\n" + item.player;
             notificationBox.anchoredPosition = hiddenPosition;
@@ -104,7 +99,7 @@ namespace BlasphemousMultiworld
 
         private void createReceiverUI()
         {
-            if (backgroundSprite == null || boxSprite == null || textFont == null)
+            if (m_ImageBackground == null || m_ImageBox == null || m_TextFont == null)
                 return;
             Main.Multiworld.Log("Creating item receiver notification box!");
 
@@ -122,7 +117,7 @@ namespace BlasphemousMultiworld
             notificationBox.anchorMax = new Vector2(0, 1);
             notificationBox.anchoredPosition = hiddenPosition;
             notificationBox.sizeDelta = new Vector2(150, 40);
-            notificationBox.GetComponent<Image>().sprite = backgroundSprite;
+            notificationBox.GetComponent<Image>().sprite = m_ImageBackground;
 
             // Create item box holder
             obj = new GameObject("Item Box", typeof(RectTransform), typeof(Image));
@@ -130,7 +125,7 @@ namespace BlasphemousMultiworld
             itemBox.SetParent(notificationBox, false);
             itemBox.sizeDelta = new Vector2(30, 30);
             itemBox.anchoredPosition = new Vector2(-30, 0);
-            itemBox.GetComponent<Image>().sprite = boxSprite;
+            itemBox.GetComponent<Image>().sprite = m_ImageBox;
 
             // Create item image
             obj = new GameObject("Item Image", typeof(RectTransform), typeof(Image));
@@ -146,9 +141,35 @@ namespace BlasphemousMultiworld
             text.sizeDelta = new Vector2(90, 40);
             text.anchoredPosition = new Vector2(30, 0);
             receivedText = text.GetComponent<Text>();
-            receivedText.font = textFont;
+            receivedText.font = m_TextFont;
             receivedText.fontSize = 16;
             receivedText.alignment = TextAnchor.MiddleCenter;
+        }
+
+        // Set by other objects on awake
+        private Sprite m_ImageBackground;
+        public Sprite ImageBackground
+        {
+            set
+            {
+                if (m_ImageBackground == null) m_ImageBackground = value;
+            }
+        }
+        private Sprite m_ImageBox;
+        public Sprite ImageBox
+        {
+            set
+            {
+                if (m_ImageBox == null) m_ImageBox = value;
+            }
+        }
+        private Font m_TextFont;
+        public Font TextFont
+        {
+            set
+            {
+                if (m_TextFont == null) m_TextFont = value;
+            }
         }
     }
 }

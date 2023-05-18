@@ -1,17 +1,16 @@
-﻿using BlasphemousRandomizer.Structures;
-
+﻿
 namespace BlasphemousMultiworld.Structures
 {
     public class QueuedItem
     {
-        public QueuedItem(Item item, int index, string player)
+        public QueuedItem(string itemId, int index, string player)
         {
-            this.item = item;
+            this.itemId = itemId;
             this.index = index;
             this.player = player;
         }
 
-        public Item item;
+        public string itemId;
         public int index;
         public string player;
     }
