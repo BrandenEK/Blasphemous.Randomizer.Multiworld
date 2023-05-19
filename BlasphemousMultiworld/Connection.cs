@@ -58,19 +58,19 @@ namespace BlasphemousMultiworld
             LoginSuccessful login = result as LoginSuccessful;
 
             // Retrieve server slot data
-            GameData data = new GameData();
+            GameSettings settings = new GameSettings();
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
-            data.Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>();
-            data.RequiredEnding = int.Parse(login.SlotData["ending"].ToString());
-            data.DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
-            data.PlayerName = player;
+            settings.Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>();
+            settings.RequiredEnding = int.Parse(login.SlotData["ending"].ToString());
+            settings.DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
+            settings.PlayerName = player;
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
             deathLink.OnDeathLinkReceived += ReceiveDeath;
-            EnableDeathLink(data.DeathLinkEnabled);
+            EnableDeathLink(settings.DeathLinkEnabled);
 
-            Main.Multiworld.onConnect(locations, data);
+            Main.Multiworld.onConnect(locations, settings);
             return resultMessage;
         }
 

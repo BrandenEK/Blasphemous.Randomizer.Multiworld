@@ -37,8 +37,8 @@ namespace BlasphemousMultiworld.DeathLink
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {
                 Main.Multiworld.Log("Received death link!");
+                Main.Multiworld.NotificationManager.DisplayNotification(new Structures.QueuedItem("Death", 0, player));
                 CurrentStatus = DeathLinkStatus.Queued;
-                //itemReceiver.receiveItem(new QueuedItem("Death", 0, player));
             }
         }
 

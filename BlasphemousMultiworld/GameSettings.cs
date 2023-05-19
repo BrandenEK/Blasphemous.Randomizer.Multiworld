@@ -1,8 +1,8 @@
 ﻿using BlasphemousRandomizer;
 
-namespace BlasphemousMultiworld.Structures
+namespace BlasphemousMultiworld
 {
-    public class GameData
+    public class GameSettings
     {
         public Config Config { get; set; }
         public string PlayerName { get; set; }

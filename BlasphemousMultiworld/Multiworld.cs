@@ -2,9 +2,9 @@
 using UnityEngine;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
-using BlasphemousRandomizer.Settings;
 using BlasphemousMultiworld.Structures;
 using BlasphemousMultiworld.DeathLink;
+using BlasphemousMultiworld.Notifications;
 using Framework.Managers;
 using ModdingAPI;
 
@@ -12,7 +12,6 @@ namespace BlasphemousMultiworld
 {
     public class Multiworld : PersistentMod
     {
-
         // Data
         private Dictionary<string, long> apLocationIds;
         private Sprite[] multiworldImages;
@@ -22,14 +21,14 @@ namespace BlasphemousMultiworld
         // Managers
         public Connection connection { get; private set; }
         public DeathLinkManager DeathLinkManager { get; private set; }
+        public NotificationManager NotificationManager { get; private set; }
 
         public override string PersistentID => "ID_MULTIWORLD";
 
-        public ItemReceiver itemReceiver { get; private set; }
         private List<QueuedItem> queuedItems;
 
         // Game
-        public GameData MultiworldSettings { get; private set; }
+        public GameSettings MultiworldSettings { get; private set; }
         private Dictionary<string, string> multiworldMap;
         public bool InGame { get; private set; }
 
@@ -41,10 +40,10 @@ namespace BlasphemousMultiworld
         protected override void Initialize()
         {
             // Set basic initialization for awake
-            MultiworldSettings = new GameData();
-            itemReceiver = new ItemReceiver();
+            MultiworldSettings = new GameSettings();
             connection = new Connection();
             DeathLinkManager = new DeathLinkManager();
+            NotificationManager = new NotificationManager();
 
             RegisterCommand(new MultiworldCommand());
 
@@ -72,10 +71,7 @@ namespace BlasphemousMultiworld
         public override void LoadGame(ModPersistentData data)
         {
             MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
-            if (multiworldData != null)
-            {
-                itemsReceived = multiworldData.itemsReceived;
-            }
+            itemsReceived = multiworldData.itemsReceived;
         }
 
         public override void NewGame(bool NGPlus)
@@ -116,7 +112,7 @@ namespace BlasphemousMultiworld
             return result;
         }
 
-        public void onConnect(ArchipelagoLocation[] locations, GameData serverSettings)
+        public void onConnect(ArchipelagoLocation[] locations, GameSettings serverSettings)
         {
             // Init
             apLocationIds.Clear();
@@ -219,7 +215,7 @@ namespace BlasphemousMultiworld
                 if (queuedItems[i].index > itemsReceived)
                 {
                     Main.Randomizer.data.items[queuedItems[i].itemId].addToInventory();
-                    itemReceiver.receiveItem(queuedItems[i]);
+                    NotificationManager.DisplayNotification(queuedItems[i]);
                     itemsReceived++;
                 }
             }
