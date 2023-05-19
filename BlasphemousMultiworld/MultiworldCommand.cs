@@ -137,7 +137,7 @@ namespace BlasphemousMultiworld
 
             if (Main.Multiworld.connection.connected)
             {
-                bool enabled = Main.Multiworld.toggleDeathLink();
+                bool enabled = Main.Multiworld.DeathLinkManager.ToggleDeathLink();
                 Write("Deathlink has been " + (enabled ? "enabled" : "disabled"));
             }
             else

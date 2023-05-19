@@ -68,7 +68,7 @@ namespace BlasphemousMultiworld
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
             deathLink.OnDeathLinkReceived += ReceiveDeath;
-            SetDeathLinkStatus(data.DeathLinkEnabled);
+            EnableDeathLink(data.DeathLinkEnabled);
 
             Main.Multiworld.onConnect(locations, data);
             return resultMessage;
@@ -136,16 +136,16 @@ namespace BlasphemousMultiworld
         {
             if (connected)
             {
-                deathLink.SendDeathLink(new DeathLink(Main.Multiworld.MultiworldSettings.PlayerName));
+                deathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Main.Multiworld.MultiworldSettings.PlayerName));
             }
         }
 
-        private void ReceiveDeath(DeathLink link)
+        private void ReceiveDeath(Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink link)
         {
-            Main.Multiworld.receiveDeathLink(link.Source);
+            Main.Multiworld.DeathLinkManager.ReceiveDeath(link.Source);
         }
 
-        public void SetDeathLinkStatus(bool enabled)
+        public void EnableDeathLink(bool enabled)
         {
             if (connected)
             {

@@ -22,33 +22,4 @@ namespace BlasphemousMultiworld.Patches
             }
         }
     }
-
-    // Send deathlink & prevent dropping guilt fragment
-    [HarmonyPatch(typeof(GuiltManager), "OnPenitentDead")]
-    public class GuiltManager_Patch
-    {
-        public static void Prefix(ref bool __state)
-        {
-            __state = Core.Logic.Penitent.GuiltDrop;
-            if (Main.Multiworld.deathlink == Multiworld.DeathLinkStatus.Killing)
-            {
-                Core.Logic.Penitent.GuiltDrop = false;
-            }
-        }
-
-        public static void Postfix(bool __state)
-        {
-            Core.Logic.Penitent.GuiltDrop = __state;
-
-            // Send deathlink
-            if (Main.Multiworld.deathlink == Multiworld.DeathLinkStatus.Nothing)
-            {
-                Main.Multiworld.sendDeathLink();
-            }
-            else if (Main.Multiworld.deathlink == Multiworld.DeathLinkStatus.Killing)
-            {
-                Main.Multiworld.deathlink = Multiworld.DeathLinkStatus.Nothing;
-            }
-        }
-    }
 }

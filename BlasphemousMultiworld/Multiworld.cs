@@ -4,6 +4,7 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
 using BlasphemousRandomizer.Settings;
 using BlasphemousMultiworld.Structures;
+using BlasphemousMultiworld.DeathLink;
 using Framework.Managers;
 using ModdingAPI;
 
@@ -11,7 +12,6 @@ namespace BlasphemousMultiworld
 {
     public class Multiworld : PersistentMod
     {
-        public enum DeathLinkStatus { Nothing, Queued, Killing }
 
         // Data
         private Dictionary<string, long> apLocationIds;
@@ -19,35 +19,34 @@ namespace BlasphemousMultiworld
         public Sprite ImageAP => multiworldImages[0];
         public Sprite ImageDeathlink => multiworldImages[1];
 
-        // Connection
+        // Managers
         public Connection connection { get; private set; }
+        public DeathLinkManager DeathLinkManager { get; private set; }
 
         public override string PersistentID => "ID_MULTIWORLD";
 
         public ItemReceiver itemReceiver { get; private set; }
-        public DeathLinkStatus deathlink;
         private List<QueuedItem> queuedItems;
 
         // Game
         public GameData MultiworldSettings { get; private set; }
         private Dictionary<string, string> multiworldMap;
-        private bool gameStatus;
+        public bool InGame { get; private set; }
+
         private bool sentLocations;
         private int itemsReceived;
 
-        public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion)
+        public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion) { }
+
+        protected override void Initialize()
         {
             // Set basic initialization for awake
             MultiworldSettings = new GameData();
             itemReceiver = new ItemReceiver();
-        }
-
-        protected override void Initialize()
-        {
-            RegisterCommand(new MultiworldCommand());
-
-            // Create new connection
             connection = new Connection();
+            DeathLinkManager = new DeathLinkManager();
+
+            RegisterCommand(new MultiworldCommand());
 
             // Initialize data storages
             apLocationIds = new Dictionary<string, long>();
@@ -91,7 +90,7 @@ namespace BlasphemousMultiworld
 
         protected override void LevelLoaded(string oldLevel, string newLevel)
         {
-            gameStatus = newLevel != "MainMenu";
+            InGame = newLevel != "MainMenu";
             processItems(true);
             sendAllLocations();
         }
@@ -107,12 +106,7 @@ namespace BlasphemousMultiworld
 
             }
             
-            // If you received a deathlink & are able to die
-            if (MultiworldSettings.DeathLinkEnabled && deathlink == DeathLinkStatus.Queued && gameStatus && !Core.LevelManager.InsideChangeLevel && !Core.Input.HasBlocker("*"))
-            {
-                deathlink = DeathLinkStatus.Killing;
-                Core.Logic.Penitent.KillInstanteneously();
-            }
+            DeathLinkManager.Update();
         }
 
         public string tryConnect(string server, string playerName, string password)
@@ -181,7 +175,7 @@ namespace BlasphemousMultiworld
 
         public void sendAllLocations()
         {
-            if (sentLocations || !gameStatus || !connection.connected)
+            if (sentLocations || !InGame || !connection.connected)
             {
                 return;
             }
@@ -213,40 +207,10 @@ namespace BlasphemousMultiworld
             }
         }
 
-        // Move these into separate class
-        public void sendDeathLink()
-        {
-            if (!MultiworldSettings.DeathLinkEnabled) return;
-
-            Main.Multiworld.Log("Sending death link!");
-            connection.SendDeath();
-        }
-
-        public void receiveDeathLink(string player)
-        {
-            if (!MultiworldSettings.DeathLinkEnabled) return;
-
-            if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
-            {
-                Main.Multiworld.Log("Received death link!");
-                deathlink = DeathLinkStatus.Queued;
-                itemReceiver.receiveItem(new QueuedItem("Death", 0, player));
-            }
-        }
-
-        public bool toggleDeathLink()
-        {
-            bool newDeathLinkEnabled = !MultiworldSettings.DeathLinkEnabled;
-            MultiworldSettings.DeathLinkEnabled = newDeathLinkEnabled;
-            connection.SetDeathLinkStatus(newDeathLinkEnabled);
-            Main.Multiworld.Log("Setting deathlink status to " + newDeathLinkEnabled.ToString());
-            return newDeathLinkEnabled;
-        }
-
         public void processItems(bool ignoreLoadingCheck)
         {
             // Wait to process items until inside a save file and the level is loaded
-            if (queuedItems.Count == 0 || !gameStatus || (!ignoreLoadingCheck && Core.LevelManager.InsideChangeLevel))
+            if (queuedItems.Count == 0 || !InGame || (!ignoreLoadingCheck && Core.LevelManager.InsideChangeLevel))
                 return;
 
             for (int i = 0; i < queuedItems.Count; i++)
