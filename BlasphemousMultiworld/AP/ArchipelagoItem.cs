@@ -1,7 +1,7 @@
 ﻿using BlasphemousRandomizer.ItemRando;
 using BlasphemousRandomizer.Notifications;
 
-namespace BlasphemousMultiworld.Structures
+namespace BlasphemousMultiworld.AP
 {
     public class ArchipelagoItem : Item
     {
@@ -12,10 +12,7 @@ namespace BlasphemousMultiworld.Structures
             playerName = player;
         }
 
-        public override void addToInventory()
-        {
-            return;
-        }
+        public override void addToInventory() { }
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {

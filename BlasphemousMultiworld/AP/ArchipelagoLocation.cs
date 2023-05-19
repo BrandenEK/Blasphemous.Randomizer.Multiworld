@@ -1,4 +1,5 @@
-﻿namespace BlasphemousMultiworld.Structures
+﻿
+namespace BlasphemousMultiworld.AP
 {
    public class ArchipelagoLocation
     {

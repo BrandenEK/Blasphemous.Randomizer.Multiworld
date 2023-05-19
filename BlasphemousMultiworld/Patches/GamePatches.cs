@@ -54,7 +54,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static bool Prefix()
         {
-            if (!Main.Multiworld.connection.connected)
+            if (!Main.Multiworld.APManager.Connected)
             {
                 Main.Multiworld.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;
@@ -67,7 +67,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static bool Prefix()
         {
-            if (!Main.Multiworld.connection.connected)
+            if (!Main.Multiworld.APManager.Connected)
             {
                 Main.Multiworld.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;

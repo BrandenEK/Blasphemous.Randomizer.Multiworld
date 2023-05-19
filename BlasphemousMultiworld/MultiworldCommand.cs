@@ -39,7 +39,7 @@ namespace BlasphemousMultiworld
         {
             if (!ValidateParameterList(parameters, 0)) return;
 
-            string server = Main.Multiworld.connection.ServerAddress;
+            string server = Main.Multiworld.APManager.ServerAddress;
             if (server == string.Empty)
                 Write("Not connected to any server");
             else
@@ -49,7 +49,7 @@ namespace BlasphemousMultiworld
         private void Connect(string[] parameters)
         {
             // Already connected
-            if (Main.Multiworld.connection.connected)
+            if (Main.Multiworld.APManager.Connected)
             {
                 Write("Already connected to a server!");
                 return;
@@ -122,9 +122,9 @@ namespace BlasphemousMultiworld
         {
             if (!ValidateParameterList(parameters, 0)) return;
 
-            if (Main.Multiworld.connection.connected)
+            if (Main.Multiworld.APManager.Connected)
             {
-                Main.Multiworld.connection.Disconnect();
+                Main.Multiworld.APManager.Disconnect();
                 Write("Disconnected from server");
             }
             else
@@ -135,7 +135,7 @@ namespace BlasphemousMultiworld
         {
             if (!ValidateParameterList(parameters, 0)) return;
 
-            if (Main.Multiworld.connection.connected)
+            if (Main.Multiworld.APManager.Connected)
             {
                 bool enabled = Main.Multiworld.DeathLinkManager.ToggleDeathLink();
                 Write("Deathlink has been " + (enabled ? "enabled" : "disabled"));

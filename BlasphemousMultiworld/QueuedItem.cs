@@ -1,5 +1,5 @@
 ﻿
-namespace BlasphemousMultiworld.Structures
+namespace BlasphemousMultiworld
 {
     public class QueuedItem
     {

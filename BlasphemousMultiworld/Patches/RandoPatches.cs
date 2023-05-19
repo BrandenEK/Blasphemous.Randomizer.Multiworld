@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
 using BlasphemousRandomizer.HintRando;
-using BlasphemousMultiworld.Structures;
+using BlasphemousMultiworld.AP;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -13,7 +13,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static bool Prefix(Randomizer __instance, int ___seed)
         {
-            if (Main.Multiworld.connection.connected)
+            if (Main.Multiworld.APManager.Connected)
             {
                 Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
 

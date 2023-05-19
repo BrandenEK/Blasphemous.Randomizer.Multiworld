@@ -2,9 +2,9 @@
 using UnityEngine;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
-using BlasphemousMultiworld.Structures;
 using BlasphemousMultiworld.DeathLink;
 using BlasphemousMultiworld.Notifications;
+using BlasphemousMultiworld.AP;
 using Framework.Managers;
 using ModdingAPI;
 
@@ -13,13 +13,12 @@ namespace BlasphemousMultiworld
     public class Multiworld : PersistentMod
     {
         // Data
-        private Dictionary<string, long> apLocationIds;
         private Sprite[] multiworldImages;
         public Sprite ImageAP => multiworldImages[0];
         public Sprite ImageDeathlink => multiworldImages[1];
 
         // Managers
-        public Connection connection { get; private set; }
+        public APManager APManager { get; private set; }
         public DeathLinkManager DeathLinkManager { get; private set; }
         public NotificationManager NotificationManager { get; private set; }
 
@@ -41,14 +40,13 @@ namespace BlasphemousMultiworld
         {
             // Set basic initialization for awake
             MultiworldSettings = new GameSettings();
-            connection = new Connection();
+            APManager = new APManager();
             DeathLinkManager = new DeathLinkManager();
             NotificationManager = new NotificationManager();
 
             RegisterCommand(new MultiworldCommand());
 
             // Initialize data storages
-            apLocationIds = new Dictionary<string, long>();
             queuedItems = new List<QueuedItem>();
 
             // Load external data
@@ -107,15 +105,15 @@ namespace BlasphemousMultiworld
 
         public string tryConnect(string server, string playerName, string password)
         {
-            string result = connection.Connect(server, playerName, password); // Check if not in game first ?
+            string result = APManager.Connect(server, playerName, password); // Check if not in game first ?
             Main.Multiworld.Log(result);
             return result;
         }
 
-        public void onConnect(ArchipelagoLocation[] locations, GameSettings serverSettings)
+        public void OnConnect(ArchipelagoLocation[] locations, GameSettings serverSettings)
         {
             // Init
-            apLocationIds.Clear();
+            //apLocationIds.Clear();
             multiworldMap = new Dictionary<string, string>();
             MultiworldSettings = serverSettings;
 
@@ -123,7 +121,7 @@ namespace BlasphemousMultiworld
             for (int i = 0; i < locations.Length; i++)
             {
                 // Add conversion from location id to name
-                apLocationIds.Add(locations[i].id, locations[i].ap_id);
+                //apLocationIds.Add(locations[i].id, locations[i].ap_id);
 
                 // Add to new list of random items
                 if (locations[i].player_name == serverSettings.PlayerName)
@@ -152,7 +150,7 @@ namespace BlasphemousMultiworld
             sendAllLocations();
         }
 
-        public void onDisconnect()
+        public void OnDisconnect()
         {
             Main.Multiworld.LogDisplay("Disconnected from multiworld server!");
             multiworldMap = null;
@@ -163,15 +161,15 @@ namespace BlasphemousMultiworld
 
         public void sendLocation(string location)
         {
-            if (apLocationIds.ContainsKey(location))
-                connection.SendLocation(apLocationIds[location]);
-            else
-                Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+            //if (apLocationIds.ContainsKey(location))
+            //    APManager.SendLocation(apLocationIds[location]);
+            //else
+            //    Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
         }
 
         public void sendAllLocations()
         {
-            if (sentLocations || !InGame || !connection.connected)
+            if (sentLocations || !InGame || !APManager.Connected)
             {
                 return;
             }
@@ -180,12 +178,12 @@ namespace BlasphemousMultiworld
             List<long> checkedLocations = new List<long>();
             foreach (string location in Main.Randomizer.data.itemLocations.Keys)
             {
-                if (Core.Events.GetFlag("LOCATION_" + location))
-                    checkedLocations.Add(apLocationIds[location]);
+                //if (Core.Events.GetFlag("LOCATION_" + location))
+                //    checkedLocations.Add(apLocationIds[location]);
             }
 
             Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count})");
-            connection.SendMultipleLocations(checkedLocations.ToArray());
+            APManager.SendMultipleLocations(checkedLocations.ToArray());
             sentLocations = true;
         }
 
@@ -230,7 +228,7 @@ namespace BlasphemousMultiworld
             if (ending >= MultiworldSettings.RequiredEnding)
             {
                 Main.Multiworld.Log($"Completing goal {MultiworldSettings.RequiredEnding} with ending {ending}!");
-                connection.SendGoal();
+                APManager.SendGoal();
             }
         }
 

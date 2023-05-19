@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using BlasphemousMultiworld.Structures;
 using Gameplay.UI;
 
 namespace BlasphemousMultiworld.Notifications

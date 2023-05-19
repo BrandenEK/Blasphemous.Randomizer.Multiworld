@@ -1,23 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
-using Newtonsoft.Json.Linq;
 using BlasphemousRandomizer;
-using BlasphemousMultiworld.Structures;
+using Newtonsoft.Json.Linq;
 
-namespace BlasphemousMultiworld
+namespace BlasphemousMultiworld.AP
 {
-    public class Connection
+    public class APManager
     {
         private ArchipelagoSession session;
         private DeathLinkService deathLink;
 
-        public bool connected { get; private set; }
+        public bool Connected { get; private set; }
+        public string ServerAddress => Connected ? session.Socket.Uri.ToString() : string.Empty;
 
-        public string ServerAddress => connected ? session.Socket.Uri.ToString() : string.Empty;
+        private Dictionary<string, long> apLocationIds = new Dictionary<string, long>();
+
+        #region Connection
 
         public string Connect(string server, string player, string password)
         {
@@ -41,7 +44,7 @@ namespace BlasphemousMultiworld
             // Connection failed
             if (!result.Successful)
             {
-                connected = false;
+                Connected = false;
                 LoginFailure failure = result as LoginFailure;
                 resultMessage = "Multiworld connection failed: ";
                 if (failure.Errors.Length > 0)
@@ -53,7 +56,7 @@ namespace BlasphemousMultiworld
             }
 
             // Connection successful
-            connected = true;
+            Connected = true;
             resultMessage = "Multiworld connection successful";
             LoginSuccessful login = result as LoginSuccessful;
 
@@ -70,32 +73,34 @@ namespace BlasphemousMultiworld
             deathLink.OnDeathLinkReceived += ReceiveDeath;
             EnableDeathLink(settings.DeathLinkEnabled);
 
-            Main.Multiworld.onConnect(locations, settings);
+            Main.Multiworld.OnConnect(locations, settings);
             return resultMessage;
         }
 
         public void Disconnect()
         {
-            if (connected)
+            if (Connected)
             {
                 session.Socket.Disconnect();
-                connected = false;
+                Connected = false;
                 session = null;
             }
         }
 
         private void OnDisconnect(string reason)
         {
-            Main.Multiworld.onDisconnect();
-            connected = false;
+            Main.Multiworld.OnDisconnect();
+            Connected = false;
             session = null;
         }
+
+        #endregion Connection
 
         #region Locations, items, & goal
 
         public void SendLocation(long apLocationId)
         {
-            if (connected)
+            if (Connected)
             {
                 session.Locations.CompleteLocationChecks(apLocationId);
             }
@@ -103,7 +108,7 @@ namespace BlasphemousMultiworld
 
         public void SendMultipleLocations(long[] apLocationIds)
         {
-            if (connected)
+            if (Connected)
             {
                 session.Locations.CompleteLocationChecks(apLocationIds);
             }
@@ -120,7 +125,7 @@ namespace BlasphemousMultiworld
 
         public void SendGoal()
         {
-            if (connected)
+            if (Connected)
             {
                 StatusUpdatePacket statusUpdate = new StatusUpdatePacket();
                 statusUpdate.Status = ArchipelagoClientState.ClientGoal;
@@ -134,7 +139,7 @@ namespace BlasphemousMultiworld
 
         public void SendDeath()
         {
-            if (connected)
+            if (Connected)
             {
                 deathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Main.Multiworld.MultiworldSettings.PlayerName));
             }
@@ -147,7 +152,7 @@ namespace BlasphemousMultiworld
 
         public void EnableDeathLink(bool enabled)
         {
-            if (connected)
+            if (Connected)
             {
                 if (enabled) deathLink.EnableDeathLink();
                 else deathLink.DisableDeathLink();

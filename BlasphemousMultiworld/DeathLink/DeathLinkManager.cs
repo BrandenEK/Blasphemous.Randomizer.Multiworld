@@ -27,7 +27,7 @@ namespace BlasphemousMultiworld.DeathLink
             if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled) return;
 
             Main.Multiworld.Log("Sending death link!");
-            Main.Multiworld.connection.SendDeath();
+            Main.Multiworld.APManager.SendDeath();
         }
 
         public void ReceiveDeath(string player)
@@ -37,7 +37,7 @@ namespace BlasphemousMultiworld.DeathLink
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {
                 Main.Multiworld.Log("Received death link!");
-                Main.Multiworld.NotificationManager.DisplayNotification(new Structures.QueuedItem("Death", 0, player));
+                Main.Multiworld.NotificationManager.DisplayNotification(new QueuedItem("Death", 0, player));
                 CurrentStatus = DeathLinkStatus.Queued;
             }
         }
@@ -46,7 +46,7 @@ namespace BlasphemousMultiworld.DeathLink
         {
             bool newDeathLinkEnabled = !DeathLinkEnabled;
             DeathLinkEnabled = newDeathLinkEnabled;
-            Main.Multiworld.connection.EnableDeathLink(newDeathLinkEnabled);
+            Main.Multiworld.APManager.EnableDeathLink(newDeathLinkEnabled);
             Main.Multiworld.Log("Setting deathlink status to " + newDeathLinkEnabled.ToString());
             return newDeathLinkEnabled;
         }
