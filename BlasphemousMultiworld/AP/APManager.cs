@@ -20,7 +20,9 @@ namespace BlasphemousMultiworld.AP
         public bool Connected { get; private set; }
         public string ServerAddress => Connected ? session.Socket.Uri.ToString() : string.Empty;
 
+        // These are cleared and refilled when connecting
         private Dictionary<string, long> apLocationIds = new Dictionary<string, long>();
+        private List<ArchipelagoItem> apItems = new List<ArchipelagoItem>();
 
         #region Connection
 
@@ -84,6 +86,7 @@ namespace BlasphemousMultiworld.AP
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             Dictionary<string, string> mappedItems = new Dictionary<string, string>();
             apLocationIds.Clear();
+            apItems.Clear();
 
             // Process locations
             for (int i = 0; i < locations.Length; i++)
@@ -109,7 +112,8 @@ namespace BlasphemousMultiworld.AP
                 else
                 {
                     // This is an item to a different game
-                    mappedItems.Add(currentLocation.id, "AP"); // Will need to store index here also
+                    mappedItems.Add(currentLocation.id, "AP" + apItems.Count);
+                    apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name));
                 }
             }
 
@@ -191,6 +195,12 @@ namespace BlasphemousMultiworld.AP
                 statusUpdate.Status = ArchipelagoClientState.ClientGoal;
                 session.Socket.SendPacket(statusUpdate);
             }
+        }
+
+        public ArchipelagoItem GetAPItem(string apId)
+        {
+            int index = int.Parse(apId.Substring(2));
+            return apItems[index];
         }
 
         private bool ItemNameExists(string itemName, out string itemId)

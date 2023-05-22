@@ -11,16 +11,17 @@ namespace BlasphemousMultiworld.Patches
     [HarmonyPatch(typeof(Randomizer), "Randomize")]
     public class RandomizerRandomize_Patch
     {
-        public static bool Prefix(Randomizer __instance, int ___seed)
+        public static bool Prefix(Randomizer __instance)
         {
             if (Main.Multiworld.APManager.Connected)
             {
                 Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
+                int seed = Main.Randomizer.GameSeed;
 
                 __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
                 __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
-                __instance.hintShuffler.Shuffle(___seed); // Uses built-in hint filler based on multiworld items
-                __instance.enemyShuffler.Shuffle(___seed); // Uses built-in enemy shuffle
+                __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
+                __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
 
                 Main.Multiworld.Log(mappedItems.Count + " items have been inserted from multiworld!");
             }
@@ -52,6 +53,22 @@ namespace BlasphemousMultiworld.Patches
         public static void Postfix(string locationId)
         {
             Main.Multiworld.APManager.SendLocation(locationId);
+        }
+    }
+
+    // Return archipelago item when checking location
+    [HarmonyPatch(typeof(ItemShuffle), "getItemAtLocation")]
+    public class ItemShuffleItem_Patch
+    {
+        public static bool Prefix(string locationId, ref Item __result)
+        {
+            Dictionary<string, string> mappedItems = Main.Randomizer.itemShuffler.SaveMappedItems();
+
+            if (mappedItems == null || !mappedItems.ContainsKey(locationId) || !mappedItems[locationId].StartsWith("AP"))
+                return true;
+
+            __result = Main.Multiworld.APManager.GetAPItem(locationId);
+            return false;
         }
     }
 }

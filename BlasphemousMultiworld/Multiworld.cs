@@ -51,11 +51,11 @@ namespace BlasphemousMultiworld
 
             // Load external data
             if (!FileUtil.loadDataImages("multiworld_images.png", 32, 32, 32, 0, true, out multiworldImages))
-                Main.Multiworld.LogError("Error: Multiworld images could not be loaded!");
+                LogError("Error: Multiworld images could not be loaded!");
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
             if (cherub != null) cherub.name = "Child of Moonlight";
 
-            Main.Multiworld.Log("Multiworld has been initialized!");
+            Log("Multiworld has been initialized!");
         }
 
         public override ModPersistentData SaveGame()
@@ -122,7 +122,7 @@ namespace BlasphemousMultiworld
             MultiworldSettings = serverSettings;
 
             // MappedItems has been filled with new shuffled items
-            Main.Multiworld.Log("Game variables have been loaded from multiworld!");
+            Log("Game variables have been loaded from multiworld!");
             if (!hasSentLocations && InGame)
             {
                 APManager.SendAllLocations();
@@ -132,9 +132,10 @@ namespace BlasphemousMultiworld
 
         public void OnDisconnect()
         {
-            Main.Multiworld.LogDisplay("Disconnected from multiworld server!");
+            LogDisplay("Disconnected from multiworld server!");
             multiworldMap = null;
             hasSentLocations = false;
+            queuedItems.Clear();
         }
 
         public Dictionary<string, string> LoadMultiworldItems() => multiworldMap;
@@ -153,7 +154,7 @@ namespace BlasphemousMultiworld
 
             for (int i = 0; i < queuedItems.Count; i++)
             {
-                Main.Multiworld.Log($"Item '{queuedItems[i].itemId}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
+                Log($"Item '{queuedItems[i].itemId}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
                 if (queuedItems[i].index > itemsReceived)
                 {
                     Main.Randomizer.data.items[queuedItems[i].itemId].addToInventory();
