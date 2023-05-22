@@ -51,7 +51,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static void Postfix(string locationId)
         {
-            Main.Multiworld.sendLocation(locationId);
+            Main.Multiworld.APManager.SendLocation(locationId);
         }
     }
 }

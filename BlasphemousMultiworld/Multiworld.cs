@@ -12,7 +12,7 @@ namespace BlasphemousMultiworld
 {
     public class Multiworld : PersistentMod
     {
-        // Data
+        // Images
         private Sprite[] multiworldImages;
         public Sprite ImageAP => multiworldImages[0];
         public Sprite ImageDeathlink => multiworldImages[1];
@@ -31,7 +31,7 @@ namespace BlasphemousMultiworld
         private Dictionary<string, string> multiworldMap;
         public bool InGame { get; private set; }
 
-        private bool sentLocations;
+        private bool hasSentLocations;
         private int itemsReceived;
 
         public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion) { }
@@ -85,8 +85,13 @@ namespace BlasphemousMultiworld
         protected override void LevelLoaded(string oldLevel, string newLevel)
         {
             InGame = newLevel != "MainMenu";
-            processItems(true);
-            sendAllLocations();
+            ProcessItems(true);
+            
+            if (!hasSentLocations && InGame && APManager.Connected)
+            {
+                APManager.SendAllLocations();
+                hasSentLocations = true;
+            }
         }
         
         protected override void Update()
@@ -110,98 +115,37 @@ namespace BlasphemousMultiworld
             return result;
         }
 
-        public void OnConnect(ArchipelagoLocation[] locations, GameSettings serverSettings)
+        public void OnConnect(Dictionary<string, string> mappedItems, GameSettings serverSettings)
         {
-            // Init
-            //apLocationIds.Clear();
-            multiworldMap = new Dictionary<string, string>();
+            // Get data from server
+            multiworldMap = mappedItems;
             MultiworldSettings = serverSettings;
 
-            // Process locations
-            for (int i = 0; i < locations.Length; i++)
-            {
-                // Add conversion from location id to name
-                //apLocationIds.Add(locations[i].id, locations[i].ap_id);
-
-                // Add to new list of random items
-                if (locations[i].player_name == serverSettings.PlayerName)
-                {
-                    // This is an item for this player
-                    if (ItemNameExists(locations[i].name, out string itemId))
-                    {
-                        multiworldMap.Add(locations[i].id, itemId);
-                    }
-                    else
-                    {
-                        Main.Multiworld.LogError("Item " + locations[i].name + " doesn't exist!");
-                        continue;
-                    }
-                }
-                else
-                {
-                    // This is an item to a different game
-                    multiworldMap.Add(locations[i].id, "AP");
-                    //newItems.Add(locations[i].id, new ArchipelagoItem(locations[i].name, locations[i].player_name));
-                }
-            }
-
-            // newItems has been filled with new shuffled items
+            // MappedItems has been filled with new shuffled items
             Main.Multiworld.Log("Game variables have been loaded from multiworld!");
-            sendAllLocations();
+            if (!hasSentLocations && InGame)
+            {
+                APManager.SendAllLocations();
+                hasSentLocations = true;
+            }
         }
 
         public void OnDisconnect()
         {
             Main.Multiworld.LogDisplay("Disconnected from multiworld server!");
             multiworldMap = null;
-            sentLocations = false;
+            hasSentLocations = false;
         }
 
         public Dictionary<string, string> LoadMultiworldItems() => multiworldMap;
 
-        public void sendLocation(string location)
+        public void QueueItem(QueuedItem item)
         {
-            //if (apLocationIds.ContainsKey(location))
-            //    APManager.SendLocation(apLocationIds[location]);
-            //else
-            //    Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+            queuedItems.Add(item);
+            ProcessItems(false);
         }
 
-        public void sendAllLocations()
-        {
-            if (sentLocations || !InGame || !APManager.Connected)
-            {
-                return;
-            }
-
-            // Send list of all locations already checked
-            List<long> checkedLocations = new List<long>();
-            foreach (string location in Main.Randomizer.data.itemLocations.Keys)
-            {
-                //if (Core.Events.GetFlag("LOCATION_" + location))
-                //    checkedLocations.Add(apLocationIds[location]);
-            }
-
-            Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count})");
-            APManager.SendMultipleLocations(checkedLocations.ToArray());
-            sentLocations = true;
-        }
-
-        public void receiveItem(string itemName, int index, string player)
-        {
-            Main.Multiworld.Log("Receiving item: " + itemName);
-            if (ItemNameExists(itemName, out string itemId))
-            {
-                queuedItems.Add(new QueuedItem(itemId, index, player));
-                processItems(false);
-            }
-            else
-            {
-                Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
-            }
-        }
-
-        public void processItems(bool ignoreLoadingCheck)
+        public void ProcessItems(bool ignoreLoadingCheck)
         {
             // Wait to process items until inside a save file and the level is loaded
             if (queuedItems.Count == 0 || !InGame || (!ignoreLoadingCheck && Core.LevelManager.InsideChangeLevel))
@@ -218,32 +162,6 @@ namespace BlasphemousMultiworld
                 }
             }
             queuedItems.Clear();
-        }
-
-
-
-
-        public void ReachedEnding(int ending)
-        {
-            if (ending >= MultiworldSettings.RequiredEnding)
-            {
-                Main.Multiworld.Log($"Completing goal {MultiworldSettings.RequiredEnding} with ending {ending}!");
-                APManager.SendGoal();
-            }
-        }
-
-        private bool ItemNameExists(string itemName, out string itemId)
-        {
-            foreach (Item item in Main.Randomizer.data.items.Values)
-            {
-                if (item.name == itemName)
-                {
-                    itemId = item.id;
-                    return true;
-                }
-            }
-            itemId = null;
-            return false;
         }
     }
 }

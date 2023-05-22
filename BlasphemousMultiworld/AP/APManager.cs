@@ -6,6 +6,8 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using BlasphemousRandomizer;
+using BlasphemousRandomizer.ItemRando;
+using Framework.Managers;
 using Newtonsoft.Json.Linq;
 
 namespace BlasphemousMultiworld.AP
@@ -60,21 +62,58 @@ namespace BlasphemousMultiworld.AP
             resultMessage = "Multiworld connection successful";
             LoginSuccessful login = result as LoginSuccessful;
 
-            // Retrieve server slot data
+            OnConnect(login, player);
+            return resultMessage;
+        }
+
+        private void OnConnect(LoginSuccessful login, string playerName)
+        {
+            // Get settings from slot data
             GameSettings settings = new GameSettings();
-            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             settings.Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>();
             settings.RequiredEnding = int.Parse(login.SlotData["ending"].ToString());
             settings.DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
-            settings.PlayerName = player;
+            settings.PlayerName = playerName;
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
             deathLink.OnDeathLinkReceived += ReceiveDeath;
             EnableDeathLink(settings.DeathLinkEnabled);
 
-            Main.Multiworld.OnConnect(locations, settings);
-            return resultMessage;
+            // Get location list from slot data
+            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+            Dictionary<string, string> mappedItems = new Dictionary<string, string>();
+            apLocationIds.Clear();
+
+            // Process locations
+            for (int i = 0; i < locations.Length; i++)
+            {
+                ArchipelagoLocation currentLocation = locations[i];
+                // Add conversion from location id to name
+                apLocationIds.Add(currentLocation.id, currentLocation.ap_id);
+
+                // Add to new list of random items
+                if (currentLocation.player_name == settings.PlayerName)
+                {
+                    // This is an item for this player
+                    if (ItemNameExists(currentLocation.name, out string itemId))
+                    {
+                        mappedItems.Add(currentLocation.id, itemId);
+                    }
+                    else
+                    {
+                        Main.Multiworld.LogError("Item " + currentLocation.name + " doesn't exist!");
+                        continue;
+                    }
+                }
+                else
+                {
+                    // This is an item to a different game
+                    mappedItems.Add(currentLocation.id, "AP"); // Will need to store index here also
+                }
+            }
+
+            Main.Multiworld.OnConnect(mappedItems, settings);
         }
 
         public void Disconnect()
@@ -98,29 +137,50 @@ namespace BlasphemousMultiworld.AP
 
         #region Locations, items, & goal
 
-        public void SendLocation(long apLocationId)
+        public void SendLocation(string location)
         {
-            if (Connected)
-            {
-                session.Locations.CompleteLocationChecks(apLocationId);
-            }
+            if (!Connected) return;
+
+            if (apLocationIds.ContainsKey(location))
+                session.Locations.CompleteLocationChecks(apLocationIds[location]);
+            else
+                Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
         }
 
-        public void SendMultipleLocations(long[] apLocationIds)
+        public void SendAllLocations()
         {
-            if (Connected)
+            if (!Connected) return;
+
+            List<long> checkedLocations = new List<long>();
+            foreach (string location in Main.Randomizer.data.itemLocations.Keys)
             {
-                session.Locations.CompleteLocationChecks(apLocationIds);
+                if (Core.Events.GetFlag("LOCATION_" + location))
+                    checkedLocations.Add(apLocationIds[location]);
             }
+
+            Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count})");
+            session.Locations.CompleteLocationChecks(checkedLocations.ToArray());
         }
 
         private void ReceiveItem(ReceivedItemsHelper helper)
         {
+            // Get information from helper
             string player = session.Players.GetPlayerName(helper.PeekItem().Player);
             if (player == null || player == string.Empty) player = "Server";
-
-            Main.Multiworld.receiveItem(helper.PeekItemName(), helper.Index, player);
+            string itemName = helper.PeekItemName();
+            int itemIdx = helper.Index;
             helper.DequeueItem();
+
+            // Process item
+            if (ItemNameExists(itemName, out string itemId))
+            {
+                Main.Multiworld.Log("Receiving item: " + itemName);
+                Main.Multiworld.QueueItem(new QueuedItem(itemId, itemIdx, player));
+            }
+            else
+            {
+                Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
+            }
         }
 
         public void SendGoal()
@@ -131,6 +191,20 @@ namespace BlasphemousMultiworld.AP
                 statusUpdate.Status = ArchipelagoClientState.ClientGoal;
                 session.Socket.SendPacket(statusUpdate);
             }
+        }
+
+        private bool ItemNameExists(string itemName, out string itemId)
+        {
+            foreach (Item item in Main.Randomizer.data.items.Values)
+            {
+                if (item.name == itemName)
+                {
+                    itemId = item.id;
+                    return true;
+                }
+            }
+            itemId = null;
+            return false;
         }
 
         #endregion Locations, items, & goal
