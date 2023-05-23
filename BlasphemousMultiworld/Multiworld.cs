@@ -74,7 +74,8 @@ namespace BlasphemousMultiworld
 
         public override void NewGame(bool NGPlus)
         {
-            Core.Events.SetFlag("MULTIWORLD", true, false);
+            if (APManager.Connected)
+                Core.Events.SetFlag("MULTIWORLD", true, false);
         }
 
         public override void ResetGame()

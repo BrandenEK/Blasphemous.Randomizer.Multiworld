@@ -13,25 +13,25 @@ namespace BlasphemousMultiworld.Patches
     {
         public static bool Prefix(Randomizer __instance)
         {
-            if (Main.Multiworld.APManager.Connected)
+            if (!Main.Multiworld.APManager.Connected)
+                return true;
+
+            Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
+            int seed = Main.Randomizer.GameSeed;
+
+            try
             {
-                Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
-                int seed = Main.Randomizer.GameSeed;
-
-                try
-                {
-                    __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
-                    __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
-                    __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
-                    __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
-                }
-                catch (System.Exception e)
-                {
-                    Main.Multiworld.LogError("Error with filling: " + e.Message);
-                }
-
-                Main.Multiworld.Log(mappedItems.Count + " items have been inserted from multiworld!");
+                __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
+                __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
+                __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
+                __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
             }
+            catch (System.Exception e)
+            {
+                Main.Multiworld.LogError("Error with filling: " + e.Message);
+            }
+
+            Main.Multiworld.Log(mappedItems.Count + " items have been inserted from multiworld!");
             return false;
         }
     }

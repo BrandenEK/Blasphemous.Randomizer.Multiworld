@@ -12,7 +12,8 @@ namespace BlasphemousMultiworld.Patches
     {
         public static void Prefix(ref Config config)
         {
-            config = Main.Multiworld.MultiworldSettings.Config;
+            if (Main.Multiworld.APManager.Connected)
+                config = Main.Multiworld.MultiworldSettings.Config;
         }
     }
     [HarmonyPatch(typeof(SettingsMenu), "update")]
@@ -20,7 +21,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static void Postfix(ref Text ___descriptionText, GameObject ___settingsMenu, bool ___menuActive)
         {
-            if (___settingsMenu != null && ___menuActive)
+            if (Main.Multiworld.APManager.Connected && ___settingsMenu != null && ___menuActive)
                 ___descriptionText.text = Main.Multiworld.Localize("config");
         }
     }
@@ -29,7 +30,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static bool Prefix()
         {
-            return false;
+            return !Main.Multiworld.APManager.Connected;
         }
     }
     [HarmonyPatch(typeof(SettingsElement), "onClick")]
@@ -37,7 +38,7 @@ namespace BlasphemousMultiworld.Patches
     {
         public static bool Prefix()
         {
-            return false;
+            return !Main.Multiworld.APManager.Connected;
         }
     }
 }

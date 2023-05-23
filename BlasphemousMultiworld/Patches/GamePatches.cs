@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Gameplay.UI.Widgets;
 using Gameplay.UI.Others.MenuLogic;
-using BlasphemousRandomizer.Settings;
 using Tools.Playmaker2.Action;
 using Framework.Managers;
 using UnityEngine.UI;
@@ -42,34 +41,6 @@ namespace BlasphemousMultiworld.Patches
             {
                 int startIdx = ___ZoneText.text.IndexOf('(');
                 ___ZoneText.text = ___ZoneText.text.Substring(0, startIdx) + info;
-                return false;
-            }
-            return true;
-        }
-    }
-
-    // Don't allow to open a save file unless connected
-    [HarmonyPatch(typeof(SelectSaveSlots), "OnAcceptSlots")]
-    public class SelectSaveSlotsBegin_Patch
-    {
-        public static bool Prefix()
-        {
-            if (!Main.Multiworld.APManager.Connected)
-            {
-                Main.Multiworld.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
-                return false;
-            }
-            return true;
-        }
-    }
-    [HarmonyPatch(typeof(SettingsMenu), "openMenu")]
-    public class SettingsMenuOpen_Patch
-    {
-        public static bool Prefix()
-        {
-            if (!Main.Multiworld.APManager.Connected)
-            {
-                Main.Multiworld.LogDisplay(Main.Multiworld.Localize("conerr") + "!");
                 return false;
             }
             return true;
