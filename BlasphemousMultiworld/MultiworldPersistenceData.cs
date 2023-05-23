@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ModdingAPI;
 
 namespace BlasphemousMultiworld
@@ -9,5 +10,6 @@ namespace BlasphemousMultiworld
         public MultiworldPersistenceData() : base("ID_MULTIWORLD") { }
 
         public int itemsReceived;
+        public List<string> scoutedLocations;
     }
 }

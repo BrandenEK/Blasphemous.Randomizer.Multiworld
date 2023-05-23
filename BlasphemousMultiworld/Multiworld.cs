@@ -66,7 +66,8 @@ namespace BlasphemousMultiworld
         {
             return new MultiworldPersistenceData
             {
-                itemsReceived = itemsReceived
+                itemsReceived = itemsReceived,
+                scoutedLocations = APManager.SaveScoutedLocations()
             };
         }
 
@@ -74,6 +75,7 @@ namespace BlasphemousMultiworld
         {
             MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
             itemsReceived = multiworldData.itemsReceived;
+            APManager.LoadScoutedLocations(multiworldData.scoutedLocations);
         }
 
         public override void NewGame(bool NGPlus)
@@ -85,6 +87,7 @@ namespace BlasphemousMultiworld
         public override void ResetGame()
         {
             itemsReceived = 0;
+            APManager.ClearScoutedLocations();
         }
 
         protected override void LevelLoaded(string oldLevel, string newLevel)

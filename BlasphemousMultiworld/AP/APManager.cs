@@ -24,6 +24,12 @@ namespace BlasphemousMultiworld.AP
         private Dictionary<string, long> apLocationIds = new Dictionary<string, long>();
         private List<ArchipelagoItem> apItems = new List<ArchipelagoItem>();
 
+        // Save checked hints
+        private List<string> scoutedLocations;
+        public List<string> SaveScoutedLocations() => scoutedLocations;
+        public void LoadScoutedLocations(List<string> locations) => scoutedLocations = locations;
+        public void ClearScoutedLocations() => scoutedLocations = new List<string>();
+
         #region Connection
 
         public string Connect(string server, string player, string password)
@@ -202,9 +208,17 @@ namespace BlasphemousMultiworld.AP
             if (!Connected) return;
 
             if (apLocationIds.ContainsKey(location))
-                session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
+            {
+                if (!scoutedLocations.Contains(location))
+                {
+                    session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
+                    scoutedLocations.Add(location);
+                }
+            }
             else
+            {
                 Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+            }
         }
 
         public ArchipelagoItem GetAPItem(string apId)
