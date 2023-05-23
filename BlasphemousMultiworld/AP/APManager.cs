@@ -200,7 +200,7 @@ namespace BlasphemousMultiworld.AP
         public ArchipelagoItem GetAPItem(string apId)
         {
             int index = int.Parse(apId.Substring(2));
-            return apItems[index];
+            return index >= 0 && index < apItems.Count ? apItems[index] : null;
         }
 
         private bool ItemNameExists(string itemName, out string itemId)

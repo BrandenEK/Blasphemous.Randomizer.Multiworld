@@ -54,7 +54,7 @@ namespace BlasphemousMultiworld
             queuedItems = new List<QueuedItem>();
 
             // Load external data
-            if (!FileUtil.loadDataImages("multiworld_images.png", 32, 32, 32, 0, true, out multiworldImages))
+            if (!FileUtil.loadDataImages("multi-images.png", 30, 30, 30, 0, true, out multiworldImages))
                 LogError("Error: Multiworld images could not be loaded!");
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
             if (cherub != null) cherub.name = "Child of Moonlight";
