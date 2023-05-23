@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Gameplay.UI.Others.MenuLogic;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
 using BlasphemousMultiworld.DeathLink;
@@ -27,12 +29,14 @@ namespace BlasphemousMultiworld
         private List<QueuedItem> queuedItems;
 
         // Game
-        public GameSettings MultiworldSettings { get; private set; }
         private Dictionary<string, string> multiworldMap;
+        public GameSettings MultiworldSettings { get; private set; }
+        public bool HasRequiredMods { get; private set; }
         public bool InGame { get; private set; }
 
         private bool hasSentLocations;
         private int itemsReceived;
+
 
         public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion) { }
 
@@ -121,6 +125,9 @@ namespace BlasphemousMultiworld
             // Get data from server
             multiworldMap = mappedItems;
             MultiworldSettings = serverSettings;
+            HasRequiredMods =
+                (!MultiworldSettings.Config.ShuffleBootsOfPleading || Main.Randomizer.InstalledBootsMod) &&
+                (!MultiworldSettings.Config.ShufflePurifiedHand || Main.Randomizer.InstalledDoubleJumpMod);
 
             // MappedItems has been filled with new shuffled items
             Log("Game variables have been loaded from multiworld!");
@@ -164,6 +171,23 @@ namespace BlasphemousMultiworld
                 }
             }
             queuedItems.Clear();
+        }
+
+        private Text m_MultiworldStatusText;
+        public Text MultiworldStatusText
+        {
+            get
+            {
+                if (m_MultiworldStatusText == null)
+                {
+                    Log("Creating multiworld status text");
+                    Transform textHolder = Object.FindObjectOfType<NewMainMenu>().transform.Find("Settings Menu/Main Section");
+                    GameObject randoText = textHolder.Find("Description").gameObject;
+                    m_MultiworldStatusText = Object.Instantiate(randoText, textHolder).GetComponent<Text>();
+                    m_MultiworldStatusText.rectTransform.anchoredPosition = new Vector2(-175, 182);
+                }
+                return m_MultiworldStatusText;
+            }
         }
     }
 }
