@@ -5,8 +5,9 @@ arnot: Sending to
 vandis: Vanilla
 muldis: Multiworld
 sindis: Singleworld
-conerr: Not connected to a multiworld server
-config: Configuration settings have been determined by Multiworld
+setnon: Not connected to a multiworld server
+setcon: Settings have been determined by Multiworld
+seterr: The required mods are not installed
 
 lang: es
 found: Encontrado por
@@ -15,8 +16,9 @@ arnot: Enviando a
 vandis: Vanilla
 muldis: Multimundo
 sindis: Mundo Un jugador
-conerr: No te has conectado a un servidor multijugador
-config: El Multimundo ha establecido los ajustes
+setnon: No te has conectado a un servidor multijugador
+setcon: El Multimundo ha establecido los ajustes
+seterr: Los mods necesarios no están instalados
 
 lang: zh
 found: 发现者
@@ -25,8 +27,9 @@ arnot: 给予
 vandis: 原版
 muldis: 多世界
 sindis: 单世界
-conerr: 未连接至多世界服务器
-config: 设置已被多世界服务器决定
+setnon: 未连接至多世界服务器
+setcon: 设置已被多世界服务器决定
+seterr: 
 
 lang: fr
 found: Créé par
@@ -35,5 +38,6 @@ arnot: Envoi à
 vandis: Vanilla
 muldis: Multi-monde
 sindis: Mono-monde
-conerr: Non connecté à un serveur multi-monde
-config: Les paramètres de configuration ont été déterminées par Multi-monde
+setnon: Non connecté à un serveur multi-monde
+setcon: Les paramètres de configuration ont été déterminées par Multi-monde
+seterr: 
