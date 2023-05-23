@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Enums;
@@ -44,7 +45,7 @@ namespace BlasphemousMultiworld.AP
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += ReceiveItem;
                 session.Socket.SocketClosed += OnDisconnect;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 3, 6), null, null, password);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 4, 1), null, null, password);
             }
             catch (Exception e)
             {
@@ -89,6 +90,7 @@ namespace BlasphemousMultiworld.AP
             EnableDeathLink(settings.DeathLinkEnabled);
 
             // Get location list from slot data
+            session.Locations.CheckedLocationsUpdated += CheckedLocationsUpdated;
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             Dictionary<string, string> mappedItems = new Dictionary<string, string>();
             apLocationIds.Clear();
@@ -225,6 +227,10 @@ namespace BlasphemousMultiworld.AP
         {
             int index = int.Parse(apId.Substring(2));
             return index >= 0 && index < apItems.Count ? apItems[index] : null;
+        }
+
+        private void CheckedLocationsUpdated(ReadOnlyCollection<long> newCheckedLocations)
+        {
         }
 
         private bool ItemNameExists(string itemName, out string itemId)
