@@ -18,10 +18,17 @@ namespace BlasphemousMultiworld.Patches
                 Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
                 int seed = Main.Randomizer.GameSeed;
 
-                __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
-                __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
-                __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
-                __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
+                try
+                {
+                    __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
+                    __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
+                    __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
+                    __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
+                }
+                catch (System.Exception e)
+                {
+                    Main.Multiworld.LogError("Error with filling: " + e.Message);
+                }
 
                 Main.Multiworld.Log(mappedItems.Count + " items have been inserted from multiworld!");
             }
@@ -67,7 +74,7 @@ namespace BlasphemousMultiworld.Patches
             if (mappedItems == null || !mappedItems.ContainsKey(locationId) || !mappedItems[locationId].StartsWith("AP"))
                 return true;
 
-            __result = Main.Multiworld.APManager.GetAPItem(locationId);
+            __result = Main.Multiworld.APManager.GetAPItem(mappedItems[locationId]);
             return false;
         }
     }
