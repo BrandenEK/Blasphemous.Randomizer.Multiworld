@@ -50,6 +50,7 @@ namespace BlasphemousMultiworld.Patches
             ArchipelagoItem archItem = item as ArchipelagoItem;
             string itemHint = $"'{archItem.name}' for {archItem.playerName}";
             __result = __result.Replace("[AP]", itemHint);
+            Main.Multiworld.APManager.ScoutLocation(location);
         }
     }
 

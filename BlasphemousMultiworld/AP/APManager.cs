@@ -197,6 +197,16 @@ namespace BlasphemousMultiworld.AP
             }
         }
 
+        public void ScoutLocation(string location)
+        {
+            if (!Connected) return;
+
+            if (apLocationIds.ContainsKey(location))
+                session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
+            else
+                Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+        }
+
         public ArchipelagoItem GetAPItem(string apId)
         {
             int index = int.Parse(apId.Substring(2));

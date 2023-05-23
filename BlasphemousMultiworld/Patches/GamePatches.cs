@@ -5,6 +5,7 @@ using Gameplay.UI.Others.MenuLogic;
 using Tools.Playmaker2.Action;
 using Framework.Managers;
 using UnityEngine.UI;
+using BlasphemousRandomizer.ItemRando;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -85,6 +86,48 @@ namespace BlasphemousMultiworld.Patches
             {
                 Main.Multiworld.Log($"Completing goal {chosenEnding} with ending {acquiredEnding}!");
                 Main.Multiworld.APManager.SendGoal();
+            }
+        }
+    }
+
+    // Send hint when looking at shop items
+    [HarmonyPatch(typeof(DialogManager), "StartConversation")]
+    public class DialogManager_Patch
+    {
+        public static void Postfix(string conversiationId)
+        {
+            string location;
+            switch (conversiationId)
+            {
+                case "DLG_QT_1001": location = "QI58"; break;
+                case "DLG_QT_1002": location = "RB05"; break;
+                case "DLG_QT_1003": location = "RB09"; break;
+                case "DLG_QT_1004": location = "QI11"; break;
+                case "DLG_QT_1005": location = "RB37"; break;
+                case "DLG_QT_1006": location = "RB02"; break;
+                case "DLG_QT_1007": location = "QI71"; break;
+                case "DLG_QT_1008": location = "RB12"; break;
+                case "DLG_QT_1009": location = "QI49"; break;
+                default: return;
+            }
+
+            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
+            if (item != null && item.type == 200)
+                Main.Multiworld.APManager.ScoutLocation(location);
+        }
+    }
+    [HarmonyPatch(typeof(NewInventory_Description), "SetKill")]
+    public class InvDescription_Patch
+    {
+        public static void Postfix(string skillId)
+        {
+            // Only hint for items at shrine
+            if (!Main.Randomizer.ShrineEditMode) return;
+
+            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(skillId);
+            if (item != null && item.type == 200 && Core.SkillManager.CanUnlockSkillNoCheckPoints(skillId))
+            {
+                Main.Multiworld.APManager.ScoutLocation(skillId);
             }
         }
     }
