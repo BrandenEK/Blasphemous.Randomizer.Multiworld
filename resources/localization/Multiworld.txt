@@ -29,7 +29,7 @@ muldis: 多世界
 sindis: 单世界
 setnon: 未连接至多世界服务器
 setcon: 设置已被多世界服务器决定
-seterr: 
+seterr: ???
 
 lang: fr
 found: Créé par
@@ -40,4 +40,4 @@ muldis: Multi-monde
 sindis: Mono-monde
 setnon: Non connecté à un serveur multi-monde
 setcon: Les paramètres de configuration ont été déterminées par Multi-monde
-seterr: 
+seterr: ???

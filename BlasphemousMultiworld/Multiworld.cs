@@ -104,15 +104,6 @@ namespace BlasphemousMultiworld
         
         protected override void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Keypad9))
-            {
-                
-            }
-            else if (Input.GetKeyDown(KeyCode.Equals))
-            {
-
-            }
-            
             DeathLinkManager.Update();
         }
 
