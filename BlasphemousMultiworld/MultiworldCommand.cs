@@ -25,6 +25,11 @@ namespace BlasphemousMultiworld
             };
         }
 
+        public void HackWriteToConsole(string message)
+        {
+            Write(message);
+        }
+
         private void Help(string[] parameters)
         {
             if (!ValidateParameterList(parameters, 0)) return;

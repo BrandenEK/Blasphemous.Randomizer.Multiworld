@@ -34,6 +34,7 @@ namespace BlasphemousMultiworld
         public bool HasRequiredMods { get; private set; }
         public bool InGame { get; private set; }
 
+        private readonly MultiworldCommand command = new MultiworldCommand();
         private bool hasSentLocations;
         private int itemsReceived;
 
@@ -48,7 +49,7 @@ namespace BlasphemousMultiworld
             DeathLinkManager = new DeathLinkManager();
             NotificationManager = new NotificationManager();
 
-            RegisterCommand(new MultiworldCommand());
+            RegisterCommand(command);
 
             // Initialize data storages
             queuedItems = new List<QueuedItem>();
@@ -138,6 +139,12 @@ namespace BlasphemousMultiworld
             multiworldMap = null;
             hasSentLocations = false;
             queuedItems.Clear();
+        }
+
+        public void WriteToConsole(string message)
+        {
+            Log("Received message: " + message);
+            command.HackWriteToConsole(message);
         }
 
         public Dictionary<string, string> LoadMultiworldItems() => multiworldMap;

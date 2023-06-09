@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Archipelago.MultiClient.Net;
-using Archipelago.MultiClient.Net.Helpers;
-using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Packets;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.MessageLog.Messages;
+using Archipelago.MultiClient.Net.Packets;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
 using Framework.Managers;
@@ -44,6 +45,7 @@ namespace BlasphemousMultiworld.AP
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += ReceiveItem;
+                session.MessageLog.OnMessageReceived += MessageReceived;
                 session.Socket.SocketClosed += OnDisconnect;
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 4, 1), null, null, password);
             }
@@ -213,6 +215,11 @@ namespace BlasphemousMultiworld.AP
                 packet.Text = message;
                 session.Socket.SendPacket(packet);
             }
+        }
+
+        private void MessageReceived(LogMessage message)
+        {
+            Main.Multiworld.WriteToConsole(message.ToString());
         }
 
         public void ScoutLocation(string location)
