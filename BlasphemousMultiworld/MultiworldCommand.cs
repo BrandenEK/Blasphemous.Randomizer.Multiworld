@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using ModdingAPI.Commands;
 
 namespace BlasphemousMultiworld
@@ -19,6 +20,7 @@ namespace BlasphemousMultiworld
                 { "connect", Connect },
                 { "disconnect", Disconnect },
                 { "deathlink", Deathlink },
+                { "say", Say },
                 //{ "players", Players }
             };
         }
@@ -32,6 +34,7 @@ namespace BlasphemousMultiworld
             Write("multiworld connect SERVER NAME [PASSWORD]: Connect to SERVER with player name as NAME with optional PASSWORD");
             Write("multiworld disconnect: Disconnect from current server");
             Write("multiworld deathlink: Toggles deathlink on/off");
+            Write("multiworld say COMMAND: Sends a text message or command to the server");
             //Write("multiworld players : List all players in this multiworld");
         }
 
@@ -142,6 +145,30 @@ namespace BlasphemousMultiworld
             }
             else
                 Write("Not connected to any server!");
+        }
+
+        private void Say(string[] parameters)
+        {
+            // Too few parameters
+            if (parameters.Length < 1)
+            {
+                Write("This command requires at least one parameter.  You passed " + parameters.Length);
+                return;
+            }
+
+            // Not connected to multiworld
+            if (!Main.Multiworld.APManager.Connected)
+            {
+                Write("Not connected to any server!");
+                return;
+            }
+
+            StringBuilder output = new StringBuilder(parameters[0]);
+            for (int i = 1; i < parameters.Length; i++)
+            {
+                output.AppendFormat(" {0}", parameters[i]);
+            }
+            Main.Multiworld.APManager.SendMessage(output.ToString());
         }
 
         //private void Players(string[] parameters)

@@ -199,9 +199,19 @@ namespace BlasphemousMultiworld.AP
         {
             if (Connected)
             {
-                StatusUpdatePacket statusUpdate = new StatusUpdatePacket();
-                statusUpdate.Status = ArchipelagoClientState.ClientGoal;
-                session.Socket.SendPacket(statusUpdate);
+                StatusUpdatePacket packet = new StatusUpdatePacket();
+                packet.Status = ArchipelagoClientState.ClientGoal;
+                session.Socket.SendPacket(packet);
+            }
+        }
+
+        public void SendMessage(string message)
+        {
+            if (Connected)
+            {
+                SayPacket packet = new SayPacket();
+                packet.Text = message;
+                session.Socket.SendPacket(packet);
             }
         }
 
@@ -209,17 +219,18 @@ namespace BlasphemousMultiworld.AP
         {
             if (!Connected) return;
 
-            if (apLocationIds.ContainsKey(location))
-            {
-                if (!scoutedLocations.Contains(location))
-                {
-                    session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
-                    scoutedLocations.Add(location);
-                }
-            }
-            else
+            // If location doesn't exist, throw error
+            if (!apLocationIds.ContainsKey(location))
             {
                 Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+                return;
+            }
+
+            // If location hasn't already been scouted, send it
+            if (!scoutedLocations.Contains(location))
+            {
+                session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
+                scoutedLocations.Add(location);
             }
         }
 
