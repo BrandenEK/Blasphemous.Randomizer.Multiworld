@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using Gameplay.UI.Others.MenuLogic;
-using BlasphemousRandomizer;
-using BlasphemousRandomizer.ItemRando;
+﻿using BlasphemousRandomizer.ItemRando;
 using BlasphemousMultiworld.DeathLink;
 using BlasphemousMultiworld.Notifications;
 using BlasphemousMultiworld.AP;
 using Framework.Managers;
+using Gameplay.UI.Others.MenuLogic;
 using ModdingAPI;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace BlasphemousMultiworld
 {
@@ -57,8 +56,10 @@ namespace BlasphemousMultiworld
             // Load external data
             if (!FileUtil.loadDataImages("multi-images.png", 30, 30, 30, 0, true, out multiworldImages))
                 LogError("Error: Multiworld images could not be loaded!");
+
             Main.Randomizer.data.items.TryGetValue("CH", out Item cherub);
-            if (cherub != null) cherub.name = "Child of Moonlight";
+            if (cherub != null)
+                cherub.name = "Child of Moonlight";
 
             Log("Multiworld has been initialized!");
         }

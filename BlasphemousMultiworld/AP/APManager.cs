@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Archipelago.MultiClient.Net;
+﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
@@ -11,6 +8,9 @@ using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
 using Framework.Managers;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BlasphemousMultiworld.AP
 {
@@ -23,8 +23,8 @@ namespace BlasphemousMultiworld.AP
         public string ServerAddress => Connected ? session.Socket.Uri.ToString() : string.Empty;
 
         // These are cleared and refilled when connecting
-        private Dictionary<string, long> apLocationIds = new Dictionary<string, long>();
-        private List<ArchipelagoItem> apItems = new List<ArchipelagoItem>();
+        private readonly Dictionary<string, long> apLocationIds = new ();
+        private readonly List<ArchipelagoItem> apItems = new ();
 
         // Save checked hints
         private List<string> scoutedLocations;
@@ -39,7 +39,7 @@ namespace BlasphemousMultiworld.AP
             // Create login
             LoginResult result;
             string resultMessage;
-
+            
             // Try connection
             try
             {
@@ -123,7 +123,7 @@ namespace BlasphemousMultiworld.AP
                 {
                     // This is an item to a different game
                     mappedItems.Add(currentLocation.id, "AP" + apItems.Count);
-                    apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name));
+                    apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name, currentLocation.type == 1));
                 }
             }
 
@@ -229,16 +229,24 @@ namespace BlasphemousMultiworld.AP
             // If location doesn't exist, throw error
             if (!apLocationIds.ContainsKey(location))
             {
-                Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+                Main.Multiworld.LogError("Location " + location + " does not exist in the multiworld!");
                 return;
             }
 
-            // If location hasn't already been scouted, send it
-            if (!scoutedLocations.Contains(location))
+            // If the item isnt progression belonging to another player, return
+            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
+            if (item == null || item.type != 200 || !((ArchipelagoItem)item).IsProgression)
             {
-                session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
-                scoutedLocations.Add(location);
+                Main.Multiworld.Log("Location " + location + " does not qualify to be scouted");
+                return;
             }
+
+            // If location has already been scouted, return
+            if (scoutedLocations.Contains(location))
+                return;
+
+            session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
+            scoutedLocations.Add(location);
         }
 
         public ArchipelagoItem GetAPItem(string apId)

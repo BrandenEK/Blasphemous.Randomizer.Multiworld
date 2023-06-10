@@ -1,11 +1,10 @@
-﻿using HarmonyLib;
-using System.Collections.Generic;
-using Gameplay.UI.Widgets;
+﻿using Framework.Managers;
+using HarmonyLib;
 using Gameplay.UI.Others.MenuLogic;
+using Gameplay.UI.Widgets;
+using System.Collections.Generic;
 using Tools.Playmaker2.Action;
-using Framework.Managers;
 using UnityEngine.UI;
-using BlasphemousRandomizer.ItemRando;
 
 namespace BlasphemousMultiworld.Patches
 {
@@ -111,9 +110,7 @@ namespace BlasphemousMultiworld.Patches
                 default: return;
             }
 
-            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
-            if (item != null && item.type == 200)
-                Main.Multiworld.APManager.ScoutLocation(location);
+            Main.Multiworld.APManager.ScoutLocation(location);
         }
     }
     [HarmonyPatch(typeof(NewInventory_Description), "SetKill")]
@@ -124,8 +121,7 @@ namespace BlasphemousMultiworld.Patches
             // Only hint for items at shrine
             if (!Main.Randomizer.ShrineEditMode) return;
 
-            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(skillId);
-            if (item != null && item.type == 200 && Core.SkillManager.CanUnlockSkillNoCheckPoints(skillId))
+            if (Core.SkillManager.CanUnlockSkillNoCheckPoints(skillId))
             {
                 Main.Multiworld.APManager.ScoutLocation(skillId);
             }

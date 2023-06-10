@@ -5,18 +5,23 @@ namespace BlasphemousMultiworld.AP
 {
     public class ArchipelagoItem : Item
     {
-        public string playerName;
+        private readonly string _playerName;
+        public string PlayerName => _playerName;
 
-        public ArchipelagoItem(string name, string player) : base("AP", name, "[AP]", 200, false, 0)
+        private readonly bool _progression;
+        public bool IsProgression => _progression;
+
+        public ArchipelagoItem(string name, string player, bool progression) : base("AP", name, "[AP]", 200, false, 0)
         {
-            playerName = player;
+            _playerName = player;
+            _progression = progression;
         }
 
         public override void addToInventory() { }
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {
-            return new RewardInfo(name, $"{Main.Multiworld.Localize("ardesc")} {playerName}.", $"{Main.Multiworld.Localize("arnot")} {playerName}!", Main.Multiworld.ImageAP);
+            return new RewardInfo(name, $"{Main.Multiworld.Localize("ardesc")} {_playerName}.", $"{Main.Multiworld.Localize("arnot")} {_playerName}!", Main.Multiworld.ImageAP);
         }
     }
 }

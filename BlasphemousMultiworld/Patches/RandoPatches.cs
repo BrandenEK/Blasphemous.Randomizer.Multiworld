@@ -48,7 +48,7 @@ namespace BlasphemousMultiworld.Patches
 
             // This is a valid location that holds another player's item
             ArchipelagoItem archItem = item as ArchipelagoItem;
-            string itemHint = $"'{archItem.name}' for {archItem.playerName}";
+            string itemHint = $"'{archItem.name}' for {archItem.PlayerName}";
             __result = __result.Replace("[AP]", itemHint);
             Main.Multiworld.APManager.ScoutLocation(location);
         }
