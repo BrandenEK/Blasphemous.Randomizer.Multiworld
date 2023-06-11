@@ -36,6 +36,7 @@ Manual installation
 ## Available commands
 - Press the 'backslash' key to open the debug console
 - Type the desired command followed by the parameters all separated by a single space
+- The 'PageUp' and 'PageDown' keys can be used to scroll through previous messages
 
 | Command | Parameters | Description |
 | ------- | ----------- | ------- |
@@ -44,7 +45,7 @@ Manual installation
 | `multiworld connect` | SERVER, NAME, PASSWORD (Optional) | Connect to the specified server IP address |
 | `multiworld disconnect` | none | Disconnect from current server |
 | `multiworld deathlink` | none | Toggles deathlink on/off |
-| `multiworld players` | none | List all players in this multiworld |
+| `multiworld say` | COMMAND | Sends a command or message to the AP server |
 
 ---
 
