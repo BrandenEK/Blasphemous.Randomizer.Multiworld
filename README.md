@@ -45,7 +45,7 @@ Manual installation
 | `multiworld connect` | SERVER, NAME, PASSWORD (Optional) | Connect to the specified server IP address |
 | `multiworld disconnect` | none | Disconnect from current server |
 | `multiworld deathlink` | none | Toggles deathlink on/off |
-| `multiworld say` | COMMAND | Sends a command or message to the AP server |
+| `multiworld say` | COMMAND | Sends a command to the AP server |
 
 ---
 
