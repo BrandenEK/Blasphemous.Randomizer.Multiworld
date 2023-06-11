@@ -3,6 +3,7 @@ using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
+using Archipelago.MultiClient.Net.MessageLog.Parts;
 using Archipelago.MultiClient.Net.Packets;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
@@ -11,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace BlasphemousMultiworld.AP
 {
@@ -221,7 +223,15 @@ namespace BlasphemousMultiworld.AP
 
         private void MessageReceived(LogMessage message)
         {
-            Main.Multiworld.WriteToConsole(message.ToString());
+            System.Text.StringBuilder text = new();
+
+            foreach (MessagePart part in message.Parts)
+            {
+                string color = ColorUtility.ToHtmlStringRGB(new Color(part.Color.R, part.Color.G, part.Color.B));
+                text.AppendFormat("<color=#{0}>{1}</color>", color, part.Text);
+            }
+
+            Main.Multiworld.WriteToConsole(text.ToString());
         }
 
         public void ScoutLocation(string location)
