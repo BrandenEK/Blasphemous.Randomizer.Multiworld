@@ -1,19 +1,19 @@
-﻿using System.Collections;
+﻿using Gameplay.UI;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Gameplay.UI;
 
 namespace BlasphemousMultiworld.Notifications
 {
     public class NotificationManager
     {
-        private const float MOVEMENT_TIME = 0.5f;
-        private const float DISPLAY_TIME = 1.8f;
+        private const float MOVEMENT_TIME = 0.3f;
+        private const float DISPLAY_TIME = 2f;
         private const float END_DELAY = 0.2f;
 
-        private readonly Vector2 POSITION_HIDDEN = new Vector2(-80, -98);
-        private readonly Vector2 POSITION_VISIBLE = new Vector2(55, -98);
+        private readonly Vector2 POSITION_HIDDEN = new(220, 30);
+        private readonly Vector2 POSITION_VISIBLE = new(-80, 30);
 
         // UI elements
         RectTransform notificationBox;
@@ -21,7 +21,7 @@ namespace BlasphemousMultiworld.Notifications
         Text receivedText;
 
         // Game process
-        Queue<QueuedItem> queue = new Queue<QueuedItem>();
+        readonly Queue<QueuedItem> queue = new();
         bool isShowing = false;
 
         public void DisplayNotification(QueuedItem item)
@@ -42,17 +42,25 @@ namespace BlasphemousMultiworld.Notifications
         private IEnumerator DisplayCorroutine(QueuedItem item)
         {
             isShowing = true;
+
+            Sprite image;
+            string name;
             if (item.itemId == "Death")
             {
                 // Deathlink
-                itemImage.sprite = Main.Multiworld.ImageDeathlink;
+                image = Main.Multiworld.ImageDeathlink;
+                name = "Death";
             }
             else
             {
                 // Regular item
-                itemImage.sprite = Main.Randomizer.data.items[item.itemId].getRewardInfo(false).sprite;
+                BlasphemousRandomizer.ItemRando.Item randoItem = Main.Randomizer.data.items[item.itemId];
+                image = randoItem.getRewardInfo(false).sprite;
+                name = randoItem.name;
             }
-            receivedText.text = Main.Multiworld.Localize("found") + ":\n" + item.player;
+            itemImage.sprite = image;
+            receivedText.text = $"{name}\n\t{Main.Multiworld.Localize("found")}: {item.player}";
+
             notificationBox.anchoredPosition = POSITION_HIDDEN;
             float positionDifference = POSITION_VISIBLE.x - POSITION_HIDDEN.x;
 
@@ -104,18 +112,21 @@ namespace BlasphemousMultiworld.Notifications
             GameObject obj = new GameObject("Receive Notification", typeof(RectTransform), typeof(Image));
             notificationBox = obj.GetComponent<RectTransform>();
             notificationBox.SetParent(parent, false);
-            notificationBox.anchorMin = new Vector2(0, 1);
-            notificationBox.anchorMax = new Vector2(0, 1);
+            notificationBox.anchorMin = new Vector2(1, 0);
+            notificationBox.anchorMax = new Vector2(1, 0);
+
             notificationBox.anchoredPosition = POSITION_HIDDEN;
-            notificationBox.sizeDelta = new Vector2(150, 40);
+            notificationBox.sizeDelta = new Vector2(430, 40);
             notificationBox.GetComponent<Image>().sprite = m_ImageBackground;
 
             // Create item box holder
             obj = new GameObject("Item Box", typeof(RectTransform), typeof(Image));
             RectTransform itemBox = obj.GetComponent<RectTransform>();
             itemBox.SetParent(notificationBox, false);
+            itemBox.anchorMin = new Vector2(0, 0.5f);
+            itemBox.anchorMax = new Vector2(0, 0.5f);
             itemBox.sizeDelta = new Vector2(30, 30);
-            itemBox.anchoredPosition = new Vector2(-30, 0);
+            itemBox.anchoredPosition = new Vector2(40, 0);
             itemBox.GetComponent<Image>().sprite = m_ImageBox;
 
             // Create item image
@@ -129,12 +140,15 @@ namespace BlasphemousMultiworld.Notifications
             obj = new GameObject("Text", typeof(RectTransform), typeof(Text));
             RectTransform text = obj.GetComponent<RectTransform>();
             text.SetParent(notificationBox, false);
-            text.sizeDelta = new Vector2(90, 40);
-            text.anchoredPosition = new Vector2(30, 0);
+            text.sizeDelta = new Vector2(200, 40);
+            text.anchorMin = new Vector2(0, 0.5f);
+            text.anchorMax = new Vector2(0, 0.5f);
+            text.anchoredPosition = new Vector2(180, 0);
             receivedText = text.GetComponent<Text>();
             receivedText.font = m_TextFont;
             receivedText.fontSize = 16;
-            receivedText.alignment = TextAnchor.MiddleCenter;
+            receivedText.alignment = TextAnchor.MiddleLeft;
+            receivedText.horizontalOverflow = HorizontalWrapMode.Overflow;
         }
 
         // Set by other objects on awake
@@ -143,7 +157,7 @@ namespace BlasphemousMultiworld.Notifications
         {
             set
             {
-                if (m_ImageBackground == null) m_ImageBackground = value;
+                m_ImageBackground ??= value;
             }
         }
         private Sprite m_ImageBox;
@@ -151,7 +165,7 @@ namespace BlasphemousMultiworld.Notifications
         {
             set
             {
-                if (m_ImageBox == null) m_ImageBox = value;
+                m_ImageBox ??= value;
             }
         }
         private Font m_TextFont;
@@ -159,7 +173,7 @@ namespace BlasphemousMultiworld.Notifications
         {
             set
             {
-                if (m_TextFont == null) m_TextFont = value;
+                m_TextFont ??= value;
             }
         }
     }

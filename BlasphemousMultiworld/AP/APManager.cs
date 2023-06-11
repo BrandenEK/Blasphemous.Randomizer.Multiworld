@@ -47,7 +47,7 @@ namespace BlasphemousMultiworld.AP
                 session.Items.ItemReceived += ReceiveItem;
                 session.MessageLog.OnMessageReceived += MessageReceived;
                 session.Socket.SocketClosed += OnDisconnect;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 4, 1), null, null, password);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 4, 2), null, null, password);
             }
             catch (Exception e)
             {
@@ -80,11 +80,13 @@ namespace BlasphemousMultiworld.AP
         private void OnConnect(LoginSuccessful login, string playerName)
         {
             // Get settings from slot data
-            GameSettings settings = new GameSettings();
-            settings.Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>();
-            settings.RequiredEnding = int.Parse(login.SlotData["ending"].ToString());
-            settings.DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString());
-            settings.PlayerName = playerName;
+            GameSettings settings = new()
+            {
+                Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>(),
+                RequiredEnding = int.Parse(login.SlotData["ending"].ToString()),
+                DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString()),
+                PlayerName = playerName
+            };
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
@@ -94,7 +96,7 @@ namespace BlasphemousMultiworld.AP
             // Get location list from slot data
             session.Locations.CheckedLocationsUpdated += CheckedLocationsUpdated;
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
-            Dictionary<string, string> mappedItems = new Dictionary<string, string>();
+            Dictionary<string, string> mappedItems = new();
             apLocationIds.Clear();
             apItems.Clear();
 
