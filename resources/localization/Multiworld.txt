@@ -1,7 +1,10 @@
 lang: en
 found: Found by
-ardesc: An item that belongs to
-arnot: Sending to
+arprog: This item seems like it would help * to progress.
+arusef: This item appears to be somewhat useful to *.
+artrap: This item could benefit *, but then again it might be a trap.
+arbasc: This item looks like a pretty basic trinket for *.
+arnot: Sending to *!
 vandis: Vanilla
 muldis: Multiworld
 sindis: Singleworld
@@ -11,8 +14,7 @@ seterr: The required mods are not installed
 
 lang: es
 found: Encontrado por
-ardesc: Un objeto que pertenece a
-arnot: Enviando a
+arnot: Enviando a *
 vandis: Vanilla
 muldis: Multimundo
 sindis: Mundo Un jugador
@@ -22,22 +24,18 @@ seterr: Los mods necesarios no están instalados
 
 lang: zh
 found: 发现者
-ardesc: 该物品的所有者为
-arnot: 给予
+arnot: 给予 *
 vandis: 原版
 muldis: 多世界
 sindis: 单世界
 setnon: 未连接至多世界服务器
 setcon: 设置已被多世界服务器决定
-seterr: ???
 
 lang: fr
 found: Créé par
-ardesc: Un objet appartenant à
-arnot: Envoi à
+arnot: Envoi à *
 vandis: Vanilla
 muldis: Multi-monde
 sindis: Mono-monde
 setnon: Non connecté à un serveur multi-monde
 setcon: Les paramètres de configuration ont été déterminées par Multi-monde
-seterr: ???

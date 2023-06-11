@@ -8,20 +8,48 @@ namespace BlasphemousMultiworld.AP
         private readonly string _playerName;
         public string PlayerName => _playerName;
 
-        private readonly bool _progression;
-        public bool IsProgression => _progression;
+        private readonly ItemType _type;
+        public bool IsProgression => _type == ItemType.Progression;
 
-        public ArchipelagoItem(string name, string player, bool progression) : base("AP", name, "[AP]", 200, false, 0)
+        public ArchipelagoItem(string name, string player, ItemType type) : base("AP", name, "[AP]", 200, false, 0)
         {
             _playerName = player;
-            _progression = progression;
+            _type = type;
         }
 
         public override void addToInventory() { }
 
         public override RewardInfo getRewardInfo(bool upgraded)
         {
-            return new RewardInfo(name, $"{Main.Multiworld.Localize("ardesc")} {_playerName}.", $"{Main.Multiworld.Localize("arnot")} {_playerName}!", Main.Multiworld.ImageAP);
+            string descTerm = _type switch
+            {
+                ItemType.Progression => "arprog",
+                ItemType.Useful => "arusef",
+                ItemType.Trap => "artrap",
+                _ => "arbasc"
+            };
+
+            return new RewardInfo
+            (
+                name: name,
+                description: GetTextWithPlayerName(descTerm),
+                notification: GetTextWithPlayerName("arnot"),
+                sprite: Main.Multiworld.ImageAP
+            );
+        }
+
+        private string GetTextWithPlayerName(string term)
+        {
+            string text = Main.Multiworld.Localize(term);
+            return text.Replace("*", _playerName);
+        }
+
+        public enum ItemType
+        {
+            Basic = 0,
+            Progression = 1,
+            Useful = 2,
+            Trap = 4,
         }
     }
 }

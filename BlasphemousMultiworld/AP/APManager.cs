@@ -127,7 +127,7 @@ namespace BlasphemousMultiworld.AP
                 {
                     // This is an item to a different game
                     mappedItems.Add(currentLocation.id, "AP" + apItems.Count);
-                    apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name, currentLocation.type == 1));
+                    apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name, (ArchipelagoItem.ItemType)currentLocation.type));
                 }
             }
 
