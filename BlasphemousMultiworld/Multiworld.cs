@@ -25,7 +25,9 @@ namespace BlasphemousMultiworld
 
         public override string PersistentID => "ID_MULTIWORLD";
 
-        private List<QueuedItem> queuedItems;
+        private readonly List<QueuedItem> queuedItems = new();
+        private readonly Queue<string> messageQueue = new();
+        private static readonly object messageLock = new();
 
         // Game
         private Dictionary<string, string> multiworldMap;
@@ -49,9 +51,6 @@ namespace BlasphemousMultiworld
             NotificationManager = new NotificationManager();
 
             RegisterCommand(command);
-
-            // Initialize data storages
-            queuedItems = new List<QueuedItem>();
 
             // Load external data
             if (!FileUtil.loadDataImages("multi-images.png", 30, 30, 30, 0, true, out multiworldImages))
@@ -107,6 +106,14 @@ namespace BlasphemousMultiworld
         protected override void Update()
         {
             DeathLinkManager.Update();
+
+            lock (messageLock)
+            {
+                if (messageQueue.Count > 0)
+                {
+                    command.HackWriteToConsole(messageQueue.Dequeue());
+                }
+            }
         }
 
         public string tryConnect(string server, string playerName, string password)
@@ -142,10 +149,13 @@ namespace BlasphemousMultiworld
             queuedItems.Clear();
         }
 
-        public void WriteToConsole(string message)
+        public void QueueMessage(string message)
         {
-            Log("Received message: " + message);
-            command.HackWriteToConsole(message);
+            lock (messageLock)
+            {
+                Log("Received message: " + message);
+                messageQueue.Enqueue(message);
+            }
         }
 
         public Dictionary<string, string> LoadMultiworldItems() => multiworldMap;
