@@ -48,7 +48,7 @@ namespace BlasphemousMultiworld.AP
                 session.Items.ItemReceived += ReceiveItem;
                 session.Socket.PacketReceived += ReceivePacket;
                 session.Socket.SocketClosed += OnDisconnect;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.RemoteItems, new Version(0, 4, 2), null, null, password);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 4, 2), null, null, password);
             }
             catch (Exception e)
             {
