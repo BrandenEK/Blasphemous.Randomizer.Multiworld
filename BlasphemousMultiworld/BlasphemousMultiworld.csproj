@@ -6,7 +6,7 @@
     <BepInExPluginGuid>com.damocles.blasphemous.multiworld</BepInExPluginGuid>
     <BepInExPluginName>Multiworld</BepInExPluginName>
     <Description>A multiworld client for the Blasphemous randomizer</Description>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
