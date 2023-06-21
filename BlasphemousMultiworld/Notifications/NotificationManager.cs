@@ -29,6 +29,11 @@ namespace BlasphemousMultiworld.Notifications
             if (notificationBox == null)
                 CreateNotificationBox();
 
+            // Only display wall climb & dash ability if they are from a real player
+            // Ideally this would be a more precise check instead of just player name
+            if (item.player == "Server" && (item.itemId == "Slide" || item.itemId == "WallClimb"))
+                return;
+
             if (isShowing)
             {
                 queue.Enqueue(item);
