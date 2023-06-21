@@ -30,7 +30,8 @@ namespace BlasphemousMultiworld
         private static readonly object messageLock = new();
 
         // Game
-        private Dictionary<string, string> multiworldMap;
+        private Dictionary<string, string> multiworldItems;
+        private Dictionary<string, string> multiworldDoors;
         public GameSettings MultiworldSettings { get; private set; }
         public bool HasRequiredMods { get; private set; }
         public bool InGame { get; private set; }
@@ -123,10 +124,11 @@ namespace BlasphemousMultiworld
             return result;
         }
 
-        public void OnConnect(Dictionary<string, string> mappedItems, GameSettings serverSettings)
+        public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors, GameSettings serverSettings)
         {
             // Get data from server
-            multiworldMap = mappedItems;
+            multiworldItems = mappedItems;
+            multiworldDoors = mappedDoors;
             MultiworldSettings = serverSettings;
             HasRequiredMods =
                 (!MultiworldSettings.Config.ShuffleBootsOfPleading || Main.Randomizer.InstalledBootsMod) &&
@@ -144,7 +146,8 @@ namespace BlasphemousMultiworld
         public void OnDisconnect()
         {
             LogDisplay("Disconnected from multiworld server!");
-            multiworldMap = null;
+            multiworldItems = null;
+            multiworldDoors = null;
             hasSentLocations = false;
             queuedItems.Clear();
         }
@@ -158,7 +161,8 @@ namespace BlasphemousMultiworld
             }
         }
 
-        public Dictionary<string, string> LoadMultiworldItems() => multiworldMap;
+        public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;
+        public Dictionary<string, string> LoadMultiworldDoors() => multiworldDoors;
 
         public void QueueItem(QueuedItem item)
         {

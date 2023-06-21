@@ -17,12 +17,13 @@ namespace BlasphemousMultiworld.Patches
                 return true;
 
             Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
+            Dictionary<string, string> mappedDoors = Main.Multiworld.LoadMultiworldDoors();
             int seed = Main.Randomizer.GameSeed;
 
             try
             {
                 __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
-                __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle yet
+                __instance.itemShuffler.LoadMappedDoors(mappedDoors); // Set door list from multiworld data
                 __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
                 __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
             }

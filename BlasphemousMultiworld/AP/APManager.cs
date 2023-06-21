@@ -94,6 +94,9 @@ namespace BlasphemousMultiworld.AP
             deathLink.OnDeathLinkReceived += ReceiveDeath;
             EnableDeathLink(settings.DeathLinkEnabled);
 
+            // Get door list from slot data
+            Dictionary<string, string> mappedDoors = ((JObject)login.SlotData["doors"]).ToObject<Dictionary<string, string>>();
+
             // Get location list from slot data
             session.Locations.CheckedLocationsUpdated += CheckedLocationsUpdated;
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
@@ -130,7 +133,7 @@ namespace BlasphemousMultiworld.AP
                 }
             }
 
-            Main.Multiworld.OnConnect(mappedItems, settings);
+            Main.Multiworld.OnConnect(mappedItems, mappedDoors, settings);
         }
 
         public void Disconnect()
