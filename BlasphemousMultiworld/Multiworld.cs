@@ -25,9 +25,6 @@ namespace BlasphemousMultiworld
 
         public override string PersistentID => "ID_MULTIWORLD";
 
-        private readonly Queue<string> messageQueue = new();
-        private static readonly object messageLock = new();
-
         // Game
         private Dictionary<string, string> multiworldItems;
         private Dictionary<string, string> multiworldDoors;
@@ -110,14 +107,12 @@ namespace BlasphemousMultiworld
         protected override void Update()
         {
             DeathLinkManager.Update();
+            APManager.MessageReceiver.Update();
+        }
 
-            lock (messageLock)
-            {
-                if (messageQueue.Count > 0)
-                {
-                    command.HackWriteToConsole(messageQueue.Dequeue());
-                }
-            }
+        public void WriteToConsole(string message)
+        {
+            command.HackWriteToConsole(message);
         }
 
         public string tryConnect(string server, string playerName, string password)
@@ -152,17 +147,7 @@ namespace BlasphemousMultiworld
             multiworldItems = null;
             multiworldDoors = null;
             hasSentLocations = false;
-
             APManager.ClearAllReceivers();
-        }
-
-        public void QueueMessage(string message)
-        {
-            lock (messageLock)
-            {
-                Log("Received message: " + message);
-                messageQueue.Enqueue(message);
-            }
         }
 
         public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;

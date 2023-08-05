@@ -1,7 +1,6 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BlasphemousMultiworld.AP.Receivers;
 using BlasphemousRandomizer;
@@ -10,7 +9,6 @@ using Framework.Managers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using ItemFlags = Archipelago.MultiClient.Net.Enums.ItemFlags;
 
 namespace BlasphemousMultiworld.AP
 {
@@ -40,6 +38,7 @@ namespace BlasphemousMultiworld.AP
         private readonly MessageReceiver messageReceiver = new();
 
         public ItemReceiver ItemReceiver => itemReceiver;
+        public MessageReceiver MessageReceiver => messageReceiver;
 
         #region Connection
 
@@ -54,7 +53,7 @@ namespace BlasphemousMultiworld.AP
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += itemReceiver.OnReceiveItem;
-                session.Socket.PacketReceived += ReceivePacket;
+                session.Socket.PacketReceived += messageReceiver.OnReceiveMessage;
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnDisconnect;
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 4, 2), null, null, password);
@@ -169,7 +168,7 @@ namespace BlasphemousMultiworld.AP
             hintReceiver.ProcessHintQueue();
             itemReceiver.ProcessItemQueue();
             locationReceiver.ProcessLocationQueue();
-            messageReceiver.ProcessMessageQueue();
+            // Messages are processed every frame
         }
 
         public void ClearAllReceivers()
@@ -198,7 +197,7 @@ namespace BlasphemousMultiworld.AP
         {
             if (!Connected) return;
 
-            List<long> checkedLocations = new List<long>();
+            var checkedLocations = new List<long>();
             foreach (string location in Main.Randomizer.data.itemLocations.Keys)
             {
                 if (Core.Events.GetFlag("LOCATION_" + location))
@@ -213,7 +212,7 @@ namespace BlasphemousMultiworld.AP
         {
             if (Connected)
             {
-                StatusUpdatePacket packet = new StatusUpdatePacket();
+                var packet = new StatusUpdatePacket();
                 packet.Status = ArchipelagoClientState.ClientGoal;
                 session.Socket.SendPacket(packet);
             }
@@ -223,107 +222,10 @@ namespace BlasphemousMultiworld.AP
         {
             if (Connected)
             {
-                SayPacket packet = new SayPacket();
+                var packet = new SayPacket();
                 packet.Text = message;
                 session.Socket.SendPacket(packet);
             }
-        }
-
-        private void ReceivePacket(ArchipelagoPacketBase packet)
-        {
-            if (packet.PacketType != ArchipelagoPacketType.PrintJSON)
-                return;
-
-            PrintJsonPacket jsonPacket = packet as PrintJsonPacket;
-            System.Text.StringBuilder output = new();
-            
-            foreach (JsonMessagePart messagePart in jsonPacket.Data)
-            {
-                string text = messagePart.Text;
-                ColorType color = ColorType.NoColor;
-                switch (messagePart.Type)
-                {
-                    case JsonMessagePartType.ItemId:
-                        {
-                            if (long.TryParse(text, out long itemId))
-                            {
-                                if (messagePart.Flags == ItemFlags.Advancement)
-                                    color = ColorType.ItemProgression;
-                                else if (messagePart.Flags == ItemFlags.NeverExclude)
-                                    color = ColorType.ItemUseful;
-                                else if (messagePart.Flags == ItemFlags.Trap)
-                                    color = ColorType.ItemTrap;
-                                else
-                                    color = ColorType.ItemBasic;
-
-                                text = session.Items.GetItemName(itemId) ?? text;
-                            }
-                            else
-                            {
-                                color = ColorType.Error;
-                            }
-                            break;
-                        }
-                    case JsonMessagePartType.LocationId:
-                        {
-                            if (long.TryParse(text, out long locationId))
-                            {
-                                color = ColorType.Location;
-                                text = session.Locations.GetLocationNameFromId(locationId) ?? text;
-                            }
-                            else
-                            {
-                                color = ColorType.Error;
-                            }
-                            break;
-                        }
-                    case JsonMessagePartType.PlayerId:
-                        {
-                            if (int.TryParse(text, out int playerId))
-                            {
-                                if (session.Players.GetPlayerName(playerId) == Main.Multiworld.MultiworldSettings.PlayerName)
-                                    color = ColorType.PlayerSelf;
-                                else
-                                    color = ColorType.PlayerOther;
-
-                                text = session.Players.GetPlayerAlias(playerId) ?? text;
-                            }
-                            else
-                            {
-                                color = ColorType.Error;
-                            }
-                            break;
-                        }
-                    case JsonMessagePartType.Color:
-                        {
-                            if (messagePart.Color.HasValue)
-                            {
-                                if (messagePart.Color.Value == JsonMessagePartColor.Red)
-                                    color = ColorType.Red;
-                                else if (messagePart.Color.Value == JsonMessagePartColor.Green)
-                                    color = ColorType.Location;
-                            }
-                            else
-                            {
-                                color = ColorType.Error;
-                            }
-                            break;
-                        }
-                }
-
-                if (color == ColorType.NoColor)
-                {
-                    //No associated color, use default white
-                    output.Append(text);
-                }
-                else
-                {
-                    // Using custom color
-                    output.AppendFormat("<color=#{0}>{1}</color>", colorCodes[color], text);
-                }
-            }
-
-            Main.Multiworld.QueueMessage(output.ToString());
         }
 
         public void ScoutLocation(string location)
@@ -361,7 +263,22 @@ namespace BlasphemousMultiworld.AP
 
         public string GetPlayerNameFromSlot(int slot)
         {
-            return session.Players.GetPlayerName(slot);
+            return session.Players.GetPlayerName(slot); // If null it shows coming from the server
+        }
+
+        public string GetPlayerAliasFromSlot(int slot)
+        {
+            return session.Players.GetPlayerAlias(slot) ?? $"Player[{slot}]";
+        }
+
+        public string GetItemNameFromId(long id)
+        {
+            return session.Items.GetItemName(id) ?? $"Item[{id}]";
+        }
+
+        public string GetLocationNameFromId(long id)
+        {
+            return session.Locations.GetLocationNameFromId(id) ?? $"Location[{id}]";
         }
 
         public bool ItemNameExists(string itemName, out string itemId)
@@ -420,32 +337,5 @@ namespace BlasphemousMultiworld.AP
         }
 
         #endregion Death link
-
-        private readonly Dictionary<ColorType, string> colorCodes = new()
-        {
-            { ColorType.ItemProgression, "AF99EF" },
-            { ColorType.ItemUseful, "6D8BE8" },
-            { ColorType.ItemTrap, "FA8072" },
-            { ColorType.ItemBasic, "00EEEE" },
-            { ColorType.Location, "00FF7F" },
-            { ColorType.PlayerSelf, "EE00EE" },
-            { ColorType.PlayerOther, "FAFAD2" },
-            { ColorType.Red, "EE0000" },
-            { ColorType.Error, "7F7F7F" },
-        };
-
-        private enum ColorType
-        {
-            ItemProgression,
-            ItemUseful,
-            ItemTrap,
-            ItemBasic,
-            Location,
-            PlayerSelf,
-            PlayerOther,
-            Red,
-            Error,
-            NoColor,
-        }
     }
 }
