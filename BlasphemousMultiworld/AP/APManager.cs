@@ -1,7 +1,6 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BlasphemousMultiworld.AP.Receivers;
@@ -11,7 +10,6 @@ using Framework.Managers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using ItemFlags = Archipelago.MultiClient.Net.Enums.ItemFlags;
 
 namespace BlasphemousMultiworld.AP
@@ -41,6 +39,8 @@ namespace BlasphemousMultiworld.AP
         private readonly LocationReceiver locationReceiver = new();
         private readonly MessageReceiver messageReceiver = new();
 
+        public ItemReceiver ItemReceiver => itemReceiver;
+
         #region Connection
 
         public string Connect(string server, string player, string password)
@@ -53,7 +53,7 @@ namespace BlasphemousMultiworld.AP
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
-                session.Items.ItemReceived += ReceiveItem;
+                session.Items.ItemReceived += itemReceiver.OnReceiveItem;
                 session.Socket.PacketReceived += ReceivePacket;
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnDisconnect;
@@ -209,27 +209,6 @@ namespace BlasphemousMultiworld.AP
             session.Locations.CompleteLocationChecks(checkedLocations.ToArray());
         }
 
-        private void ReceiveItem(ReceivedItemsHelper helper)
-        {
-            // Get information from helper
-            string player = session.Players.GetPlayerName(helper.PeekItem().Player);
-            if (player == null || player == string.Empty) player = "Server";
-            string itemName = helper.PeekItemName();
-            int itemIdx = helper.Index;
-            helper.DequeueItem();
-
-            // Process item
-            if (ItemNameExists(itemName, out string itemId))
-            {
-                Main.Multiworld.Log("Receiving item: " + itemName);
-                Main.Multiworld.QueueItem(new QueuedItem(itemId, itemIdx, player));
-            }
-            else
-            {
-                Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
-            }
-        }
-
         public void SendGoal()
         {
             if (Connected)
@@ -380,7 +359,12 @@ namespace BlasphemousMultiworld.AP
             return index >= 0 && index < apItems.Count ? apItems[index] : null;
         }
 
-        private bool ItemNameExists(string itemName, out string itemId)
+        public string GetPlayerNameFromSlot(int slot)
+        {
+            return session.Players.GetPlayerName(slot);
+        }
+
+        public bool ItemNameExists(string itemName, out string itemId)
         {
             foreach (Item item in Main.Randomizer.data.items.Values)
             {

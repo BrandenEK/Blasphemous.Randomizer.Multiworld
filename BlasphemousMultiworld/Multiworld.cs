@@ -25,7 +25,6 @@ namespace BlasphemousMultiworld
 
         public override string PersistentID => "ID_MULTIWORLD";
 
-        private readonly List<QueuedItem> queuedItems = new();
         private readonly Queue<string> messageQueue = new();
         private static readonly object messageLock = new();
 
@@ -38,7 +37,6 @@ namespace BlasphemousMultiworld
 
         private readonly MultiworldCommand command = new MultiworldCommand();
         private bool hasSentLocations;
-        private int itemsReceived;
 
 
         public Multiworld(string modId, string modName, string modVersion) : base(modId, modName, modVersion) { }
@@ -68,7 +66,7 @@ namespace BlasphemousMultiworld
         {
             return new MultiworldPersistenceData
             {
-                itemsReceived = itemsReceived,
+                itemsReceived = APManager.ItemReceiver.SaveItemsReceived(),
                 scoutedLocations = APManager.SaveScoutedLocations()
             };
         }
@@ -76,7 +74,7 @@ namespace BlasphemousMultiworld
         public override void LoadGame(ModPersistentData data)
         {
             MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
-            itemsReceived = multiworldData.itemsReceived;
+            APManager.ItemReceiver.LoadItemsReceived(multiworldData.itemsReceived);
             APManager.LoadScoutedLocations(multiworldData.scoutedLocations);
         }
 
@@ -88,7 +86,7 @@ namespace BlasphemousMultiworld
 
         public override void ResetGame()
         {
-            itemsReceived = 0;
+            APManager.ItemReceiver.ResetItemsReceived();
             APManager.ClearScoutedLocations();
         }
 
@@ -96,10 +94,6 @@ namespace BlasphemousMultiworld
         {
             InGame = newLevel != "MainMenu";
             APManager.ProcessAllReceivers();
-
-
-
-            ProcessItems(true);
             
             if (!hasSentLocations && InGame && APManager.Connected)
             {
@@ -158,7 +152,6 @@ namespace BlasphemousMultiworld
             multiworldItems = null;
             multiworldDoors = null;
             hasSentLocations = false;
-            queuedItems.Clear();
 
             APManager.ClearAllReceivers();
         }
@@ -174,31 +167,6 @@ namespace BlasphemousMultiworld
 
         public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;
         public Dictionary<string, string> LoadMultiworldDoors() => multiworldDoors;
-
-        public void QueueItem(QueuedItem item)
-        {
-            queuedItems.Add(item);
-            ProcessItems(false);
-        }
-
-        public void ProcessItems(bool ignoreLoadingCheck)
-        {
-            // Wait to process items until inside a save file and the level is loaded
-            if (queuedItems.Count == 0 || !InGame || (!ignoreLoadingCheck && Core.LevelManager.InsideChangeLevel))
-                return;
-
-            for (int i = 0; i < queuedItems.Count; i++)
-            {
-                Log($"Item '{queuedItems[i].itemId}' is at index {queuedItems[i].index} with {itemsReceived} items currently received");
-                if (queuedItems[i].index > itemsReceived)
-                {
-                    Main.Randomizer.data.items[queuedItems[i].itemId].addToInventory();
-                    NotificationManager.DisplayNotification(queuedItems[i]);
-                    itemsReceived++;
-                }
-            }
-            queuedItems.Clear();
-        }
 
         private Text m_MultiworldStatusText;
         public Text MultiworldStatusText
