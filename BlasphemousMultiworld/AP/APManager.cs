@@ -55,7 +55,7 @@ namespace BlasphemousMultiworld.AP
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += ReceiveItem;
                 session.Socket.PacketReceived += ReceivePacket;
-                session.Locations.CheckedLocationsUpdated += CheckedLocationsUpdated;
+                session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnDisconnect;
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 4, 2), null, null, password);
             }
@@ -107,7 +107,6 @@ namespace BlasphemousMultiworld.AP
             Dictionary<string, string> mappedDoors = ((JObject)login.SlotData["doors"]).ToObject<Dictionary<string, string>>();
 
             // Get location list from slot data
-            session.Locations.CheckedLocationsUpdated += CheckedLocationsUpdated;
             ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             Dictionary<string, string> mappedItems = new();
             apLocationIds.Clear();
@@ -167,13 +166,10 @@ namespace BlasphemousMultiworld.AP
 
         public void ProcessAllReceivers()
         {
-            if (Main.Multiworld.InGame)
-            {
-                hintReceiver.ProcessHintQueue();
-                itemReceiver.ProcessItemQueue();
-                locationReceiver.ProcessLocationQueue();
-                messageReceiver.ProcessMessageQueue();
-            }
+            hintReceiver.ProcessHintQueue();
+            itemReceiver.ProcessItemQueue();
+            locationReceiver.ProcessLocationQueue();
+            messageReceiver.ProcessMessageQueue();
         }
 
         public void ClearAllReceivers()
@@ -382,25 +378,6 @@ namespace BlasphemousMultiworld.AP
         {
             int index = int.Parse(apId.Substring(2));
             return index >= 0 && index < apItems.Count ? apItems[index] : null;
-        }
-
-        private void CheckedLocationsUpdated(ReadOnlyCollection<long> newCheckedLocations)
-        {
-            foreach (long apId in newCheckedLocations)
-            {
-                if (LocationIdExists(apId, out string locationId))
-                {
-                    if (!Core.Events.GetFlag("LOCATION_" + locationId))
-                    {
-                        Core.Events.SetFlag("APLOCATION_" + locationId, true, false);
-                        Main.Multiworld.Log("Setting ap location flag for " + locationId);
-                    }
-                }
-                else
-                {
-                    Main.Multiworld.LogError("Received invalid checked location: " + apId);
-                }
-            }
         }
 
         private bool ItemNameExists(string itemName, out string itemId)
