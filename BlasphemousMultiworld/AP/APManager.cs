@@ -47,6 +47,7 @@ namespace BlasphemousMultiworld.AP
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += ReceiveItem;
                 session.Socket.PacketReceived += ReceivePacket;
+                session.Locations.CheckedLocationsUpdated += CheckedLocationsUpdated;
                 session.Socket.SocketClosed += OnDisconnect;
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 4, 2), null, null, password);
             }
@@ -355,6 +356,21 @@ namespace BlasphemousMultiworld.AP
 
         private void CheckedLocationsUpdated(ReadOnlyCollection<long> newCheckedLocations)
         {
+            foreach (long apId in newCheckedLocations)
+            {
+                if (LocationIdExists(apId, out string locationId))
+                {
+                    if (!Core.Events.GetFlag("LOCATION_" + locationId))
+                    {
+                        Core.Events.SetFlag("APLOCATION_" + locationId, true, false);
+                        Main.Multiworld.Log("Setting ap location flag for " + locationId);
+                    }
+                }
+                else
+                {
+                    Main.Multiworld.LogError("Received invalid checked location: " + apId);
+                }
+            }
         }
 
         private bool ItemNameExists(string itemName, out string itemId)
@@ -368,6 +384,21 @@ namespace BlasphemousMultiworld.AP
                 }
             }
             itemId = null;
+            return false;
+        }
+
+        private bool LocationIdExists(long apId, out string locationId)
+        {
+            foreach (KeyValuePair<string, long> locationPair in apLocationIds)
+            {
+                if (locationPair.Value == apId)
+                {
+                    locationId = locationPair.Key;
+                    return true;
+                }
+            }
+
+            locationId = null;
             return false;
         }
 
