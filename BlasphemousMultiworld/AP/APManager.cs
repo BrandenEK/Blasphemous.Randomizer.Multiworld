@@ -143,7 +143,7 @@ namespace BlasphemousMultiworld.AP
             }
 
             // Start tracking hints
-            //session.DataStorage.TrackHints(hintReceiver.OnReceiveHints, true);
+            session.DataStorage.TrackHints(hintReceiver.OnReceiveHints, true);
 
             Main.Multiworld.OnConnect(mappedItems, mappedDoors, settings);
         }
@@ -163,6 +163,25 @@ namespace BlasphemousMultiworld.AP
             Main.Multiworld.OnDisconnect();
             Connected = false;
             session = null;
+        }
+
+        public void ProcessAllReceivers()
+        {
+            if (Main.Multiworld.InGame)
+            {
+                hintReceiver.ProcessHintQueue();
+                itemReceiver.ProcessItemQueue();
+                locationReceiver.ProcessLocationQueue();
+                messageReceiver.ProcessMessageQueue();
+            }
+        }
+
+        public void ClearAllReceivers()
+        {
+            hintReceiver.ClearHintQueue();
+            itemReceiver.ClearItemQueue();
+            locationReceiver.ClearLocationQueue();
+            messageReceiver.ClearMessageQueue();
         }
 
         #endregion Connection

@@ -18,7 +18,7 @@ namespace BlasphemousMultiworld.AP.Receivers
                 if (Main.Multiworld.APManager.LocationIdExists(hint.LocationId, out string locationId))
                 {
                     hintQueue.Add(locationId);
-                    Main.Multiworld.Log("Setting ap hint flag for " + locationId);
+                    Main.Multiworld.Log("Queueing hint for location: " + locationId);
                 }
                 else
                 {
@@ -31,6 +31,11 @@ namespace BlasphemousMultiworld.AP.Receivers
 
         public void ProcessHintQueue()
         {
+            if (!Main.Multiworld.InGame || hintQueue.Count == 0)
+                return;
+
+            Main.Multiworld.LogWarning("Processing hint queue");
+
             foreach (string locationId in hintQueue)
             {
                 Core.Events.SetFlag("APHINT_" + locationId, true, false);

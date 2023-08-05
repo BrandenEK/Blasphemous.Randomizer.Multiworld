@@ -95,6 +95,10 @@ namespace BlasphemousMultiworld
         protected override void LevelLoaded(string oldLevel, string newLevel)
         {
             InGame = newLevel != "MainMenu";
+            APManager.ProcessAllReceivers();
+
+
+
             ProcessItems(true);
             
             if (!hasSentLocations && InGame && APManager.Connected)
@@ -103,7 +107,12 @@ namespace BlasphemousMultiworld
                 hasSentLocations = true;
             }
         }
-        
+
+        protected override void LevelUnloaded(string oldLevel, string newLevel)
+        {
+            InGame = false;
+        }
+
         protected override void Update()
         {
             DeathLinkManager.Update();
@@ -150,6 +159,8 @@ namespace BlasphemousMultiworld
             multiworldDoors = null;
             hasSentLocations = false;
             queuedItems.Clear();
+
+            APManager.ClearAllReceivers();
         }
 
         public void QueueMessage(string message)
