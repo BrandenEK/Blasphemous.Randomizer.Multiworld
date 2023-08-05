@@ -4,6 +4,7 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
+using BlasphemousMultiworld.AP.Receivers;
 using BlasphemousRandomizer;
 using BlasphemousRandomizer.ItemRando;
 using Framework.Managers;
@@ -22,6 +23,7 @@ namespace BlasphemousMultiworld.AP
 
         public bool Connected { get; private set; }
         public string ServerAddress => Connected ? session.Socket.Uri.ToString() : string.Empty;
+        public int PlayerSlot => Connected ? session.ConnectionInfo.Slot : -1;
 
         // These are cleared and refilled when connecting
         private readonly Dictionary<string, long> apLocationIds = new ();
@@ -32,6 +34,12 @@ namespace BlasphemousMultiworld.AP
         public List<string> SaveScoutedLocations() => scoutedLocations;
         public void LoadScoutedLocations(List<string> locations) => scoutedLocations = locations;
         public void ClearScoutedLocations() => scoutedLocations = new List<string>();
+
+        // AP Receivers
+        private readonly HintReceiver hintReceiver = new();
+        private readonly ItemReceiver itemReceiver = new();
+        private readonly LocationReceiver locationReceiver = new();
+        private readonly MessageReceiver messageReceiver = new();
 
         #region Connection
 
@@ -133,6 +141,9 @@ namespace BlasphemousMultiworld.AP
                     apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name, (ArchipelagoItem.ItemType)currentLocation.type));
                 }
             }
+
+            // Start tracking hints
+            //session.DataStorage.TrackHints(hintReceiver.OnReceiveHints, true);
 
             Main.Multiworld.OnConnect(mappedItems, mappedDoors, settings);
         }
@@ -387,7 +398,7 @@ namespace BlasphemousMultiworld.AP
             return false;
         }
 
-        private bool LocationIdExists(long apId, out string locationId)
+        public bool LocationIdExists(long apId, out string locationId)
         {
             foreach (KeyValuePair<string, long> locationPair in apLocationIds)
             {
