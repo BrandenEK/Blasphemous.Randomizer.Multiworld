@@ -270,7 +270,7 @@ namespace BlasphemousMultiworld.AP
         public ArchipelagoItem GetAPItem(string apId)
         {
             int index = int.Parse(apId.Substring(2));
-            return index >= 0 && index < apItems.Count ? apItems[index] : null;
+            return index >= 0 && index < apItems.Count ? apItems[index] : new ArchipelagoItem("Unknown Item", "Unknown Player", ArchipelagoItem.ItemType.Basic);
         }
 
         public string GetPlayerNameFromSlot(int slot)
