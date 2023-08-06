@@ -10,25 +10,26 @@ namespace BlasphemousMultiworld.AP.Receivers
 
         public void OnReceiveLocations(ReadOnlyCollection<long> locations)
         {
-            foreach (long apId in locations)
+            lock (APManager.receiverLock)
             {
-                if (Main.Multiworld.APManager.LocationIdExists(apId, out string locationId))
+                foreach (long apId in locations)
                 {
-                    locationQueue.Add(locationId);
-                    Main.Multiworld.Log("Queueing check for location: " + locationId);
-                }
-                else
-                {
-                    Main.Multiworld.LogError("Received invalid checked location: " + apId);
+                    if (Main.Multiworld.APManager.LocationIdExists(apId, out string locationId))
+                    {
+                        locationQueue.Add(locationId);
+                        Main.Multiworld.Log("Queueing check for location: " + locationId);
+                    }
+                    else
+                    {
+                        Main.Multiworld.LogError("Received invalid checked location: " + apId);
+                    }
                 }
             }
-
-            ProcessLocationQueue();
         }
 
-        public void ProcessLocationQueue()
+        public void Update()
         {
-            if (!Main.Multiworld.InGame || locationQueue.Count == 0)
+            if (locationQueue.Count == 0)
                 return;
 
             Main.Multiworld.LogWarning("Processing location queue");

@@ -90,7 +90,6 @@ namespace BlasphemousMultiworld
         protected override void LevelLoaded(string oldLevel, string newLevel)
         {
             InGame = newLevel != "MainMenu";
-            APManager.ProcessAllReceivers();
             
             if (!hasSentLocations && InGame && APManager.Connected)
             {
@@ -107,7 +106,7 @@ namespace BlasphemousMultiworld
         protected override void Update()
         {
             DeathLinkManager.Update();
-            APManager.MessageReceiver.Update();
+            APManager.UpdateAllReceivers();
         }
 
         public void WriteToConsole(string message)

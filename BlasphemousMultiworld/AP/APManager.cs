@@ -40,6 +40,9 @@ namespace BlasphemousMultiworld.AP
         public ItemReceiver ItemReceiver => itemReceiver;
         public MessageReceiver MessageReceiver => messageReceiver;
 
+        // Each receiver will be locked when processing and clearing, so you only need to lock it when receiving
+        public static readonly object receiverLock = new();
+
         #region Connection
 
         public string Connect(string server, string player, string password)
@@ -163,20 +166,29 @@ namespace BlasphemousMultiworld.AP
             session = null;
         }
 
-        public void ProcessAllReceivers()
+        public void UpdateAllReceivers()
         {
-            hintReceiver.ProcessHintQueue();
-            itemReceiver.ProcessItemQueue();
-            locationReceiver.ProcessLocationQueue();
-            // Messages are processed every frame
+            lock (receiverLock)
+            {
+                if (Main.Multiworld.InGame)
+                {
+                    hintReceiver.Update();
+                    itemReceiver.Update();
+                    locationReceiver.Update();
+                }
+                messageReceiver.Update(); // Doesn't need to be in game
+            }
         }
 
         public void ClearAllReceivers()
         {
-            hintReceiver.ClearHintQueue();
-            itemReceiver.ClearItemQueue();
-            locationReceiver.ClearLocationQueue();
-            messageReceiver.ClearMessageQueue();
+            lock (receiverLock)
+            {
+                hintReceiver.ClearHintQueue();
+                itemReceiver.ClearItemQueue();
+                locationReceiver.ClearLocationQueue();
+                messageReceiver.ClearMessageQueue();
+            }
         }
 
         #endregion Connection

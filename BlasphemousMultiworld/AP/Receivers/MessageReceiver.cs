@@ -10,8 +10,6 @@ namespace BlasphemousMultiworld.AP.Receivers
     {
         private readonly Queue<string> messageQueue = new();
 
-        private static readonly object messageLock = new();
-
         public void OnReceiveMessage(ArchipelagoPacketBase packet)
         {
             if (packet.PacketType != ArchipelagoPacketType.PrintJSON)
@@ -106,7 +104,7 @@ namespace BlasphemousMultiworld.AP.Receivers
                 }
             }
 
-            lock (messageLock)
+            lock (APManager.receiverLock)
             {
                 string message = output.ToString();
                 Main.Multiworld.Log("Queueing message: " + message);
@@ -116,21 +114,15 @@ namespace BlasphemousMultiworld.AP.Receivers
 
         public void Update()
         {
-            lock (messageLock)
+            if (messageQueue.Count > 0)
             {
-                if (messageQueue.Count > 0)
-                {
-                    Main.Multiworld.WriteToConsole(messageQueue.Dequeue());
-                }
+                Main.Multiworld.WriteToConsole(messageQueue.Dequeue());
             }
         }
 
         public void ClearMessageQueue()
         {
-            lock (messageLock)
-            {
-                messageQueue.Clear();
-            }
+            messageQueue.Clear();
         }
 
         private readonly Dictionary<ColorType, string> colorCodes = new()

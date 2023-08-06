@@ -10,29 +10,30 @@ namespace BlasphemousMultiworld.AP.Receivers
 
         public void OnReceiveItem(ReceivedItemsHelper helper)
         {
-            string player = Main.Multiworld.APManager.GetPlayerNameFromSlot(helper.PeekItem().Player);
-            if (player == null || player == string.Empty)
-                player = "Server";
-            string itemName = helper.PeekItemName();
-            int itemIdx = helper.Index;
-            helper.DequeueItem();
-
-            if (Main.Multiworld.APManager.ItemNameExists(itemName, out string itemId))
+            lock (APManager.receiverLock)
             {
-                itemQueue.Add(new QueuedItem(itemId, itemIdx, player));
-                Main.Multiworld.Log("Queueing item: " + itemId);
-            }
-            else
-            {
-                Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
-            }
+                string player = Main.Multiworld.APManager.GetPlayerNameFromSlot(helper.PeekItem().Player);
+                if (player == null || player == string.Empty)
+                    player = "Server";
+                string itemName = helper.PeekItemName();
+                int itemIdx = helper.Index;
+                helper.DequeueItem();
 
-            ProcessItemQueue();
+                if (Main.Multiworld.APManager.ItemNameExists(itemName, out string itemId))
+                {
+                    itemQueue.Add(new QueuedItem(itemId, itemIdx, player));
+                    Main.Multiworld.Log("Queueing item: " + itemId);
+                }
+                else
+                {
+                    Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
+                }
+            }
         }
 
-        public void ProcessItemQueue()
+        public void Update()
         {
-            if (!Main.Multiworld.InGame || itemQueue.Count == 0)
+            if (itemQueue.Count == 0)
                 return;
 
             Main.Multiworld.LogWarning("Processing item queue");

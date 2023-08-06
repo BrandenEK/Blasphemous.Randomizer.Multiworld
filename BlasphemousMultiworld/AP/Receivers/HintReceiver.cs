@@ -10,28 +10,29 @@ namespace BlasphemousMultiworld.AP.Receivers
 
         public void OnReceiveHints(Hint[] hints)
         {
-            foreach (Hint hint in hints)
+            lock (APManager.receiverLock)
             {
-                if (hint.Found || hint.FindingPlayer != Main.Multiworld.APManager.PlayerSlot)
-                    continue;
+                foreach (Hint hint in hints)
+                {
+                    if (hint.Found || hint.FindingPlayer != Main.Multiworld.APManager.PlayerSlot)
+                        continue;
 
-                if (Main.Multiworld.APManager.LocationIdExists(hint.LocationId, out string locationId))
-                {
-                    hintQueue.Add(locationId);
-                    Main.Multiworld.Log("Queueing hint for location: " + locationId);
-                }
-                else
-                {
-                    Main.Multiworld.LogError("Received invalid hint location: " + hint.LocationId);
+                    if (Main.Multiworld.APManager.LocationIdExists(hint.LocationId, out string locationId))
+                    {
+                        hintQueue.Add(locationId);
+                        Main.Multiworld.Log("Queueing hint for location: " + locationId);
+                    }
+                    else
+                    {
+                        Main.Multiworld.LogError("Received invalid hint location: " + hint.LocationId);
+                    }
                 }
             }
-
-            ProcessHintQueue();
         }
 
-        public void ProcessHintQueue()
+        public void Update()
         {
-            if (!Main.Multiworld.InGame || hintQueue.Count == 0)
+            if (hintQueue.Count == 0)
                 return;
 
             Main.Multiworld.LogWarning("Processing hint queue");
@@ -40,6 +41,7 @@ namespace BlasphemousMultiworld.AP.Receivers
             {
                 Core.Events.SetFlag("APHINT_" + locationId, true, false);
             }
+
             ClearHintQueue();
         }
 
