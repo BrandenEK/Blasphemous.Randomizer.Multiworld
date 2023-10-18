@@ -11,6 +11,10 @@ sindis: Singleworld
 setnon: Not connected to a multiworld server
 setcon: Settings have been determined by Multiworld
 seterr: The required mods are not installed
+tirse0: Your goal is Any Ending.  You must defeat His Holiness Escribar.
+tirse1: Your goal is Ending A.  You must collect all thorn upgrades and defeat His Holiness Escribar.
+tirse2: Your goal is Ending C.  You must collect all thorn upgrades and the Holy Wound of Abnegation, then defeat His Holiness Escribar.
+tirseu: I am unsure of your current goal.  You are not connected to an Archipelago server.
 
 lang: es
 found: Encontrado por

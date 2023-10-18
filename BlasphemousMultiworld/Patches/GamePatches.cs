@@ -100,8 +100,12 @@ namespace BlasphemousMultiworld.Patches
             if (conversiationId == "DLG_0302")
             {
                 DialogObject current = ___allDialogs[conversiationId];
+                string tirsoText = Main.Multiworld.Localize(Main.Multiworld.APManager.Connected
+                    ? "tirse" + Main.Multiworld.MultiworldSettings.RequiredEnding
+                    : "tirseu");
+
                 current.dialogLines.Clear();
-                current.dialogLines.Add("New text");
+                current.dialogLines.Add(tirsoText);
                 return;
             }
 
