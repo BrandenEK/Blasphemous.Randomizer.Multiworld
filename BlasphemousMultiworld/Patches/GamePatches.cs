@@ -1,7 +1,8 @@
-﻿using Framework.Managers;
-using HarmonyLib;
+﻿using Framework.Dialog;
+using Framework.Managers;
 using Gameplay.UI.Others.MenuLogic;
 using Gameplay.UI.Widgets;
+using HarmonyLib;
 using System.Collections.Generic;
 using Tools.Playmaker2.Action;
 using UnityEngine.UI;
@@ -89,12 +90,26 @@ namespace BlasphemousMultiworld.Patches
         }
     }
 
-    // Send hint when looking at shop items
+    // Send hint when looking at shop items, and show goal text for tirso
     [HarmonyPatch(typeof(DialogManager), "StartConversation")]
     public class DialogManager_Patch
     {
-        public static void Postfix(string conversiationId)
+        public static void Prefix(string conversiationId, Dictionary<string, DialogObject> ___allDialogs)
         {
+            // If talking to Tirso, change text to current goal
+            if (conversiationId == "DLG_0302")
+            {
+                DialogObject current = ___allDialogs[conversiationId];
+                string tirsoText = Main.Multiworld.Localize(Main.Multiworld.APManager.Connected
+                    ? "tirse" + Main.Multiworld.MultiworldSettings.RequiredEnding
+                    : "tirseu");
+
+                current.dialogLines.Clear();
+                current.dialogLines.Add(tirsoText);
+                return;
+            }
+
+            // If starting dialog for a shop item, send a hint
             string location;
             switch (conversiationId)
             {
