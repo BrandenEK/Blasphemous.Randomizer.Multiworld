@@ -2,15 +2,14 @@
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
-using BlasphemousMultiworld.AP.Receivers;
-using BlasphemousRandomizer;
-using BlasphemousRandomizer.ItemRando;
+using Blasphemous.Randomizer.Multiworld.AP.Receivers;
+using Blasphemous.Randomizer.ItemRando;
 using Framework.Managers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace BlasphemousMultiworld.AP
+namespace Blasphemous.Randomizer.Multiworld.AP
 {
     public class APManager
     {

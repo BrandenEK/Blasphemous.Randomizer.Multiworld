@@ -1,6 +1,6 @@
 ﻿using Framework.Managers;
 
-namespace BlasphemousMultiworld.DeathLink
+namespace Blasphemous.Randomizer.Multiworld.DeathLink
 {
     public class DeathLinkManager
     {
@@ -24,7 +24,8 @@ namespace BlasphemousMultiworld.DeathLink
 
         public void SendDeath()
         {
-            if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled) return;
+            if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled)
+                return;
 
             Main.Multiworld.Log("Sending death link!");
             Main.Multiworld.APManager.SendDeath();
@@ -32,7 +33,8 @@ namespace BlasphemousMultiworld.DeathLink
 
         public void ReceiveDeath(string player)
         {
-            if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled) return;
+            if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled)
+                return;
 
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {

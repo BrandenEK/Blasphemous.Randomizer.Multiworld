@@ -4,7 +4,7 @@ using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using System.Collections.Generic;
 
-namespace BlasphemousMultiworld.AP.Receivers
+namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
 {
     public class MessageReceiver
     {

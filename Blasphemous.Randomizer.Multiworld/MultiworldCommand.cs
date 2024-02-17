@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Blasphemous.CheatConsole;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using ModdingAPI.Commands;
 
-namespace BlasphemousMultiworld
+namespace Blasphemous.Randomizer.Multiworld
 {
     public class MultiworldCommand : ModCommand
     {

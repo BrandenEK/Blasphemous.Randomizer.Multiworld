@@ -1,5 +1,5 @@
 ﻿
-namespace BlasphemousMultiworld.DeathLink
+namespace Blasphemous.Randomizer.Multiworld.DeathLink
 {
     public enum DeathLinkStatus
     {

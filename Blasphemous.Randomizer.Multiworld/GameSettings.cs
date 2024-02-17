@@ -1,6 +1,5 @@
-﻿using BlasphemousRandomizer;
-
-namespace BlasphemousMultiworld
+﻿
+namespace Blasphemous.Randomizer.Multiworld
 {
     public class GameSettings
     {

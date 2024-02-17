@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace BlasphemousMultiworld.AP.Receivers
+namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
 {
     public class LocationReceiver
     {

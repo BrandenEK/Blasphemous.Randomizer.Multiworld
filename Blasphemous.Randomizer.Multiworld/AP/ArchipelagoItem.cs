@@ -1,7 +1,7 @@
-﻿using BlasphemousRandomizer.ItemRando;
-using BlasphemousRandomizer.Notifications;
+﻿using Blasphemous.Randomizer.ItemRando;
+using Blasphemous.Randomizer.Notifications;
 
-namespace BlasphemousMultiworld.AP
+namespace Blasphemous.Randomizer.Multiworld.AP
 {
     public class ArchipelagoItem : Item
     {
@@ -40,7 +40,7 @@ namespace BlasphemousMultiworld.AP
 
         private string GetTextWithPlayerName(string term)
         {
-            string text = Main.Multiworld.Localize(term);
+            string text = Main.Multiworld.LocalizationHandler.Localize(term);
             return text.Replace("*", _playerName);
         }
 

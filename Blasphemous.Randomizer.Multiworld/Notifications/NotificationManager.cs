@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BlasphemousMultiworld.Notifications
+namespace Blasphemous.Randomizer.Multiworld.Notifications
 {
     public class NotificationManager
     {
@@ -59,12 +59,12 @@ namespace BlasphemousMultiworld.Notifications
             else
             {
                 // Regular item
-                BlasphemousRandomizer.ItemRando.Item randoItem = Main.Randomizer.data.items[item.itemId];
+                ItemRando.Item randoItem = Main.Randomizer.data.items[item.itemId];
                 image = randoItem.getRewardInfo(false).sprite;
                 name = randoItem.name;
             }
             itemImage.sprite = image;
-            receivedText.text = $"{name}\n\t{Main.Multiworld.Localize("found")}: {item.player}";
+            receivedText.text = $"{name}\n\t{Main.Multiworld.LocalizationHandler.Localize("found")}: {item.player}";
 
             notificationBox.anchoredPosition = POSITION_HIDDEN;
             float positionDifference = POSITION_VISIBLE.x - POSITION_HIDDEN.x;
