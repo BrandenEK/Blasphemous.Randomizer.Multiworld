@@ -15,7 +15,7 @@ namespace Blasphemous.Randomizer.Multiworld;
 
 public class Multiworld : BlasMod, IPersistentMod
 {
-    public Multiworld() : base(ModInfo.MOD_ID, ModInfo.MOD_NAME, ModInfo.MOD_AUTHOR, ModInfo.MOD_VERSION) { }
+    internal Multiworld() : base(ModInfo.MOD_ID, ModInfo.MOD_NAME, ModInfo.MOD_AUTHOR, ModInfo.MOD_VERSION) { }
 
     // Images
     private Sprite[] multiworldImages;
@@ -39,6 +39,9 @@ public class Multiworld : BlasMod, IPersistentMod
     private readonly MultiworldCommand command = new MultiworldCommand();
     private bool hasSentLocations;
 
+    /// <summary>
+    /// Register handlers and create managers
+    /// </summary>
     protected override void OnInitialize()
     {
         LocalizationHandler.RegisterDefaultLanguage("en");
@@ -62,6 +65,9 @@ public class Multiworld : BlasMod, IPersistentMod
         Log("Multiworld has been initialized!");
     }
 
+    /// <summary>
+    /// Register command
+    /// </summary>
     protected override void OnRegisterServices(ModServiceProvider provider)
     {
         provider.RegisterCommand(command);

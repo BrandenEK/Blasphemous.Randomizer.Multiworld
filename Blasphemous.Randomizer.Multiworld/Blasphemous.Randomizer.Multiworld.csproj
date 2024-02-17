@@ -8,28 +8,23 @@
     <Product>Multiworld</Product>
     <Authors>Damocles</Authors>
     <Company>Damocles</Company>
-    <Description>A mod for Blasphemous 1</Description>
-    <Version>0.1.0</Version>
+    <Description>A multiworld client for the Blasphemous Randomizer</Description>
+    <Version>2.1.4</Version>
 
     <TargetName>BlasphemousMultiworld</TargetName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/Example</RepositoryUrl>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>bin\Release\$(TargetName).xml</DocumentationFile>
+    <RepositoryUrl>https://github.com/BrandenEK/Blasphemous.Randomizer.Multiworld</RepositoryUrl>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Archipelago.MultiClient.Net" Version="5.0.4" />
+    <PackageReference Include="Blasphemous.CheatConsole" Version="1.0.0" />
     <PackageReference Include="Blasphemous.ModdingAPI" Version="2.1.0" />
     <PackageReference Include="Blasphemous.ModdingReferences" Version="4.0.67" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="BlasphemousRandomizer">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Blasphemous\Modding\plugins\BlasphemousRandomizer.dll</HintPath>
-    </Reference>
-    <Reference Include="CheatConsole">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Blasphemous\Modding\plugins\CheatConsole.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Blasphemous.Randomizer" Version="2.0.12" />
   </ItemGroup>
 
   <Target Name="Development" AfterTargets="PostBuildEvent">

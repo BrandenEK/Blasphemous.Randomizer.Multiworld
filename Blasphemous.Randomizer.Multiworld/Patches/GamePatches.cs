@@ -6,6 +6,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using Tools.Playmaker2.Action;
 using UnityEngine.UI;
+using static UnityEngine.UI.ContentSizeFitter;
 
 namespace Blasphemous.Randomizer.Multiworld.Patches;
 
@@ -128,17 +129,29 @@ class DialogManager_Patch
         Main.Multiworld.APManager.ScoutLocation(location);
     }
 }
+
+// Send hint when in a shrine menu
+[HarmonyPatch(typeof(NewInventory_LayoutSkill), "ShowLayout")]
+class InvSkillShow_Patch
+{
+    public static void Prefix(bool editMode) => InvDescription_Patch.EditFlag = editMode;
+}
+[HarmonyPatch(typeof(NewInventory_LayoutSkill), "CancelEditMode")]
+class InvSkillCancel_Patch
+{
+    public static void Postfix() => InvDescription_Patch.EditFlag = false;
+}
 [HarmonyPatch(typeof(NewInventory_Description), "SetKill")]
 class InvDescription_Patch
 {
     public static void Postfix(string skillId)
     {
-        // Only hint for items at shrine
-        if (!Main.Randomizer.ShrineEditMode) return;
-
-        if (Core.SkillManager.CanUnlockSkillNoCheckPoints(skillId))
+        // Only hint for items at shrine that are visible
+        if (EditFlag && Core.SkillManager.CanUnlockSkillNoCheckPoints(skillId))
         {
             Main.Multiworld.APManager.ScoutLocation(skillId);
         }
     }
+
+    public static bool EditFlag { get; set; }
 }
