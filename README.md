@@ -1,10 +1,6 @@
 # Blasphemous Multiworld Client
 
-<div>
-  <img src="https://img.shields.io/github/v/release/BrandenEK/Blasphemous.Randomizer.Multiworld?style=for-the-badge">
-  <img src="https://img.shields.io/github/last-commit/BrandenEK/Blasphemous.Randomizer.Multiworld?color=important&style=for-the-badge">
-  <img src="https://img.shields.io/github/downloads/BrandenEK/Blasphemous.Randomizer.Multiworld/total?color=success&style=for-the-badge">
-</div>
+<img src="https://img.shields.io/github/downloads/BrandenEK/Blasphemous.Randomizer.Multiworld/total?color=6495ED&style=for-the-badge">
 
 ---
 
@@ -28,7 +24,6 @@
 | `multiworld say` | COMMAND | Sends a command to the AP server |
 
 ## Translations
-
 This mod is available in these other languages in addition to English:
 - Spanish (Thanks to Rodol J. "ConanCimmerio" Pérez (Ro))
 - Chinese (Thanks to NewbieElton)
