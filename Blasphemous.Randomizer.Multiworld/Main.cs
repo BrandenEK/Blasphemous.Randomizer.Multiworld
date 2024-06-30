@@ -7,6 +7,7 @@ namespace Blasphemous.Randomizer.Multiworld;
 [BepInDependency("Blasphemous.ModdingAPI", "2.2.0")]
 [BepInDependency("Blasphemous.Randomizer", "3.0.0")]
 [BepInDependency("Blasphemous.CheatConsole", "1.0.0")]
+[BepInDependency("Blasphemous.Framework.Menus", "0.3.0")]
 internal class Main : BaseUnityPlugin
 {
     public static Multiworld Multiworld { get; private set; }

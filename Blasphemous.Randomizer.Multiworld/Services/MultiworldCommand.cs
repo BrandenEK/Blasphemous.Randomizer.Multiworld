@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Blasphemous.Randomizer.Multiworld
+namespace Blasphemous.Randomizer.Multiworld.Services
 {
     public class MultiworldCommand : ModCommand
     {

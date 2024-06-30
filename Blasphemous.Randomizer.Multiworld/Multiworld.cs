@@ -1,10 +1,12 @@
 ﻿using Blasphemous.CheatConsole;
+using Blasphemous.Framework.Menus;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Persistence;
 using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.Multiworld.AP;
 using Blasphemous.Randomizer.Multiworld.DeathLink;
 using Blasphemous.Randomizer.Multiworld.Notifications;
+using Blasphemous.Randomizer.Multiworld.Services;
 using Framework.Managers;
 using Gameplay.UI.Others.MenuLogic;
 using System.Collections.Generic;
@@ -71,6 +73,7 @@ public class Multiworld : BlasMod, IPersistentMod
     protected override void OnRegisterServices(ModServiceProvider provider)
     {
         provider.RegisterCommand(command);
+        provider.RegisterNewGameMenu(new MultiworldMenu());
     }
 
     public SaveData SaveGame()
