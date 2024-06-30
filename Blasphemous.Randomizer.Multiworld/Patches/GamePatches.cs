@@ -1,53 +1,11 @@
 ﻿using Framework.Dialog;
 using Framework.Managers;
 using Gameplay.UI.Others.MenuLogic;
-using Gameplay.UI.Widgets;
 using HarmonyLib;
 using System.Collections.Generic;
 using Tools.Playmaker2.Action;
-using UnityEngine.UI;
-using static UnityEngine.UI.ContentSizeFitter;
 
 namespace Blasphemous.Randomizer.Multiworld.Patches;
-
-// Show whether a save file was started in multiworld
-[HarmonyPatch(typeof(SelectSaveSlots), "SetAllData")]
-class SelectSaveSlotsData_Patch
-{
-    public static void Postfix(List<SaveSlot> ___slots)
-    {
-        for (int i = 0; i < ___slots.Count; i++)
-        {
-            PersistentManager.PublicSlotData slotData = Core.Persistence.GetSlotData(i);
-            if (slotData == null)
-                continue;
-
-            // Check if this save file was played in multiworld
-            string type = $"({Main.Multiworld.LocalizationHandler.Localize("vandis")})";
-            if (slotData.flags.flags.ContainsKey("MULTIWORLD"))
-                type = $"({Main.Multiworld.LocalizationHandler.Localize("muldis")})";
-            else if (slotData.flags.flags.ContainsKey("RANDOMIZED"))
-                type = $"({Main.Multiworld.LocalizationHandler.Localize("sindis")})";
-
-            // Send extra info to the slot
-            ___slots[i].SetData("ignorealso", type, 0, false, false, false, 0, SelectSaveSlots.SlotsModes.Normal);
-        }
-    }
-}
-[HarmonyPatch(typeof(SaveSlot), "SetData")]
-class SaveSlotData_Patch
-{
-    public static bool Prefix(string zoneName, string info, ref Text ___ZoneText)
-    {
-        if (zoneName == "ignorealso")
-        {
-            int startIdx = ___ZoneText.text.IndexOf('(');
-            ___ZoneText.text = ___ZoneText.text.Substring(0, startIdx) + info;
-            return false;
-        }
-        return true;
-    }
-}
 
 // Check if there are any input blockers
 [HarmonyPatch(typeof(InputManager), "HasBlocker")]

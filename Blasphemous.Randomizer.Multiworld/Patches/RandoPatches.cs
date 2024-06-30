@@ -17,7 +17,7 @@ class RandomizerRandomize_Patch
 
         Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
         Dictionary<string, string> mappedDoors = Main.Multiworld.LoadMultiworldDoors();
-        int seed = Main.Randomizer.GameSeed;
+        int seed = Main.Randomizer.GameSettings.Seed;
 
         try
         {
