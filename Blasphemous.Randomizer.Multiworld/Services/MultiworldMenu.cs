@@ -4,6 +4,8 @@ using Blasphemous.Framework.Menus.Options;
 using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Input;
+using FMOD;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -97,16 +99,23 @@ public class MultiworldMenu : ModMenu
     {
         if (login is LoginFailure failure)
         {
-            string error = $"Failed to connect:\n{string.Join("\n", failure.Errors)}";
-
-            Main.Multiworld.LogError(error);
-            ShowTextTimed(error, Color.red, 5f);
+            ShowError(string.Join("\n", failure.Errors));
             return;
         }
 
         if (login is LoginSuccessful success)
         {
-            // Check for mod status first
+            Config cfg = ((JObject)success.SlotData["cfg"]).ToObject<Config>();
+            bool hasRequiredMods =
+                (!cfg.ShuffleBootsOfPleading || Main.Randomizer.InstalledBootsMod) &&
+                (!cfg.ShufflePurifiedHand || Main.Randomizer.InstalledDoubleJumpMod);
+
+            if (!hasRequiredMods)
+            {
+                ShowError("The required mods are not installed");
+                Main.Multiworld.APManager.Disconnect();
+                return;
+            }
 
             ShowText("Successfully connected", Color.green);
             MenuFramework.ShowNextMenu();
@@ -125,6 +134,8 @@ public class MultiworldMenu : ModMenu
         _resultText.color = color;
         _resultText.text = text;
         _timeShowingText = 0;
+
+        Main.Multiworld.Log($"Menu result: {text}");
     }
 
     private void ShowTextTimed(string text, Color color, float time)
@@ -132,5 +143,16 @@ public class MultiworldMenu : ModMenu
         _resultText.color = color;
         _resultText.text = text;
         _timeShowingText = time;
+
+        Main.Multiworld.Log($"Menu result: {text}");
+    }
+
+    private void ShowError(string text)
+    {
+        _resultText.color = Color.red;
+        _resultText.text = $"Failed to connect:\n{text}";
+        _timeShowingText = 5f;
+
+        Main.Multiworld.LogError($"Menu result: {text}");
     }
 }
