@@ -38,7 +38,7 @@ public class Multiworld : BlasMod, IPersistentMod
     /// <summary>
     /// The settings determined by the client
     /// </summary>
-    public ClientSettings ClientSettings { get; set; } = new("localhost", "unknown", "");
+    public ClientSettings ClientSettings { get; set; }
     /// <summary>
     /// The settings determined by the server
     /// </summary>
@@ -80,7 +80,10 @@ public class Multiworld : BlasMod, IPersistentMod
     protected override void OnRegisterServices(ModServiceProvider provider)
     {
         provider.RegisterCommand(command);
-        provider.RegisterNewGameMenu(new MultiworldMenu());
+
+        MultiworldMenu menu = new();
+        provider.RegisterNewGameMenu(menu);
+        provider.RegisterLoadGameMenu(menu);
     }
 
     public SaveData SaveGame()
@@ -88,7 +91,10 @@ public class Multiworld : BlasMod, IPersistentMod
         return new MultiworldPersistenceData
         {
             itemsReceived = APManager.ItemReceiver.SaveItemsReceived(),
-            scoutedLocations = APManager.SaveScoutedLocations()
+            scoutedLocations = APManager.SaveScoutedLocations(),
+            server = ClientSettings.Server,
+            name = ClientSettings.Name,
+            password = ClientSettings.Password,
         };
     }
 
@@ -97,12 +103,14 @@ public class Multiworld : BlasMod, IPersistentMod
         MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
         APManager.ItemReceiver.LoadItemsReceived(multiworldData.itemsReceived);
         APManager.LoadScoutedLocations(multiworldData.scoutedLocations);
+        ClientSettings = new ClientSettings(multiworldData.server, multiworldData.name, multiworldData.password);
     }
 
     public void ResetGame()
     {
         APManager.ItemReceiver.ResetItemsReceived();
         APManager.ClearScoutedLocations();
+        ClientSettings = null;
     }
 
     protected override void OnNewGame()
@@ -113,6 +121,9 @@ public class Multiworld : BlasMod, IPersistentMod
 
     protected override void OnLevelLoaded(string oldLevel, string newLevel)
     {
+        if (newLevel == "MainMenu")
+            APManager.Disconnect();
+
         InGame = newLevel != "MainMenu";
 
         if (!hasSentLocations && InGame && APManager.Connected)
@@ -158,7 +169,9 @@ public class Multiworld : BlasMod, IPersistentMod
 
     private void OnDisconnect()
     {
-        LogDisplay("Disconnected from multiworld server!");
+        if (InGame)
+            LogDisplay("Disconnected from multiworld server!");
+
         //multiworldItems = null;
         //multiworldDoors = null;
         hasSentLocations = false;

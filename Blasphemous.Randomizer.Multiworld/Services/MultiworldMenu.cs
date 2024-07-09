@@ -4,6 +4,7 @@ using Blasphemous.Framework.Menus.Options;
 using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Input;
+using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -87,9 +88,16 @@ public class MultiworldMenu : ModMenu
         _timeShowingText = 0;
         _connectNextFrame = 0;
 
-        _server.CurrentValue = string.Empty;
-        _name.CurrentValue = string.Empty;
-        _password.CurrentValue = string.Empty;
+        ClientSettings settings = Main.Multiworld.ClientSettings;
+        _server.CurrentValue = settings?.Server ?? string.Empty;
+        _name.CurrentValue = settings?.Name ?? string.Empty;
+        _password.CurrentValue = settings?.Password ?? string.Empty;
+    }
+
+    public override void OnFinish()
+    {
+        Main.Multiworld.Log("Storing client settings from menu");
+        Main.Multiworld.ClientSettings = new ClientSettings(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
     }
 
     private void OnSubmit()
@@ -126,9 +134,6 @@ public class MultiworldMenu : ModMenu
                 Main.Multiworld.APManager.Disconnect();
                 return;
             }
-
-            Main.Multiworld.Log("Storing client settings from menu");
-            Main.Multiworld.ClientSettings = new Models.ClientSettings(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
 
             ShowText("Successfully connected", Color.green);
             MenuFramework.ShowNextMenu();
