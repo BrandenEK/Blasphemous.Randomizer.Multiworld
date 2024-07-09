@@ -42,61 +42,56 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         // Each receiver will be locked when processing and clearing, so you only need to lock it when receiving
         public static readonly object receiverLock = new();
 
+        public delegate void ConnectDelegate(LoginResult login);
+        public delegate void DisconnectDelegate();
+
+        public event ConnectDelegate OnConnect;
+        public event DisconnectDelegate OnDisconnect;
+
+        public APManager()
+        {
+            OnConnect += OnConnected;
+        }
+
         #region Connection
 
-        public string Connect(string server, string player, string password)
+        /// <summary>
+        /// Attempts to connect to the server and calls an event with the result
+        /// </summary>
+        public void Connect(string server, string player, string password)
         {
-            // Create login
             LoginResult result;
-            string resultMessage;
             
-            // Try connection
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 session.Items.ItemReceived += itemReceiver.OnReceiveItem;
                 session.Socket.PacketReceived += messageReceiver.OnReceiveMessage;
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
-                session.Socket.SocketClosed += OnDisconnect;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 4, 2), null, null, password);
+                session.Socket.SocketClosed += OnSocketClose;
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 5, 0), null, null, password);
             }
             catch (Exception e)
             {
                 result = new LoginFailure(e.GetBaseException().Message);
             }
 
-            // Connection failed
-            if (!result.Successful)
-            {
-                Connected = false;
-                LoginFailure failure = result as LoginFailure;
-                resultMessage = "Multiworld connection failed: ";
-                if (failure.Errors.Length > 0)
-                    resultMessage += failure.Errors[0];
-                else
-                    resultMessage += "Reason unknown.";
-
-                return resultMessage;
-            }
-
-            // Connection successful
-            Connected = true;
-            resultMessage = "Multiworld connection successful";
-            LoginSuccessful login = result as LoginSuccessful;
-
-            OnConnect(login, player);
-            return resultMessage;
+            Connected = result.Successful;
+            OnConnect?.Invoke(result);
         }
 
-        private void OnConnect(LoginSuccessful login, string playerName)
+        private void OnConnected(LoginResult login)
         {
+            if (login is not LoginSuccessful success)
+                return;
+
             // Get settings from slot data
             GameSettings settings = new()
             {
-                Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>(),
-                RequiredEnding = int.Parse(login.SlotData["ending"].ToString()),
-                DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString()),
-                PlayerName = playerName
+                Config = ((JObject)success.SlotData["cfg"]).ToObject<Config>(),
+                RequiredEnding = int.Parse(success.SlotData["ending"].ToString()),
+                DeathLinkEnabled = bool.Parse(success.SlotData["death_link"].ToString()),
+                PlayerName = "Fix this later"
             };
 
             // Set up deathlink
@@ -105,10 +100,10 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             EnableDeathLink(settings.DeathLinkEnabled);
 
             // Get door list from slot data
-            Dictionary<string, string> mappedDoors = ((JObject)login.SlotData["doors"]).ToObject<Dictionary<string, string>>();
+            Dictionary<string, string> mappedDoors = ((JObject)success.SlotData["doors"]).ToObject<Dictionary<string, string>>();
 
             // Get location list from slot data
-            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+            ArchipelagoLocation[] locations = ((JArray)success.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             Dictionary<string, string> mappedItems = new();
             apLocationIds.Clear();
             apItems.Clear();
@@ -148,6 +143,9 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             Main.Multiworld.OnConnect(mappedItems, mappedDoors, settings);
         }
 
+        /// <summary>
+        /// Attempts to disconnect from the server and calls an event
+        /// </summary>
         public void Disconnect()
         {
             if (Connected)
@@ -158,11 +156,12 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             }
         }
 
-        private void OnDisconnect(string reason)
+        private void OnSocketClose(string reason)
         {
-            Main.Multiworld.OnDisconnect();
             Connected = false;
             session = null;
+
+            OnDisconnect?.Invoke();
         }
 
         public void UpdateAllReceivers()

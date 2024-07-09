@@ -1,5 +1,5 @@
 ﻿using Blasphemous.Randomizer.ItemRando;
-using Blasphemous.Randomizer.Notifications;
+using UnityEngine;
 
 namespace Blasphemous.Randomizer.Multiworld.AP
 {
@@ -19,7 +19,12 @@ namespace Blasphemous.Randomizer.Multiworld.AP
 
         public override void addToInventory() { }
 
-        public override RewardInfo getRewardInfo(bool upgraded)
+        public override string GetName(bool upgraded)
+        {
+            return name;
+        }
+
+        public override string GetDescription(bool upgraded)
         {
             string descTerm = _type switch
             {
@@ -29,13 +34,17 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 _ => "arbasc"
             };
 
-            return new RewardInfo
-            (
-                name: name,
-                description: GetTextWithPlayerName(descTerm),
-                notification: GetTextWithPlayerName("arnot"),
-                sprite: Main.Multiworld.ImageAP
-            );
+            return GetTextWithPlayerName(descTerm);
+        }
+
+        public override string GetNotification(bool upgraded)
+        {
+            return GetTextWithPlayerName("arnot");
+        }
+
+        public override Sprite GetImage(bool upgraded)
+        {
+            return Main.Multiworld.ImageAP;
         }
 
         private string GetTextWithPlayerName(string term)

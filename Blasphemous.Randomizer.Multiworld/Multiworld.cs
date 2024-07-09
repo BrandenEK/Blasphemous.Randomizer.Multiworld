@@ -1,15 +1,15 @@
 ﻿using Blasphemous.CheatConsole;
+using Blasphemous.Framework.Menus;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Persistence;
 using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.Multiworld.AP;
 using Blasphemous.Randomizer.Multiworld.DeathLink;
 using Blasphemous.Randomizer.Multiworld.Notifications;
+using Blasphemous.Randomizer.Multiworld.Services;
 using Framework.Managers;
-using Gameplay.UI.Others.MenuLogic;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Blasphemous.Randomizer.Multiworld;
 
@@ -33,7 +33,6 @@ public class Multiworld : BlasMod, IPersistentMod
     private Dictionary<string, string> multiworldItems;
     private Dictionary<string, string> multiworldDoors;
     public GameSettings MultiworldSettings { get; private set; }
-    public bool HasRequiredMods { get; private set; }
     public bool InGame { get; private set; }
 
     private readonly MultiworldCommand command = new MultiworldCommand();
@@ -51,6 +50,8 @@ public class Multiworld : BlasMod, IPersistentMod
         APManager = new APManager();
         DeathLinkManager = new DeathLinkManager();
         NotificationManager = new NotificationManager();
+
+        APManager.OnDisconnect += OnDisconnect;
 
         // Load external data
         FileHandler.LoadDataAsFixedSpritesheet("multi-images.png", new Vector2(30, 30), out multiworldImages, new ModdingAPI.Files.SpriteImportOptions()
@@ -71,6 +72,7 @@ public class Multiworld : BlasMod, IPersistentMod
     protected override void OnRegisterServices(ModServiceProvider provider)
     {
         provider.RegisterCommand(command);
+        provider.RegisterNewGameMenu(new MultiworldMenu());
     }
 
     public SaveData SaveGame()
@@ -128,22 +130,15 @@ public class Multiworld : BlasMod, IPersistentMod
         command.HackWriteToConsole(message);
     }
 
-    public string tryConnect(string server, string playerName, string password)
-    {
-        string result = APManager.Connect(server, playerName, password); // Check if not in game first ?
-        Main.Multiworld.Log(result);
-        return result;
-    }
-
+    /// <summary>
+    /// Should be using the event, but for now is called directly
+    /// </summary>
     public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors, GameSettings serverSettings)
     {
         // Get data from server
         multiworldItems = mappedItems;
         multiworldDoors = mappedDoors;
         MultiworldSettings = serverSettings;
-        HasRequiredMods =
-            (!MultiworldSettings.Config.ShuffleBootsOfPleading || Main.Randomizer.InstalledBootsMod) &&
-            (!MultiworldSettings.Config.ShufflePurifiedHand || Main.Randomizer.InstalledDoubleJumpMod);
 
         // MappedItems has been filled with new shuffled items
         Log("Game variables have been loaded from multiworld!");
@@ -154,32 +149,15 @@ public class Multiworld : BlasMod, IPersistentMod
         }
     }
 
-    public void OnDisconnect()
+    private void OnDisconnect()
     {
         LogDisplay("Disconnected from multiworld server!");
-        multiworldItems = null;
-        multiworldDoors = null;
+        //multiworldItems = null;
+        //multiworldDoors = null;
         hasSentLocations = false;
         APManager.ClearAllReceivers();
     }
 
     public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;
     public Dictionary<string, string> LoadMultiworldDoors() => multiworldDoors;
-
-    private Text m_MultiworldStatusText;
-    public Text MultiworldStatusText
-    {
-        get
-        {
-            if (m_MultiworldStatusText == null)
-            {
-                Log("Creating multiworld status text");
-                Transform textHolder = Object.FindObjectOfType<NewMainMenu>().transform.Find("Settings Menu/Main Section");
-                GameObject randoText = textHolder.Find("Description").gameObject;
-                m_MultiworldStatusText = Object.Instantiate(randoText, textHolder).GetComponent<Text>();
-                m_MultiworldStatusText.rectTransform.anchoredPosition = new Vector2(-175, 182);
-            }
-            return m_MultiworldStatusText;
-        }
-    }
 }

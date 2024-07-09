@@ -60,7 +60,7 @@ namespace Blasphemous.Randomizer.Multiworld.Notifications
             {
                 // Regular item
                 ItemRando.Item randoItem = Main.Randomizer.data.items[item.itemId];
-                image = randoItem.getRewardInfo(false).sprite;
+                image = randoItem.GetImage(false);
                 name = randoItem.name;
             }
             itemImage.sprite = image;
