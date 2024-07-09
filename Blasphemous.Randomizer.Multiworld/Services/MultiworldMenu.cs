@@ -1,8 +1,10 @@
 ﻿using Blasphemous.Framework.Menus;
 using Blasphemous.Framework.Menus.Options;
+using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Input;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Blasphemous.Randomizer.Multiworld.Services;
 
@@ -11,6 +13,8 @@ public class MultiworldMenu : ModMenu
     private TextOption _server;
     private TextOption _name;
     private TextOption _password;
+
+    private Text _resultText;
 
     protected override int Priority { get; } = int.MaxValue;
 
@@ -33,6 +37,21 @@ public class MultiworldMenu : ModMenu
         _server = text.CreateOption("server", ui, new Vector2(0, 100), "Server ip:", false, true, 64);
         _name = text.CreateOption("name", ui, new Vector2(0, 0), "Player name:", false, true, 64);
         _password = text.CreateOption("password", ui, new Vector2(0, -100), "Optional password:", false, true, 64);
+
+        _resultText = UIModder.Create(new RectCreationOptions()
+        {
+            Name = "Result Text",
+            Parent = ui,
+            Pivot = new Vector2(0.5f, 1),
+            XRange = new Vector2(0, 1),
+            YRange = new Vector2(1, 1),
+            Position = new Vector2(0, -20),
+        }).AddText(new TextCreationOptions()
+        {
+            Alignment = TextAnchor.UpperCenter,
+            FontSize = 40,
+            Contents = "Test text to show the result of a connection"
+        });
     }
 
     private void OnSubmit()
