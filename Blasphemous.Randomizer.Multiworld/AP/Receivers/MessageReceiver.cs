@@ -62,7 +62,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                         {
                             if (int.TryParse(text, out int playerId))
                             {
-                                if (Main.Multiworld.APManager.GetPlayerNameFromSlot(playerId) == Main.Multiworld.MultiworldSettings.PlayerName)
+                                if (playerId == Main.Multiworld.APManager.PlayerSlot)
                                     color = ColorType.PlayerSelf;
                                 else
                                     color = ColorType.PlayerOther;

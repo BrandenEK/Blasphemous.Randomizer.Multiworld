@@ -91,7 +91,6 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 Config = ((JObject)success.SlotData["cfg"]).ToObject<Config>(),
                 RequiredEnding = int.Parse(success.SlotData["ending"].ToString()),
                 DeathLinkEnabled = bool.Parse(success.SlotData["death_link"].ToString()),
-                PlayerName = "Fix this later"
             };
 
             // Set up deathlink
@@ -116,7 +115,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 apLocationIds.Add(currentLocation.id, currentLocation.ap_id);
 
                 // Add to new list of random items
-                if (currentLocation.player_name == settings.PlayerName)
+                if (currentLocation.player_name == string.Empty) // This wont work anymore!!
                 {
                     // This is an item for this player
                     if (ItemNameExists(currentLocation.name, out string itemId))
@@ -328,7 +327,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         {
             if (Connected)
             {
-                deathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Main.Multiworld.MultiworldSettings.PlayerName));
+                deathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Main.Multiworld.ClientSettings.Name));
             }
         }
 

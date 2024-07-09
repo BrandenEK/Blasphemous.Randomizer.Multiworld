@@ -116,6 +116,8 @@ public class MultiworldMenu : ModMenu
                 return;
             }
 
+            Main.Multiworld.ClientSettings = new Models.ClientSettings(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
+
             ShowText("Successfully connected", Color.green);
             MenuFramework.ShowNextMenu();
             return;

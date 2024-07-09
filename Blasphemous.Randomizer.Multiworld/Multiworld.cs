@@ -5,6 +5,7 @@ using Blasphemous.ModdingAPI.Persistence;
 using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.Multiworld.AP;
 using Blasphemous.Randomizer.Multiworld.DeathLink;
+using Blasphemous.Randomizer.Multiworld.Models;
 using Blasphemous.Randomizer.Multiworld.Notifications;
 using Blasphemous.Randomizer.Multiworld.Services;
 using Framework.Managers;
@@ -34,6 +35,11 @@ public class Multiworld : BlasMod, IPersistentMod
     private Dictionary<string, string> multiworldDoors;
     public GameSettings MultiworldSettings { get; private set; }
     public bool InGame { get; private set; }
+
+    /// <summary>
+    /// The connection settings determined by the client
+    /// </summary>
+    public ClientSettings ClientSettings { get; set; } = new("localhost", "unknown", "");
 
     private readonly MultiworldCommand command = new MultiworldCommand();
     private bool hasSentLocations;
