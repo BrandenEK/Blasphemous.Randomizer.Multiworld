@@ -133,7 +133,7 @@ public class Multiworld : BlasMod, IPersistentMod
 
     public string tryConnect(string server, string playerName, string password)
     {
-        string result = APManager.Connect(server, playerName, password); // Check if not in game first ?
+        string result = string.Empty;// APManager.Connect(server, playerName, password); // Check if not in game first ?
         Main.Multiworld.Log(result);
         return result;
     }
