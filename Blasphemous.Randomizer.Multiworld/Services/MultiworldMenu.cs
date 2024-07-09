@@ -1,4 +1,5 @@
-﻿using Blasphemous.Framework.Menus;
+﻿using Archipelago.MultiClient.Net;
+using Blasphemous.Framework.Menus;
 using Blasphemous.Framework.Menus.Options;
 using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
@@ -15,8 +16,16 @@ public class MultiworldMenu : ModMenu
     private TextOption _password;
 
     private Text _resultText;
+    private float _timeShowingText;
+
+    private int _connectNextFrame = 0;
 
     protected override int Priority { get; } = int.MaxValue;
+
+    public MultiworldMenu()
+    {
+        Main.Multiworld.APManager.OnConnect += OnConnect;
+    }
 
     public override void OnUpdate()
     {
@@ -24,6 +33,24 @@ public class MultiworldMenu : ModMenu
             OnSubmit();
         else if (Main.Multiworld.InputHandler.GetButtonDown(ButtonCode.UICancel))
             OnCancel();
+
+        if (_timeShowingText > 0)
+        {
+            _timeShowingText -= Time.deltaTime;
+            if (_timeShowingText <= 0)
+            {
+                _resultText.text = string.Empty;
+            }
+        }
+
+        if (_connectNextFrame > 0)
+        {
+            _connectNextFrame--;
+            if (_connectNextFrame == 0)
+            {
+                Main.Multiworld.APManager.Connect(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
+            }
+        }
     }
 
     protected override void CreateUI(Transform ui)
@@ -50,7 +77,6 @@ public class MultiworldMenu : ModMenu
         {
             Alignment = TextAnchor.UpperCenter,
             FontSize = 40,
-            Contents = "Test text to show the result of a connection"
         });
     }
 
@@ -58,8 +84,8 @@ public class MultiworldMenu : ModMenu
     {
         Main.Multiworld.Log($"Server {_server.CurrentValue} as {_name.CurrentValue} with pass {_password.CurrentValue}");
 
-        Main.Multiworld.APManager.Connect(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
-        //MenuFramework.ShowNextMenu();
+        ShowText("Attempting to connect...", Color.yellow);
+        _connectNextFrame = 2;        
     }
 
     private void OnCancel()
@@ -67,7 +93,44 @@ public class MultiworldMenu : ModMenu
         MenuFramework.ShowPreviousMenu();
     }
 
+    private void OnConnect(LoginResult login)
+    {
+        if (login is LoginFailure failure)
+        {
+            string error = $"Failed to connect:\n{string.Join("\n", failure.Errors)}";
+
+            Main.Multiworld.LogError(error);
+            ShowTextTimed(error, Color.red, 5f);
+            return;
+        }
+
+        if (login is LoginSuccessful success)
+        {
+            // Check for mod status first
+
+            ShowText("Successfully connected", Color.green);
+            MenuFramework.ShowNextMenu();
+            return;
+        }
+    }
+
     private MenuFramework MenuFramework => Main.Multiworld.IsModLoadedName("Menu Framework", out BlasMod mod)
         ? mod as MenuFramework
         : throw new System.Exception("Menu Framework was never loaded");
+
+    // Text results
+
+    private void ShowText(string text, Color color)
+    {
+        _resultText.color = color;
+        _resultText.text = text;
+        _timeShowingText = 0;
+    }
+
+    private void ShowTextTimed(string text, Color color, float time)
+    {
+        _resultText.color = color;
+        _resultText.text = text;
+        _timeShowingText = time;
+    }
 }
