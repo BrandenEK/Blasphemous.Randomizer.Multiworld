@@ -4,7 +4,6 @@ using Blasphemous.Framework.Menus.Options;
 using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Input;
-using FMOD;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.UI;

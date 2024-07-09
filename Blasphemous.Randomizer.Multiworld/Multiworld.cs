@@ -8,10 +8,8 @@ using Blasphemous.Randomizer.Multiworld.DeathLink;
 using Blasphemous.Randomizer.Multiworld.Notifications;
 using Blasphemous.Randomizer.Multiworld.Services;
 using Framework.Managers;
-using Gameplay.UI.Others.MenuLogic;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Blasphemous.Randomizer.Multiworld;
 
@@ -35,7 +33,6 @@ public class Multiworld : BlasMod, IPersistentMod
     private Dictionary<string, string> multiworldItems;
     private Dictionary<string, string> multiworldDoors;
     public GameSettings MultiworldSettings { get; private set; }
-    public bool HasRequiredMods { get; private set; }
     public bool InGame { get; private set; }
 
     private readonly MultiworldCommand command = new MultiworldCommand();
@@ -133,13 +130,6 @@ public class Multiworld : BlasMod, IPersistentMod
         command.HackWriteToConsole(message);
     }
 
-    public string tryConnect(string server, string playerName, string password)
-    {
-        string result = "Fix later";// APManager.Connect(server, playerName, password); // Check if not in game first ?
-        Main.Multiworld.Log(result);
-        return result;
-    }
-
     /// <summary>
     /// Should be using the event, but for now is called directly
     /// </summary>
@@ -149,9 +139,6 @@ public class Multiworld : BlasMod, IPersistentMod
         multiworldItems = mappedItems;
         multiworldDoors = mappedDoors;
         MultiworldSettings = serverSettings;
-        HasRequiredMods =
-            (!MultiworldSettings.Config.ShuffleBootsOfPleading || Main.Randomizer.InstalledBootsMod) &&
-            (!MultiworldSettings.Config.ShufflePurifiedHand || Main.Randomizer.InstalledDoubleJumpMod);
 
         // MappedItems has been filled with new shuffled items
         Log("Game variables have been loaded from multiworld!");
@@ -173,21 +160,4 @@ public class Multiworld : BlasMod, IPersistentMod
 
     public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;
     public Dictionary<string, string> LoadMultiworldDoors() => multiworldDoors;
-
-    //private Text m_MultiworldStatusText;
-    //public Text MultiworldStatusText
-    //{
-    //    get
-    //    {
-    //        if (m_MultiworldStatusText == null)
-    //        {
-    //            Log("Creating multiworld status text");
-    //            Transform textHolder = Object.FindObjectOfType<NewMainMenu>().transform.Find("Settings Menu/Main Section");
-    //            GameObject randoText = textHolder.Find("Description").gameObject;
-    //            m_MultiworldStatusText = Object.Instantiate(randoText, textHolder).GetComponent<Text>();
-    //            m_MultiworldStatusText.rectTransform.anchoredPosition = new Vector2(-175, 182);
-    //        }
-    //        return m_MultiworldStatusText;
-    //    }
-    //}
 }
