@@ -81,6 +81,17 @@ public class MultiworldMenu : ModMenu
         });
     }
 
+    public override void OnStart()
+    {
+        _resultText.text = string.Empty;
+        _timeShowingText = 0;
+        _connectNextFrame = 0;
+
+        _server.CurrentValue = string.Empty;
+        _name.CurrentValue = string.Empty;
+        _password.CurrentValue = string.Empty;
+    }
+
     private void OnSubmit()
     {
         Main.Multiworld.Log($"Server {_server.CurrentValue} as {_name.CurrentValue} with pass {_password.CurrentValue}");
@@ -116,6 +127,7 @@ public class MultiworldMenu : ModMenu
                 return;
             }
 
+            Main.Multiworld.Log("Storing client settings from menu");
             Main.Multiworld.ClientSettings = new Models.ClientSettings(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
 
             ShowText("Successfully connected", Color.green);

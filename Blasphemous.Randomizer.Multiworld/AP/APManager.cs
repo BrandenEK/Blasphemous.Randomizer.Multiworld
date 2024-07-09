@@ -89,6 +89,8 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             Config cfg = ((JObject)success.SlotData["cfg"]).ToObject<Config>();
             int ending = int.Parse(success.SlotData["ending"].ToString());
             bool dl = bool.Parse(success.SlotData["death_link"].ToString());
+
+            Main.Multiworld.Log("Storing server settings from APManager");
             Main.Multiworld.ServerSettings = new Models.ServerSettings(cfg, ending, dl);
 
             // Set up deathlink
