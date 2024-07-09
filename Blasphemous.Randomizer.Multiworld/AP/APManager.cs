@@ -86,18 +86,17 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 return;
 
             // Get settings from slot data
-            GameSettings settings = new()
-            {
-                Config = ((JObject)success.SlotData["cfg"]).ToObject<Config>(),
-                RequiredEnding = int.Parse(success.SlotData["ending"].ToString()),
-                DeathLinkEnabled = bool.Parse(success.SlotData["death_link"].ToString()),
-                PlayerName = "Fix this later"
-            };
+            Config cfg = ((JObject)success.SlotData["cfg"]).ToObject<Config>();
+            int ending = int.Parse(success.SlotData["ending"].ToString());
+            bool dl = bool.Parse(success.SlotData["death_link"].ToString());
+
+            Main.Multiworld.Log("Storing server settings from APManager");
+            Main.Multiworld.ServerSettings = new Models.ServerSettings(cfg, ending, dl);
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
             deathLink.OnDeathLinkReceived += ReceiveDeath;
-            EnableDeathLink(settings.DeathLinkEnabled);
+            EnableDeathLink(dl);
 
             // Get door list from slot data
             Dictionary<string, string> mappedDoors = ((JObject)success.SlotData["doors"]).ToObject<Dictionary<string, string>>();
@@ -116,7 +115,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 apLocationIds.Add(currentLocation.id, currentLocation.ap_id);
 
                 // Add to new list of random items
-                if (currentLocation.player_name == settings.PlayerName)
+                if (currentLocation.player_name == string.Empty) // This wont work anymore!!
                 {
                     // This is an item for this player
                     if (ItemNameExists(currentLocation.name, out string itemId))
@@ -140,7 +139,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             // Start tracking hints
             session.DataStorage.TrackHints(hintReceiver.OnReceiveHints, true);
 
-            Main.Multiworld.OnConnect(mappedItems, mappedDoors, settings);
+            Main.Multiworld.OnConnect(mappedItems, mappedDoors);
         }
 
         /// <summary>
@@ -328,7 +327,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         {
             if (Connected)
             {
-                deathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Main.Multiworld.MultiworldSettings.PlayerName));
+                deathLink.SendDeathLink(new Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLink(Main.Multiworld.ClientSettings.Name));
             }
         }
 

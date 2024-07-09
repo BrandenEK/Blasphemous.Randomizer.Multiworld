@@ -17,7 +17,7 @@ namespace Blasphemous.Randomizer.Multiworld.Services
             {
                 { "help", Help },
                 { "status", Status },
-                { "deathlink", Deathlink },
+                //{ "deathlink", Deathlink },
                 { "say", Say },
             };
         }
@@ -33,7 +33,7 @@ namespace Blasphemous.Randomizer.Multiworld.Services
 
             Write("Available MULTIWORLD commands:");
             Write("multiworld status: Display connection status");
-            Write("multiworld deathlink: Toggles deathlink on/off");
+            //Write("multiworld deathlink: Toggles deathlink on/off");
             Write("multiworld say COMMAND: Sends a text message or command to the server");
         }
 
@@ -48,18 +48,18 @@ namespace Blasphemous.Randomizer.Multiworld.Services
                 Write($"Connected to {server}");
         }
 
-        private void Deathlink(string[] parameters)
-        {
-            if (!ValidateParameterList(parameters, 0)) return;
+        //private void Deathlink(string[] parameters)
+        //{
+        //    if (!ValidateParameterList(parameters, 0)) return;
 
-            if (Main.Multiworld.APManager.Connected)
-            {
-                bool enabled = Main.Multiworld.DeathLinkManager.ToggleDeathLink();
-                Write("Deathlink has been " + (enabled ? "enabled" : "disabled"));
-            }
-            else
-                Write("Not connected to any server!");
-        }
+        //    if (Main.Multiworld.APManager.Connected)
+        //    {
+        //        bool enabled = Main.Multiworld.DeathLinkManager.ToggleDeathLink();
+        //        Write("Deathlink has been " + (enabled ? "enabled" : "disabled"));
+        //    }
+        //    else
+        //        Write("Not connected to any server!");
+        //}
 
         private void Say(string[] parameters)
         {

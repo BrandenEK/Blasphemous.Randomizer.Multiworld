@@ -1,4 +1,5 @@
-﻿using Gameplay.UI;
+﻿using Blasphemous.Randomizer.Multiworld.Models;
+using Gameplay.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,7 +32,7 @@ namespace Blasphemous.Randomizer.Multiworld.Notifications
 
             // Only display wall climb & dash ability if they are from a real player
             // Ideally this would be a more precise check instead of just player name
-            if (item.player == "Server" && (item.itemId == "Slide" || item.itemId == "WallClimb"))
+            if (item.Player == "Server" && (item.ItemId == "Slide" || item.ItemId == "WallClimb"))
                 return;
 
             if (isShowing)
@@ -50,7 +51,7 @@ namespace Blasphemous.Randomizer.Multiworld.Notifications
 
             Sprite image;
             string name;
-            if (item.itemId == "Death")
+            if (item.ItemId == "Death")
             {
                 // Deathlink
                 image = Main.Multiworld.ImageDeathlink;
@@ -59,12 +60,12 @@ namespace Blasphemous.Randomizer.Multiworld.Notifications
             else
             {
                 // Regular item
-                ItemRando.Item randoItem = Main.Randomizer.data.items[item.itemId];
+                ItemRando.Item randoItem = Main.Randomizer.data.items[item.ItemId];
                 image = randoItem.GetImage(false);
                 name = randoItem.name;
             }
             itemImage.sprite = image;
-            receivedText.text = $"{name}\n\t{Main.Multiworld.LocalizationHandler.Localize("found")}: {item.player}";
+            receivedText.text = $"{name}\n\t{Main.Multiworld.LocalizationHandler.Localize("found")}: {item.Player}";
 
             notificationBox.anchoredPosition = POSITION_HIDDEN;
             float positionDifference = POSITION_VISIBLE.x - POSITION_HIDDEN.x;

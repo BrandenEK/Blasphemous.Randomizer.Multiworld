@@ -5,6 +5,7 @@ using Blasphemous.ModdingAPI.Persistence;
 using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.Multiworld.AP;
 using Blasphemous.Randomizer.Multiworld.DeathLink;
+using Blasphemous.Randomizer.Multiworld.Models;
 using Blasphemous.Randomizer.Multiworld.Notifications;
 using Blasphemous.Randomizer.Multiworld.Services;
 using Framework.Managers;
@@ -32,8 +33,16 @@ public class Multiworld : BlasMod, IPersistentMod
     // Game
     private Dictionary<string, string> multiworldItems;
     private Dictionary<string, string> multiworldDoors;
-    public GameSettings MultiworldSettings { get; private set; }
     public bool InGame { get; private set; }
+
+    /// <summary>
+    /// The settings determined by the client
+    /// </summary>
+    public ClientSettings ClientSettings { get; set; }
+    /// <summary>
+    /// The settings determined by the server
+    /// </summary>
+    public ServerSettings ServerSettings { get; set; } = new(new Config(), 0, false);
 
     private readonly MultiworldCommand command = new MultiworldCommand();
     private bool hasSentLocations;
@@ -46,7 +55,6 @@ public class Multiworld : BlasMod, IPersistentMod
         LocalizationHandler.RegisterDefaultLanguage("en");
 
         // Set basic initialization for awake
-        MultiworldSettings = new GameSettings();
         APManager = new APManager();
         DeathLinkManager = new DeathLinkManager();
         NotificationManager = new NotificationManager();
@@ -72,7 +80,10 @@ public class Multiworld : BlasMod, IPersistentMod
     protected override void OnRegisterServices(ModServiceProvider provider)
     {
         provider.RegisterCommand(command);
-        provider.RegisterNewGameMenu(new MultiworldMenu());
+
+        MultiworldMenu menu = new();
+        provider.RegisterNewGameMenu(menu);
+        provider.RegisterLoadGameMenu(menu);
     }
 
     public SaveData SaveGame()
@@ -80,7 +91,10 @@ public class Multiworld : BlasMod, IPersistentMod
         return new MultiworldPersistenceData
         {
             itemsReceived = APManager.ItemReceiver.SaveItemsReceived(),
-            scoutedLocations = APManager.SaveScoutedLocations()
+            scoutedLocations = APManager.SaveScoutedLocations(),
+            server = ClientSettings.Server,
+            name = ClientSettings.Name,
+            password = ClientSettings.Password,
         };
     }
 
@@ -89,12 +103,14 @@ public class Multiworld : BlasMod, IPersistentMod
         MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
         APManager.ItemReceiver.LoadItemsReceived(multiworldData.itemsReceived);
         APManager.LoadScoutedLocations(multiworldData.scoutedLocations);
+        ClientSettings = new ClientSettings(multiworldData.server, multiworldData.name, multiworldData.password);
     }
 
     public void ResetGame()
     {
         APManager.ItemReceiver.ResetItemsReceived();
         APManager.ClearScoutedLocations();
+        ClientSettings = null;
     }
 
     protected override void OnNewGame()
@@ -105,6 +121,9 @@ public class Multiworld : BlasMod, IPersistentMod
 
     protected override void OnLevelLoaded(string oldLevel, string newLevel)
     {
+        if (newLevel == "MainMenu")
+            APManager.Disconnect();
+
         InGame = newLevel != "MainMenu";
 
         if (!hasSentLocations && InGame && APManager.Connected)
@@ -133,12 +152,11 @@ public class Multiworld : BlasMod, IPersistentMod
     /// <summary>
     /// Should be using the event, but for now is called directly
     /// </summary>
-    public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors, GameSettings serverSettings)
+    public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors)
     {
         // Get data from server
         multiworldItems = mappedItems;
         multiworldDoors = mappedDoors;
-        MultiworldSettings = serverSettings;
 
         // MappedItems has been filled with new shuffled items
         Log("Game variables have been loaded from multiworld!");
@@ -151,7 +169,9 @@ public class Multiworld : BlasMod, IPersistentMod
 
     private void OnDisconnect()
     {
-        LogDisplay("Disconnected from multiworld server!");
+        if (InGame)
+            LogDisplay("Disconnected from multiworld server!");
+
         //multiworldItems = null;
         //multiworldDoors = null;
         hasSentLocations = false;
