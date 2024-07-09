@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.Models;
 using Blasphemous.Randomizer.Multiworld.Models;
 using System.Collections.Generic;
 
@@ -13,10 +14,13 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
         {
             lock (APManager.receiverLock)
             {
-                string player = Main.Multiworld.APManager.GetPlayerNameFromSlot(helper.PeekItem().Player);
-                if (player == null || player == string.Empty)
+                ItemInfo item = helper.PeekItem();
+
+                string player = Main.Multiworld.APManager.GetPlayerNameFromSlot(item.Player);
+                if (string.IsNullOrEmpty(player))
                     player = "Server";
-                string itemName = helper.PeekItemName();
+
+                string itemName = item.ItemDisplayName;
                 int itemIdx = helper.Index;
                 helper.DequeueItem();
 
