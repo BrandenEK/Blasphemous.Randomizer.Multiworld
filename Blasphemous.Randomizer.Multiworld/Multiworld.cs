@@ -54,6 +54,8 @@ public class Multiworld : BlasMod, IPersistentMod
         DeathLinkManager = new DeathLinkManager();
         NotificationManager = new NotificationManager();
 
+        APManager.OnDisconnect += OnDisconnect;
+
         // Load external data
         FileHandler.LoadDataAsFixedSpritesheet("multi-images.png", new Vector2(30, 30), out multiworldImages, new ModdingAPI.Files.SpriteImportOptions()
         {
@@ -138,6 +140,9 @@ public class Multiworld : BlasMod, IPersistentMod
         return result;
     }
 
+    /// <summary>
+    /// Should be using the event, but for now is called directly
+    /// </summary>
     public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors, GameSettings serverSettings)
     {
         // Get data from server
@@ -157,11 +162,11 @@ public class Multiworld : BlasMod, IPersistentMod
         }
     }
 
-    public void OnDisconnect()
+    private void OnDisconnect()
     {
         LogDisplay("Disconnected from multiworld server!");
-        multiworldItems = null;
-        multiworldDoors = null;
+        //multiworldItems = null;
+        //multiworldDoors = null;
         hasSentLocations = false;
         APManager.ClearAllReceivers();
     }
@@ -169,20 +174,20 @@ public class Multiworld : BlasMod, IPersistentMod
     public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;
     public Dictionary<string, string> LoadMultiworldDoors() => multiworldDoors;
 
-    private Text m_MultiworldStatusText;
-    public Text MultiworldStatusText
-    {
-        get
-        {
-            if (m_MultiworldStatusText == null)
-            {
-                Log("Creating multiworld status text");
-                Transform textHolder = Object.FindObjectOfType<NewMainMenu>().transform.Find("Settings Menu/Main Section");
-                GameObject randoText = textHolder.Find("Description").gameObject;
-                m_MultiworldStatusText = Object.Instantiate(randoText, textHolder).GetComponent<Text>();
-                m_MultiworldStatusText.rectTransform.anchoredPosition = new Vector2(-175, 182);
-            }
-            return m_MultiworldStatusText;
-        }
-    }
+    //private Text m_MultiworldStatusText;
+    //public Text MultiworldStatusText
+    //{
+    //    get
+    //    {
+    //        if (m_MultiworldStatusText == null)
+    //        {
+    //            Log("Creating multiworld status text");
+    //            Transform textHolder = Object.FindObjectOfType<NewMainMenu>().transform.Find("Settings Menu/Main Section");
+    //            GameObject randoText = textHolder.Find("Description").gameObject;
+    //            m_MultiworldStatusText = Object.Instantiate(randoText, textHolder).GetComponent<Text>();
+    //            m_MultiworldStatusText.rectTransform.anchoredPosition = new Vector2(-175, 182);
+    //        }
+    //        return m_MultiworldStatusText;
+    //    }
+    //}
 }

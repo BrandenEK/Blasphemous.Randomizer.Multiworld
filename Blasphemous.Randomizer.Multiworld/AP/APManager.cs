@@ -48,6 +48,11 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         public event ConnectDelegate OnConnect;
         public event DisconnectDelegate OnDisconnect;
 
+        public APManager()
+        {
+            OnConnect += OnConnected;
+        }
+
         #region Connection
 
         /// <summary>
@@ -75,15 +80,18 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             OnConnect?.Invoke(result);
         }
 
-        private void nConnect(LoginSuccessful login, string playerName)
+        private void OnConnected(LoginResult login)
         {
+            if (login is not LoginSuccessful success)
+                return;
+
             // Get settings from slot data
             GameSettings settings = new()
             {
-                Config = ((JObject)login.SlotData["cfg"]).ToObject<Config>(),
-                RequiredEnding = int.Parse(login.SlotData["ending"].ToString()),
-                DeathLinkEnabled = bool.Parse(login.SlotData["death_link"].ToString()),
-                PlayerName = playerName
+                Config = ((JObject)success.SlotData["cfg"]).ToObject<Config>(),
+                RequiredEnding = int.Parse(success.SlotData["ending"].ToString()),
+                DeathLinkEnabled = bool.Parse(success.SlotData["death_link"].ToString()),
+                PlayerName = "Fix this later"
             };
 
             // Set up deathlink
@@ -92,10 +100,10 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             EnableDeathLink(settings.DeathLinkEnabled);
 
             // Get door list from slot data
-            Dictionary<string, string> mappedDoors = ((JObject)login.SlotData["doors"]).ToObject<Dictionary<string, string>>();
+            Dictionary<string, string> mappedDoors = ((JObject)success.SlotData["doors"]).ToObject<Dictionary<string, string>>();
 
             // Get location list from slot data
-            ArchipelagoLocation[] locations = ((JArray)login.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+            ArchipelagoLocation[] locations = ((JArray)success.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
             Dictionary<string, string> mappedItems = new();
             apLocationIds.Clear();
             apItems.Clear();
