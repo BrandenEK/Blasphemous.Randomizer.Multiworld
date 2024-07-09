@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net.Helpers;
+using Blasphemous.Randomizer.Multiworld.Models;
 using System.Collections.Generic;
 
 namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
@@ -40,10 +41,10 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
 
             foreach (QueuedItem item in itemQueue)
             {
-                Main.Multiworld.Log($"Item '{item.itemId}' is at index {item.index} with {itemsReceived} items currently received");
-                if (item.index > itemsReceived)
+                Main.Multiworld.Log($"Item '{item.ItemId}' is at index {item.Index} with {itemsReceived} items currently received");
+                if (item.Index > itemsReceived)
                 {
-                    Main.Randomizer.data.items[item.itemId].addToInventory();
+                    Main.Randomizer.data.items[item.ItemId].addToInventory();
                     Main.Multiworld.NotificationManager.DisplayNotification(item);
                     itemsReceived++;
                 }

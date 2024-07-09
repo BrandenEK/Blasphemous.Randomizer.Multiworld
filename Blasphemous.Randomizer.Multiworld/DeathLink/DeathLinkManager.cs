@@ -1,4 +1,5 @@
-﻿using Framework.Managers;
+﻿using Blasphemous.Randomizer.Multiworld.Models;
+using Framework.Managers;
 
 namespace Blasphemous.Randomizer.Multiworld.DeathLink
 {
