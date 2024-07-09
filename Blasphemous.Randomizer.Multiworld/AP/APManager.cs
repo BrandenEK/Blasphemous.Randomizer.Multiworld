@@ -229,12 +229,24 @@ namespace Blasphemous.Randomizer.Multiworld.AP
 
         public void SendMessage(string message)
         {
-            if (Connected)
+            if (!Connected)
+                return;
+
+            session.Socket.SendPacket(new SayPacket()
             {
-                var packet = new SayPacket();
-                packet.Text = message;
-                session.Socket.SendPacket(packet);
-            }
+                Text = message
+            });
+        }
+
+        public void SendHint(string item)
+        {
+            if (!Connected)
+                return;
+
+            session.Socket.SendPacket(new SayPacket()
+            {
+                Text = $"!hint {item}"
+            });
         }
 
         public void ScoutLocation(string location)
