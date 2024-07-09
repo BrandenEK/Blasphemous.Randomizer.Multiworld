@@ -33,13 +33,16 @@ public class Multiworld : BlasMod, IPersistentMod
     // Game
     private Dictionary<string, string> multiworldItems;
     private Dictionary<string, string> multiworldDoors;
-    public GameSettings MultiworldSettings { get; private set; }
     public bool InGame { get; private set; }
 
     /// <summary>
-    /// The connection settings determined by the client
+    /// The settings determined by the client
     /// </summary>
     public ClientSettings ClientSettings { get; set; } = new("localhost", "unknown", "");
+    /// <summary>
+    /// The settings determined by the server
+    /// </summary>
+    public ServerSettings ServerSettings { get; set; } = new(new Config(), 0, false);
 
     private readonly MultiworldCommand command = new MultiworldCommand();
     private bool hasSentLocations;
@@ -52,7 +55,6 @@ public class Multiworld : BlasMod, IPersistentMod
         LocalizationHandler.RegisterDefaultLanguage("en");
 
         // Set basic initialization for awake
-        MultiworldSettings = new GameSettings();
         APManager = new APManager();
         DeathLinkManager = new DeathLinkManager();
         NotificationManager = new NotificationManager();
@@ -139,12 +141,11 @@ public class Multiworld : BlasMod, IPersistentMod
     /// <summary>
     /// Should be using the event, but for now is called directly
     /// </summary>
-    public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors, GameSettings serverSettings)
+    public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors)
     {
         // Get data from server
         multiworldItems = mappedItems;
         multiworldDoors = mappedDoors;
-        MultiworldSettings = serverSettings;
 
         // MappedItems has been filled with new shuffled items
         Log("Game variables have been loaded from multiworld!");

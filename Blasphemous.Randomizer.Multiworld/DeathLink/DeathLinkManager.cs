@@ -9,8 +9,8 @@ namespace Blasphemous.Randomizer.Multiworld.DeathLink
 
         private bool DeathLinkEnabled
         {
-            get => Main.Multiworld.MultiworldSettings.DeathLinkEnabled;
-            set => Main.Multiworld.MultiworldSettings.DeathLinkEnabled = value;
+            get => Main.Multiworld.ServerSettings.DeathLinkEnabled;
+            //set => Main.Multiworld.ServerSettings.DeathLinkEnabled = value;
         }
 
         public void Update()
@@ -25,7 +25,7 @@ namespace Blasphemous.Randomizer.Multiworld.DeathLink
 
         public void SendDeath()
         {
-            if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled)
+            if (!Main.Multiworld.ServerSettings.DeathLinkEnabled)
                 return;
 
             Main.Multiworld.Log("Sending death link!");
@@ -34,7 +34,7 @@ namespace Blasphemous.Randomizer.Multiworld.DeathLink
 
         public void ReceiveDeath(string player)
         {
-            if (!Main.Multiworld.MultiworldSettings.DeathLinkEnabled)
+            if (!Main.Multiworld.ServerSettings.DeathLinkEnabled)
                 return;
 
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
@@ -45,13 +45,13 @@ namespace Blasphemous.Randomizer.Multiworld.DeathLink
             }
         }
 
-        public bool ToggleDeathLink()
-        {
-            bool newDeathLinkEnabled = !DeathLinkEnabled;
-            DeathLinkEnabled = newDeathLinkEnabled;
-            Main.Multiworld.APManager.EnableDeathLink(newDeathLinkEnabled);
-            Main.Multiworld.Log("Setting deathlink status to " + newDeathLinkEnabled.ToString());
-            return newDeathLinkEnabled;
-        }
+        //public bool ToggleDeathLink()
+        //{
+        //    bool newDeathLinkEnabled = !DeathLinkEnabled;
+        //    DeathLinkEnabled = newDeathLinkEnabled;
+        //    Main.Multiworld.APManager.EnableDeathLink(newDeathLinkEnabled);
+        //    Main.Multiworld.Log("Setting deathlink status to " + newDeathLinkEnabled.ToString());
+        //    return newDeathLinkEnabled;
+        //}
     }
 }

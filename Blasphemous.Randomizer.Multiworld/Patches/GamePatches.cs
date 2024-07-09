@@ -31,7 +31,7 @@ class CutscenePlay_Patch
         if (__instance.cutscene == null) return;
         string name = __instance.cutscene.name;
 
-        int acquiredEnding, chosenEnding = Main.Multiworld.MultiworldSettings.RequiredEnding;
+        int acquiredEnding, chosenEnding = Main.Multiworld.ServerSettings.RequiredEnding;
         if (name == "CTS10-EndingA")
             acquiredEnding = 1;
         else if (name == "CTS09-EndingB")
@@ -60,7 +60,7 @@ class DialogManager_Patch
         {
             DialogObject current = ___allDialogs[conversiationId];
             string tirsoText = Main.Multiworld.LocalizationHandler.Localize(Main.Multiworld.APManager.Connected
-                ? "tirse" + Main.Multiworld.MultiworldSettings.RequiredEnding
+                ? "tirse" + Main.Multiworld.ServerSettings.RequiredEnding
                 : "tirseu");
 
             current.dialogLines.Clear();
