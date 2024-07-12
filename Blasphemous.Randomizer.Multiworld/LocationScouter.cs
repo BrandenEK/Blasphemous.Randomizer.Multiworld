@@ -1,5 +1,4 @@
 ﻿using Archipelago.MultiClient.Net;
-using Blasphemous.Randomizer.Multiworld.AP;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;

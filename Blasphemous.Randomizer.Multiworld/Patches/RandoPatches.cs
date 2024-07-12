@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.HintRando;
-using Blasphemous.Randomizer.Multiworld.AP;
+using Blasphemous.Randomizer.Multiworld.Models;
 
 namespace Blasphemous.Randomizer.Multiworld.Patches;
 
@@ -43,12 +43,11 @@ class HintShuffleText_Patch
     public static void Postfix(ref string __result, string location)
     {
         Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
-        if (item == null || item.type != 200)
+        if (item == null || item is not MultiworldOtherItem otherItem)
             return;
 
         // This is a valid location that holds another player's item
-        ArchipelagoItem archItem = item as ArchipelagoItem;
-        string itemHint = $"'{archItem.name}' for {archItem.PlayerName}";
+        string itemHint = $"'{otherItem.name}' for {otherItem.PlayerName}";
         __result = __result.Replace("[AP]", itemHint);
         Main.Multiworld.APManager.ScoutLocation(location);
     }

@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blasphemous.Randomizer.Multiworld.Models;
 
 namespace Blasphemous.Randomizer.Multiworld.AP
 {
@@ -210,7 +211,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
 
             // If the item isnt progression belonging to another player, return
             Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
-            if (item == null || item.type != 200 || !((ArchipelagoItem)item).IsProgression)
+            if (item == null || item is not MultiworldOtherItem otherItem || !otherItem.progression)
             {
                 Main.Multiworld.Log("Location " + location + " does not qualify to be scouted");
                 return;
@@ -244,35 +245,6 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         {
             return session.Locations.GetLocationNameFromId(id) ?? $"Location[{id}]";
         }
-
-        //private bool ItemNameExists(string itemName, out string itemId)
-        //{
-        //    foreach (Item item in Main.Randomizer.data.items.Values)
-        //    {
-        //        if (item.name == itemName)
-        //        {
-        //            itemId = item.id;
-        //            return true;
-        //        }
-        //    }
-        //    itemId = null;
-        //    return false;
-        //}
-
-        //private bool LocationIdExists(long apId, out string locationId)
-        //{
-        //    foreach (KeyValuePair<string, long> locationPair in apLocationIds)
-        //    {
-        //        if (locationPair.Value == apId)
-        //        {
-        //            locationId = locationPair.Key;
-        //            return true;
-        //        }
-        //    }
-
-        //    locationId = null;
-        //    return false;
-        //}
 
         #endregion Locations, items, & goal
 
