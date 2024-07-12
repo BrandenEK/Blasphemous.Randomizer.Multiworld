@@ -14,14 +14,15 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
             {
                 foreach (long apId in locations)
                 {
-                    if (Main.Multiworld.APManager.LocationIdExists(apId, out string locationId))
+                    Main.Multiworld.Log($"Receiving checked location: {apId}");
+                    try
                     {
-                        locationQueue.Add(locationId);
-                        Main.Multiworld.Log("Queueing check for location: " + locationId);
+                        string internalId = Main.Multiworld.LocationScouter.MultiworldToInternalId(apId);
+                        locationQueue.Add(internalId);
                     }
-                    else
+                    catch
                     {
-                        Main.Multiworld.LogError("Received invalid checked location: " + apId);
+                        Main.Multiworld.LogError("Invalid location id");
                     }
                 }
             }

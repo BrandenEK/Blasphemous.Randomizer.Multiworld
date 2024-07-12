@@ -17,14 +17,15 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                     if (hint.Found || hint.FindingPlayer != Main.Multiworld.APManager.PlayerSlot)
                         continue;
 
-                    if (Main.Multiworld.APManager.LocationIdExists(hint.LocationId, out string locationId))
+                    Main.Multiworld.Log($"Receiving hinted location: {hint.LocationId}");
+                    try
                     {
-                        hintQueue.Add(locationId);
-                        Main.Multiworld.Log("Queueing hint for location: " + locationId);
+                        string internalId = Main.Multiworld.LocationScouter.MultiworldToInternalId(hint.LocationId);
+                        hintQueue.Add(internalId);
                     }
-                    else
+                    catch
                     {
-                        Main.Multiworld.LogError("Received invalid hint location: " + hint.LocationId);
+                        Main.Multiworld.LogError("Invalid location id");
                     }
                 }
             }

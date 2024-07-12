@@ -12,17 +12,17 @@ class RandomizerRandomize_Patch
 {
     public static bool Prefix(Randomizer __instance)
     {
-        if (!Main.Multiworld.APManager.Connected)
-            return true;
-
-        Dictionary<string, string> mappedItems = Main.Multiworld.LoadMultiworldItems();
-        Dictionary<string, string> mappedDoors = Main.Multiworld.LoadMultiworldDoors();
         int seed = Main.Randomizer.GameSettings.Seed;
 
         try
         {
-            __instance.itemShuffler.LoadMappedItems(mappedItems); // Set item list from multiworld data
-            __instance.itemShuffler.LoadMappedDoors(mappedDoors); // Set door list from multiworld data
+            var mappedItems = new Dictionary<string, string>()
+            {
+                { "AP", "AP" }
+            };
+
+            __instance.itemShuffler.LoadMappedItems(mappedItems); // Just add one location to keep valid seed
+            __instance.itemShuffler.LoadMappedDoors(null); // No door shuffle
             __instance.enemyShuffler.Shuffle(seed); // Uses built-in enemy shuffle
             __instance.hintShuffler.Shuffle(seed); // Uses built-in hint filler based on multiworld items
         }
@@ -31,7 +31,7 @@ class RandomizerRandomize_Patch
             Main.Multiworld.LogError("Error with filling: " + e.Message);
         }
 
-        Main.Multiworld.Log(mappedItems.Count + " items have been inserted from multiworld!");
+        Main.Multiworld.Log("Overrode randomizer shuffle");
         return false;
     }
 }
@@ -60,12 +60,7 @@ class ItemShuffleItem_Patch
 {
     public static bool Prefix(string locationId, ref Item __result)
     {
-        Dictionary<string, string> mappedItems = Main.Randomizer.itemShuffler.SaveMappedItems();
-
-        if (mappedItems == null || !mappedItems.ContainsKey(locationId) || !mappedItems[locationId].StartsWith("AP"))
-            return true;
-
-        __result = Main.Multiworld.APManager.GetAPItem(mappedItems[locationId]);
+        __result = Main.Multiworld.LocationScouter.GetItemAtLocation(locationId);
         return false;
     }
 }

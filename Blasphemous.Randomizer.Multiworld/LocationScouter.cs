@@ -20,6 +20,34 @@ public class LocationScouter
         Main.Multiworld.APManager.OnConnect += OnConnect;
     }
 
+    /// <summary>
+    /// Replaces the Randomizer getItem method with one that returns the items loaded by multiworld
+    /// </summary>
+    public MultiworldItem GetItemAtLocation(string locationId)
+    {
+        if (_multiworldItems.TryGetValue(locationId, out MultiworldItem item))
+            return item;
+
+        Main.Multiworld.LogError($"Location {locationId} was not recevied!");
+        return null;
+    }
+
+    /// <summary>
+    /// Converts an internal id to a multiworld one
+    /// </summary>
+    public long InternalToMultiworldId(string locationId)
+    {
+        return _idMapping.First(x => x.Key == locationId).Value;
+    }
+
+    /// <summary>
+    /// Converts a multiworld id to an internal one
+    /// </summary>
+    public string MultiworldToInternalId(long locationId)
+    {
+        return _idMapping.First(x => x.Value == locationId).Key;
+    }
+
     private void OnConnect(LoginResult login)
     {
         if (login is not LoginSuccessful success)

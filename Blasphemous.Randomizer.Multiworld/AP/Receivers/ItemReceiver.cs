@@ -2,6 +2,7 @@
 using Archipelago.MultiClient.Net.Models;
 using Blasphemous.Randomizer.Multiworld.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
 {
@@ -24,14 +25,15 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                 int itemIdx = helper.Index;
                 helper.DequeueItem();
 
-                if (Main.Multiworld.APManager.ItemNameExists(itemName, out string itemId))
+                Main.Multiworld.Log($"Receiving item: {item.ItemName}");
+                try
                 {
+                    string itemId = Main.Randomizer.data.items.Values.First(x => x.name == itemName).id;
                     itemQueue.Add(new QueuedItem(itemId, itemIdx, player));
-                    Main.Multiworld.Log("Queueing item: " + itemId);
                 }
-                else
+                catch
                 {
-                    Main.Multiworld.LogDisplay("Error: " + itemName + " doesn't exist!");
+                    Main.Multiworld.LogError("Invalid item name");
                 }
             }
         }
