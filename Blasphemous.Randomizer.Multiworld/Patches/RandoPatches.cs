@@ -54,16 +54,6 @@ class HintShuffleText_Patch
     }
 }
 
-// Send location check when giving item
-[HarmonyPatch(typeof(ItemShuffle), "giveItem")]
-class ItemShuffleLocation_Patch
-{
-    public static void Postfix(string locationId)
-    {
-        Main.Multiworld.APManager.SendLocation(locationId);
-    }
-}
-
 // Return archipelago item when checking location
 [HarmonyPatch(typeof(ItemShuffle), "getItemAtLocation")]
 class ItemShuffleItem_Patch

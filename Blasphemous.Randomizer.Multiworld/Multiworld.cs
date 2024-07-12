@@ -28,6 +28,11 @@ public class Multiworld : BlasMod, IPersistentMod
     public DeathLinkManager DeathLinkManager { get; private set; }
     public NotificationManager NotificationManager { get; private set; }
 
+    /// <summary>
+    /// Responsible for scouting all locations on connect and storing item info
+    /// </summary>
+    public LocationScouter LocationScouter { get; private set; }
+
     public string PersistentID => "ID_MULTIWORLD";
 
     // Game
@@ -58,6 +63,7 @@ public class Multiworld : BlasMod, IPersistentMod
         APManager = new APManager();
         DeathLinkManager = new DeathLinkManager();
         NotificationManager = new NotificationManager();
+        LocationScouter = new LocationScouter();
 
         APManager.OnDisconnect += OnDisconnect;
 

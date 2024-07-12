@@ -69,7 +69,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 session.Socket.PacketReceived += messageReceiver.OnReceiveMessage;
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnSocketClose;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 5, 0), null, null, password);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.AllItems, new Version(0, 5, 0), null, null, password);
             }
             catch (Exception e)
             {
