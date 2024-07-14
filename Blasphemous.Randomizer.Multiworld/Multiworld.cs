@@ -124,7 +124,10 @@ public class Multiworld : BlasMod, IPersistentMod
     protected override void OnLevelLoaded(string oldLevel, string newLevel)
     {
         if (newLevel == "MainMenu")
+        {
+            ClientSettings = null;
             APManager.Disconnect();
+        }
 
         InGame = newLevel != "MainMenu";
 

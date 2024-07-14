@@ -103,6 +103,7 @@ public class MultiworldMenu : ModMenu
     private void OnSubmit()
     {
         Main.Multiworld.Log($"Server {_server.CurrentValue} as {_name.CurrentValue} with pass {_password.CurrentValue}");
+        OnFinish();
 
         ShowText("Attempting to connect...", Color.yellow);
         _connectNextFrame = 2;        
