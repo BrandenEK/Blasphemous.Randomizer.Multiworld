@@ -102,6 +102,9 @@ public class MultiworldMenu : ModMenu
 
     private void OnSubmit()
     {
+        if (_server.CurrentValue.StartsWith("ap:"))
+            _server.CurrentValue = _server.CurrentValue.Replace("ap:", "archipelago.gg:");
+
         Main.Multiworld.Log($"Server {_server.CurrentValue} as {_name.CurrentValue} with pass {_password.CurrentValue}");
         OnFinish();
 

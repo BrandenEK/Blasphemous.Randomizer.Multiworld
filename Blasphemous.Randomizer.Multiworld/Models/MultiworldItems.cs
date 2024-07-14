@@ -45,7 +45,9 @@ public class MultiworldSelfItem : MultiworldItem
     public override Sprite GetImage(bool upgraded) => InternalItem.GetImage(upgraded);
 }
 
-
+/// <summary>
+/// A multiworld item that belongs to a different player
+/// </summary>
 public class MultiworldOtherItem : MultiworldItem
 {
     /// <summary>
