@@ -17,8 +17,11 @@ public abstract class MultiworldItem : Item
 
     public sealed override void addToInventory()
     {
+        OnCollect();
         Main.Multiworld.APManager.SendLocation(LocationId);
     }
+
+    protected virtual void OnCollect() { }
 }
 
 /// <summary>
@@ -43,6 +46,12 @@ public class MultiworldSelfItem : MultiworldItem
     public override string GetNotification(bool upgraded) => InternalItem.GetNotification(upgraded);
 
     public override Sprite GetImage(bool upgraded) => InternalItem.GetImage(upgraded);
+
+    protected override void OnCollect()
+    {
+        Main.Multiworld.LogWarning("Collecting: " + InternalItem.name);
+        // Set a temp flag that tricks the internal progressive item into thinking it is a higher level (Before the item is received)
+    }
 }
 
 /// <summary>
