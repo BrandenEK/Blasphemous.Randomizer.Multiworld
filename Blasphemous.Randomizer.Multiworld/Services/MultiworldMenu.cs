@@ -148,9 +148,19 @@ public class MultiworldMenu : ModMenu
 
     private IEnumerator FinishMenuAfterLocations(LoginSuccessful success)
     {
-        Main.Multiworld.LogError("Starting coroutine");
-        // Await the location scouters versioned method call
-        yield return null;
+        if (success.SlotData.ContainsKey("locations"))
+        {
+            yield return Main.Multiworld.LocationScouter.LoadLocationsV1(success);
+        }
+        else if (success.SlotData.ContainsKey("locationinfo"))
+        {
+            yield return Main.Multiworld.LocationScouter.LoadLocationsV2(success);
+        }
+        else
+        {
+            ShowError("No location info found in slot data");
+            yield break;
+        }
 
         ShowText("Successfully connected", Color.green);
         MenuFramework.ShowNextMenu();

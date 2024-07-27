@@ -1,6 +1,7 @@
 ﻿using Archipelago.MultiClient.Net;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,10 +15,10 @@ public class LocationScouter
     private readonly Dictionary<string, MultiworldItem> _multiworldItems = new();
     private readonly List<KeyValuePair<string, long>> _idMapping = new();
 
-    public LocationScouter()
-    {
-        Main.Multiworld.APManager.OnConnect += OnConnect;
-    }
+    //public LocationScouter()
+    //{
+    //    Main.Multiworld.APManager.OnConnect += OnConnect;
+    //}
 
     /// <summary>
     /// Replaces the Randomizer getItem method with one that returns the items loaded by multiworld
@@ -45,6 +46,28 @@ public class LocationScouter
     public string MultiworldToInternalId(long locationId)
     {
         return _idMapping.First(x => x.Value == locationId).Key;
+    }
+
+    /// <summary>
+    /// Loads location info by getting the list of all locations from slotdata
+    /// </summary>
+    public IEnumerator LoadLocationsV1(LoginSuccessful success)
+    {
+        Main.Multiworld.LogWarning("Loading location info using v1");
+        
+        yield return null;
+    }
+
+    /// <summary>
+    /// Loads location info by scouting all locations after getting the mapping through slotdata
+    /// </summary>
+    /// <param name="success"></param>
+    /// <returns></returns>
+    public IEnumerator LoadLocationsV2(LoginSuccessful success)
+    {
+        Main.Multiworld.LogWarning("Loading location info using v2");
+
+        yield return null;
     }
 
     private void OnConnect(LoginResult login)
