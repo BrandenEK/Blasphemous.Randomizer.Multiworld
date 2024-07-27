@@ -83,6 +83,14 @@ public class LocationScouter
         Main.Multiworld.LogWarning("Loading location info using v2");
         ResetLocationInfo();
 
+        // Get location list from slot data
+        MultiworldLocationV2[] locations = ((JArray)success.SlotData["locationinfo"]).ToObject<MultiworldLocationV2[]>();
+
+        foreach (MultiworldLocationV2 location in locations)
+        {
+            Main.Multiworld.LogError(location.GameId + ": " + location.ApId);
+        }
+
         yield return null;
     }
 
