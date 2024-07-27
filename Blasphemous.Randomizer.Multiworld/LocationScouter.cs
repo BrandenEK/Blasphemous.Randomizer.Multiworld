@@ -29,7 +29,7 @@ public class LocationScouter
             return item;
 
         Main.Multiworld.LogError($"Location {locationId} was not recevied!");
-        return null;
+        return new MultiworldOtherItem(locationId, "Unknown item", "Unknown player", MultiworldOtherItem.ItemType.Basic);
     }
 
     /// <summary>
@@ -61,8 +61,6 @@ public class LocationScouter
     /// <summary>
     /// Loads location info by scouting all locations after getting the mapping through slotdata
     /// </summary>
-    /// <param name="success"></param>
-    /// <returns></returns>
     public IEnumerator LoadLocationsV2(LoginSuccessful success)
     {
         Main.Multiworld.LogWarning("Loading location info using v2");
