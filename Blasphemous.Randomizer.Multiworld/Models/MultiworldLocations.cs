@@ -1,6 +1,6 @@
 ﻿namespace Blasphemous.Randomizer.Multiworld.Models
 {
-    public class ArchipelagoLocation
+    public class MultiworldLocationV1
     {
         // Location
         public string id;

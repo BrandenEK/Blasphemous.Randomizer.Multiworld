@@ -54,32 +54,12 @@ public class LocationScouter
     public IEnumerator LoadLocationsV1(LoginSuccessful success)
     {
         Main.Multiworld.LogWarning("Loading location info using v1");
-        
-        yield return null;
-    }
-
-    /// <summary>
-    /// Loads location info by scouting all locations after getting the mapping through slotdata
-    /// </summary>
-    public IEnumerator LoadLocationsV2(LoginSuccessful success)
-    {
-        Main.Multiworld.LogWarning("Loading location info using v2");
-
-        yield return null;
-    }
-
-    private void OnConnect(LoginResult login)
-    {
-        if (login is not LoginSuccessful success)
-            return;
-
-        _multiworldItems.Clear();
-        _idMapping.Clear();
+        ResetLocationInfo();
 
         // Get location list from slot data
-        ArchipelagoLocation[] locations = ((JArray)success.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+        MultiworldLocationV1[] locations = ((JArray)success.SlotData["locations"]).ToObject<MultiworldLocationV1[]>();
 
-        foreach (ArchipelagoLocation location in locations)
+        foreach (MultiworldLocationV1 location in locations)
         {
             // Add id mapping
             _idMapping.Add(new KeyValuePair<string, long>(location.id, location.ap_id));
@@ -91,14 +71,33 @@ public class LocationScouter
             // Add item to mappedItems
             _multiworldItems.Add(location.id, item);
         }
+
+        yield return null;
     }
 
-    private MultiworldItem GetSelfItem(ArchipelagoLocation location)
+    /// <summary>
+    /// Loads location info by scouting all locations after getting the mapping through slotdata
+    /// </summary>
+    public IEnumerator LoadLocationsV2(LoginSuccessful success)
+    {
+        Main.Multiworld.LogWarning("Loading location info using v2");
+        ResetLocationInfo();
+
+        yield return null;
+    }
+
+    private void ResetLocationInfo()
+    {
+        _multiworldItems.Clear();
+        _idMapping.Clear();
+    }
+
+    private MultiworldItem GetSelfItem(MultiworldLocationV1 location)
     {
         return new MultiworldSelfItem(location.id, Main.Randomizer.data.items.Values.First(x => x.name == location.name), location.name);
     }
 
-    private MultiworldItem GetOtherItem(ArchipelagoLocation location)
+    private MultiworldItem GetOtherItem(MultiworldLocationV1 location)
     {
         return new MultiworldOtherItem(location.id, location.name, location.player_name, (MultiworldOtherItem.ItemType)location.type);
     }
