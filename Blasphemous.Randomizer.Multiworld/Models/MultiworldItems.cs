@@ -17,11 +17,8 @@ public abstract class MultiworldItem : Item
 
     public sealed override void addToInventory()
     {
-        OnCollect();
         Main.Multiworld.APManager.SendLocation(LocationId);
     }
-
-    protected virtual void OnCollect() { }
 }
 
 /// <summary>
@@ -34,24 +31,24 @@ public class MultiworldSelfItem : MultiworldItem
     /// </summary>
     public Item InternalItem { get; }
 
-    public MultiworldSelfItem(string locationId, Item item) : base(locationId, item.name, item.hint, item.type, item.progression)
+    /// <summary>
+    /// The name that will be displayed for this item (Doesn't have progress-dependent text resolution)
+    /// </summary>
+    public string DisplayName { get; }
+
+    public MultiworldSelfItem(string locationId, Item item, string name) : base(locationId, item.name, item.hint, item.type, item.progression)
     {
         InternalItem = item;
+        DisplayName = name;
     }
 
-    public override string GetName(bool upgraded) => InternalItem.GetName(upgraded);
+    public override string GetName(bool upgraded) => DisplayName;
 
     public override string GetDescription(bool upgraded) => InternalItem.GetDescription(upgraded);
 
     public override string GetNotification(bool upgraded) => InternalItem.GetNotification(upgraded);
 
     public override Sprite GetImage(bool upgraded) => InternalItem.GetImage(upgraded);
-
-    protected override void OnCollect()
-    {
-        Main.Multiworld.LogWarning("Collecting: " + InternalItem.name);
-        // Set a temp flag that tricks the internal progressive item into thinking it is a higher level (Before the item is received)
-    }
 }
 
 /// <summary>

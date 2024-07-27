@@ -74,7 +74,7 @@ public class LocationScouter
 
     private MultiworldItem GetSelfItem(ArchipelagoLocation location)
     {
-        return new MultiworldSelfItem(location.id, Main.Randomizer.data.items.Values.First(x => x.name == location.name));
+        return new MultiworldSelfItem(location.id, Main.Randomizer.data.items.Values.First(x => x.name == location.name), location.name);
     }
 
     private MultiworldItem GetOtherItem(ArchipelagoLocation location)
