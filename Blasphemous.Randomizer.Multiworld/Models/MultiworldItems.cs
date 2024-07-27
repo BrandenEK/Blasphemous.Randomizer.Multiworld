@@ -31,12 +31,18 @@ public class MultiworldSelfItem : MultiworldItem
     /// </summary>
     public Item InternalItem { get; }
 
-    public MultiworldSelfItem(string locationId, Item item) : base(locationId, item.name, item.hint, item.type, item.progression)
+    /// <summary>
+    /// The name that will be displayed for this item (Doesn't have progress-dependent text resolution)
+    /// </summary>
+    public string DisplayName { get; }
+
+    public MultiworldSelfItem(string locationId, Item item, string name) : base(locationId, item.name, item.hint, item.type, item.progression)
     {
         InternalItem = item;
+        DisplayName = name;
     }
 
-    public override string GetName(bool upgraded) => InternalItem.GetName(upgraded);
+    public override string GetName(bool upgraded) => DisplayName;
 
     public override string GetDescription(bool upgraded) => InternalItem.GetDescription(upgraded);
 
