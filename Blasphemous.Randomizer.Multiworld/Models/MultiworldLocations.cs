@@ -15,5 +15,5 @@ public class MultiworldLocationV1
 public class MultiworldLocationV2
 {
     public string GameId { get; set; }
-    public string ApId { get; set; }
+    public long ApId { get; set; }
 }

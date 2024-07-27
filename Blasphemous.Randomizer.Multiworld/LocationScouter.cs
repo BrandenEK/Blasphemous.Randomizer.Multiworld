@@ -88,7 +88,8 @@ public class LocationScouter
 
         foreach (MultiworldLocationV2 location in locations)
         {
-            Main.Multiworld.LogError(location.GameId + ": " + location.ApId);
+            // Add id mapping
+            _idMapping.Add(new KeyValuePair<string, long>(location.GameId, location.ApId));
         }
 
         yield return null;
