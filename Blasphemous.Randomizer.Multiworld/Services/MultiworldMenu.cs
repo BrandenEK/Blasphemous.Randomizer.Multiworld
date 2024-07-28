@@ -5,7 +5,9 @@ using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Input;
 using Blasphemous.Randomizer.Multiworld.Models;
+using Gameplay.UI;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -146,10 +148,29 @@ public class MultiworldMenu : ModMenu
             }
 
             // Handle successful result
-            ShowText("Successfully connected", Color.green);
-            MenuFramework.ShowNextMenu();
+            UIController.instance.StartCoroutine(FinishMenuAfterLocations(success));
             return;
         }
+    }
+
+    private IEnumerator FinishMenuAfterLocations(LoginSuccessful success)
+    {
+        if (success.SlotData.ContainsKey("locations"))
+        {
+            yield return Main.Multiworld.LocationScouter.LoadLocationsV1(success);
+        }
+        else if (success.SlotData.ContainsKey("locationinfo"))
+        {
+            yield return Main.Multiworld.LocationScouter.LoadLocationsV2(success);
+        }
+        else
+        {
+            ShowError("No location info found in slot data");
+            yield break;
+        }
+
+        ShowText("Successfully connected", Color.green);
+        MenuFramework.ShowNextMenu();
     }
 
     private MenuFramework MenuFramework => Main.Multiworld.IsModLoadedName("Menu Framework", out BlasMod mod)

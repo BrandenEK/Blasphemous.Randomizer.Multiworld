@@ -1,8 +1,11 @@
 ﻿using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.Models;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Blasphemous.Randomizer.Multiworld;
 
@@ -13,10 +16,28 @@ public class LocationScouter
 {
     private readonly Dictionary<string, MultiworldItem> _multiworldItems = new();
     private readonly List<KeyValuePair<string, long>> _idMapping = new();
+    private static readonly object _scoutLock = new();
 
-    public LocationScouter()
+    private bool x_waitingForScout = false;
+    /// <summary>
+    /// Whether the LocationScouter is currently waiting and the menu should be locked
+    /// </summary>
+    public bool WaitingForScout
     {
-        Main.Multiworld.APManager.OnConnect += OnConnect;
+        get
+        {
+            lock (_scoutLock)
+            {
+                return x_waitingForScout;
+            }
+        }
+        set
+        {
+            lock (_scoutLock)
+            {
+                x_waitingForScout = value;
+            }
+        }
     }
 
     /// <summary>
@@ -28,7 +49,7 @@ public class LocationScouter
             return item;
 
         Main.Multiworld.LogError($"Location {locationId} was not recevied!");
-        return null;
+        return new MultiworldOtherItem(locationId, "Unknown item", "Unknown player", MultiworldOtherItem.ItemType.Basic);
     }
 
     /// <summary>
@@ -47,38 +68,88 @@ public class LocationScouter
         return _idMapping.First(x => x.Value == locationId).Key;
     }
 
-    private void OnConnect(LoginResult login)
+    /// <summary>
+    /// Loads location info by getting the list of all locations from slotdata
+    /// </summary>
+    public IEnumerator LoadLocationsV1(LoginSuccessful success)
     {
-        if (login is not LoginSuccessful success)
-            return;
-
-        _multiworldItems.Clear();
-        _idMapping.Clear();
+        Main.Multiworld.LogWarning("Loading location info using v1");
+        ResetLocationInfo();
 
         // Get location list from slot data
-        ArchipelagoLocation[] locations = ((JArray)success.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
+        MultiworldLocationV1[] locations = ((JArray)success.SlotData["locations"]).ToObject<MultiworldLocationV1[]>();
 
-        foreach (ArchipelagoLocation location in locations)
+        foreach (MultiworldLocationV1 location in locations)
         {
             // Add id mapping
             _idMapping.Add(new KeyValuePair<string, long>(location.id, location.ap_id));
 
             MultiworldItem item = location.player_name == Main.Multiworld.ClientSettings.Name // Probably wont work
-                ? GetSelfItem(location)
-                : GetOtherItem(location);
+                ? GetSelfItem(location.id, location.name)
+                : GetOtherItem(location.id, location.name, location.player_name, location.type);
 
             // Add item to mappedItems
             _multiworldItems.Add(location.id, item);
         }
+
+        yield return null;
     }
 
-    private MultiworldItem GetSelfItem(ArchipelagoLocation location)
+    /// <summary>
+    /// Loads location info by scouting all locations after getting the mapping through slotdata
+    /// </summary>
+    public IEnumerator LoadLocationsV2(LoginSuccessful success)
     {
-        return new MultiworldSelfItem(location.id, Main.Randomizer.data.items.Values.First(x => x.name == location.name), location.name);
+        Main.Multiworld.LogWarning("Loading location info using v2");
+        ResetLocationInfo();
+
+        // Get location list from slot data
+        MultiworldLocationV2[] locations = ((JArray)success.SlotData["locationinfo"]).ToObject<MultiworldLocationV2[]>();
+
+        foreach (MultiworldLocationV2 location in locations)
+        {
+            // Add id mapping
+            _idMapping.Add(new KeyValuePair<string, long>(location.GameId, location.ApId));
+        }
+
+        WaitingForScout = true;
+        Main.Multiworld.APManager.ScoutMultipleLocations(locations.Select(x => x.ApId), OnScoutLocationsV2);
+        yield return new WaitUntil(() => !WaitingForScout);
     }
 
-    private MultiworldItem GetOtherItem(ArchipelagoLocation location)
+    private void OnScoutLocationsV2(Dictionary<long, ScoutedItemInfo> items)
     {
-        return new MultiworldOtherItem(location.id, location.name, location.player_name, (MultiworldOtherItem.ItemType)location.type);
+        Main.Multiworld.Log("Received location scout info");
+
+        foreach (var kvp in items)
+        {
+            string internalId = MultiworldToInternalId(kvp.Key);
+            ScoutedItemInfo itemInfo = kvp.Value;
+
+            MultiworldItem item = kvp.Value.Player.Slot == Main.Multiworld.APManager.PlayerSlot
+                ? GetSelfItem(internalId, itemInfo.ItemName)
+                : GetOtherItem(internalId, itemInfo.ItemName, itemInfo.Player.Name, (byte)itemInfo.Flags);
+
+            // Add item to mappedItems
+            _multiworldItems.Add(internalId, item);
+        }
+
+        WaitingForScout = false;
+    }
+
+    private void ResetLocationInfo()
+    {
+        _multiworldItems.Clear();
+        _idMapping.Clear();
+    }
+
+    private MultiworldItem GetSelfItem(string id, string name)
+    {
+        return new MultiworldSelfItem(id, Main.Randomizer.data.items.Values.First(x => x.name == name), name);
+    }
+
+    private MultiworldItem GetOtherItem(string id, string name, string player, byte type)
+    {
+        return new MultiworldOtherItem(id, name, player, (MultiworldOtherItem.ItemType)type);
     }
 }

@@ -1,15 +1,16 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using Blasphemous.Randomizer.Multiworld.AP.Receivers;
+using Blasphemous.Randomizer.Multiworld.Models;
 using Blasphemous.Randomizer.ItemRando;
 using Framework.Managers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blasphemous.Randomizer.Multiworld.Models;
 
 namespace Blasphemous.Randomizer.Multiworld.AP
 {
@@ -232,6 +233,14 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             long id = Main.Multiworld.LocationScouter.InternalToMultiworldId(location);
             session.Locations.ScoutLocationsAsync(null, true, id);
             scoutedLocations.Add(location);
+        }
+
+        /// <summary>
+        /// This method should only called right after connection, before the save is loaded in order to determine display info for all items in this world
+        /// </summary>
+        public void ScoutMultipleLocations(IEnumerable<long> locations, Action<Dictionary<long, ScoutedItemInfo>> callback)
+        {
+            session.Locations.ScoutLocationsAsync(callback, HintCreationPolicy.None, locations.ToArray());
         }
 
         public string GetPlayerNameFromSlot(int slot)
