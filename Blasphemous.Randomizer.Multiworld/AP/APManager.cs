@@ -88,8 +88,11 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             int ending = int.Parse(success.SlotData["ending"].ToString());
             bool dl = bool.Parse(success.SlotData["death_link"].ToString());
 
+            // Store custom seed in the config object
+            cfg.Seed = CalculateMultiworldSeed(session.RoomState.Seed, Main.Multiworld.ClientSettings.Name);
+
             Main.Multiworld.Log("Storing server settings from APManager");
-            Main.Multiworld.ServerSettings = new Models.ServerSettings(cfg, ending, dl);
+            Main.Multiworld.ServerSettings = new ServerSettings(cfg, ending, dl);
 
             // Set up deathlink
             deathLink = session.CreateDeathLinkService();
@@ -98,6 +101,11 @@ namespace Blasphemous.Randomizer.Multiworld.AP
 
             // Start tracking hints
             session.DataStorage.TrackHints(hintReceiver.OnReceiveHints, true);
+        }
+
+        private int CalculateMultiworldSeed(string seed, string name)
+        {
+            return Math.Abs(((seed.GetHashCode() / 2) + (name.GetHashCode() / 2)) % Config.MAX_SEED);
         }
 
         /// <summary>

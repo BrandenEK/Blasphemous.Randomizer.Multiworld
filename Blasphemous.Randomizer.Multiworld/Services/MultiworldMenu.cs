@@ -6,6 +6,7 @@ using Blasphemous.ModdingAPI;
 using Blasphemous.ModdingAPI.Input;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -109,7 +110,7 @@ public class MultiworldMenu : ModMenu
         OnFinish();
 
         ShowText("Attempting to connect...", Color.yellow);
-        _connectNextFrame = 2;        
+        _connectNextFrame = 2;
     }
 
     private void OnCancel()
@@ -128,17 +129,23 @@ public class MultiworldMenu : ModMenu
         if (login is LoginSuccessful success)
         {
             Config cfg = ((JObject)success.SlotData["cfg"]).ToObject<Config>();
-            bool hasRequiredMods =
-                (!cfg.ShuffleBootsOfPleading || Main.Randomizer.InstalledBootsMod) &&
-                (!cfg.ShufflePurifiedHand || Main.Randomizer.InstalledDoubleJumpMod);
+            List<string> missingMods = new();
 
-            if (!hasRequiredMods)
+            // Determine which mods are missing
+            if (cfg.ShuffleBootsOfPleading && !Main.Randomizer.InstalledBootsMod)
+                missingMods.Add("Boots of Pleading");
+            if (cfg.ShufflePurifiedHand && !Main.Randomizer.InstalledDoubleJumpMod)
+                missingMods.Add("Double Jump");
+
+            // Handle failed result if mods are missing
+            if (missingMods.Count > 0)
             {
-                ShowError("The required mods are not installed");
+                ShowError($"Install the following mods: {string.Join(", ", [.. missingMods])}");
                 Main.Multiworld.APManager.Disconnect();
                 return;
             }
 
+            // Handle successful result
             ShowText("Successfully connected", Color.green);
             MenuFramework.ShowNextMenu();
             return;
