@@ -1,9 +1,11 @@
 ﻿using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.Models;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Blasphemous.Randomizer.Multiworld;
 
@@ -14,6 +16,8 @@ public class LocationScouter
 {
     private readonly Dictionary<string, MultiworldItem> _multiworldItems = new();
     private readonly List<KeyValuePair<string, long>> _idMapping = new();
+
+    private bool _waitingForScout = false;
 
     //public LocationScouter()
     //{
@@ -65,8 +69,8 @@ public class LocationScouter
             _idMapping.Add(new KeyValuePair<string, long>(location.id, location.ap_id));
 
             MultiworldItem item = location.player_name == Main.Multiworld.ClientSettings.Name // Probably wont work
-                ? GetSelfItem(location)
-                : GetOtherItem(location);
+                ? GetSelfItem(location.id, location.name)
+                : GetOtherItem(location.id, location.name, location.player_name, location.type);
 
             // Add item to mappedItems
             _multiworldItems.Add(location.id, item);
@@ -92,7 +96,30 @@ public class LocationScouter
             _idMapping.Add(new KeyValuePair<string, long>(location.GameId, location.ApId));
         }
 
-        yield return null;
+        _waitingForScout = true;
+        Main.Multiworld.APManager.ScoutMultipleLocations(locations.Select(x => x.ApId), OnScoutLocationsV2);
+        yield return new WaitUntil(() => !_waitingForScout);
+        yield return new WaitForSecondsRealtime(5);
+    }
+
+    private void OnScoutLocationsV2(Dictionary<long, ScoutedItemInfo> items)
+    {
+        Main.Multiworld.Log("Received location scout info");
+
+        foreach (var kvp in items)
+        {
+            string internalId = MultiworldToInternalId(kvp.Key);
+            ScoutedItemInfo itemInfo = kvp.Value;
+
+            MultiworldItem item = kvp.Value.Player.Slot == Main.Multiworld.APManager.PlayerSlot
+                ? GetSelfItem(internalId, itemInfo.ItemName)
+                : GetOtherItem(internalId, itemInfo.ItemName, itemInfo.Player.Name, (byte)itemInfo.Flags);
+
+            // Add item to mappedItems
+            _multiworldItems.Add(internalId, item);
+        }
+
+        _waitingForScout = false;
     }
 
     private void ResetLocationInfo()
@@ -101,13 +128,13 @@ public class LocationScouter
         _idMapping.Clear();
     }
 
-    private MultiworldItem GetSelfItem(MultiworldLocationV1 location)
+    private MultiworldItem GetSelfItem(string id, string name)
     {
-        return new MultiworldSelfItem(location.id, Main.Randomizer.data.items.Values.First(x => x.name == location.name), location.name);
+        return new MultiworldSelfItem(id, Main.Randomizer.data.items.Values.First(x => x.name == name), name);
     }
 
-    private MultiworldItem GetOtherItem(MultiworldLocationV1 location)
+    private MultiworldItem GetOtherItem(string id, string name, string player, byte type)
     {
-        return new MultiworldOtherItem(location.id, location.name, location.player_name, (MultiworldOtherItem.ItemType)location.type);
+        return new MultiworldOtherItem(id, name, player, (MultiworldOtherItem.ItemType)type);
     }
 }
