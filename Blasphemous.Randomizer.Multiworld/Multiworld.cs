@@ -9,7 +9,6 @@ using Blasphemous.Randomizer.Multiworld.Models;
 using Blasphemous.Randomizer.Multiworld.Notifications;
 using Blasphemous.Randomizer.Multiworld.Services;
 using Framework.Managers;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Blasphemous.Randomizer.Multiworld;
@@ -28,11 +27,13 @@ public class Multiworld : BlasMod, IPersistentMod
     public DeathLinkManager DeathLinkManager { get; private set; }
     public NotificationManager NotificationManager { get; private set; }
 
+    /// <summary>
+    /// Responsible for scouting all locations on connect and storing item info
+    /// </summary>
+    public LocationScouter LocationScouter { get; private set; }
+
     public string PersistentID => "ID_MULTIWORLD";
 
-    // Game
-    private Dictionary<string, string> multiworldItems;
-    private Dictionary<string, string> multiworldDoors;
     public bool InGame { get; private set; }
 
     /// <summary>
@@ -58,6 +59,7 @@ public class Multiworld : BlasMod, IPersistentMod
         APManager = new APManager();
         DeathLinkManager = new DeathLinkManager();
         NotificationManager = new NotificationManager();
+        LocationScouter = new LocationScouter();
 
         APManager.OnDisconnect += OnDisconnect;
 
@@ -122,7 +124,10 @@ public class Multiworld : BlasMod, IPersistentMod
     protected override void OnLevelLoaded(string oldLevel, string newLevel)
     {
         if (newLevel == "MainMenu")
+        {
+            ClientSettings = null;
             APManager.Disconnect();
+        }
 
         InGame = newLevel != "MainMenu";
 
@@ -149,35 +154,12 @@ public class Multiworld : BlasMod, IPersistentMod
         command.HackWriteToConsole(message);
     }
 
-    /// <summary>
-    /// Should be using the event, but for now is called directly
-    /// </summary>
-    public void OnConnect(Dictionary<string, string> mappedItems, Dictionary<string, string> mappedDoors)
-    {
-        // Get data from server
-        multiworldItems = mappedItems;
-        multiworldDoors = mappedDoors;
-
-        // MappedItems has been filled with new shuffled items
-        Log("Game variables have been loaded from multiworld!");
-        if (!hasSentLocations && InGame)
-        {
-            APManager.SendAllLocations();
-            hasSentLocations = true;
-        }
-    }
-
     private void OnDisconnect()
     {
         if (InGame)
             LogDisplay("Disconnected from multiworld server!");
 
-        //multiworldItems = null;
-        //multiworldDoors = null;
         hasSentLocations = false;
         APManager.ClearAllReceivers();
     }
-
-    public Dictionary<string, string> LoadMultiworldItems() => multiworldItems;
-    public Dictionary<string, string> LoadMultiworldDoors() => multiworldDoors;
 }

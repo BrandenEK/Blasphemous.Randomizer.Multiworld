@@ -32,7 +32,7 @@ namespace Blasphemous.Randomizer.Multiworld.Notifications
 
             // Only display wall climb & dash ability if they are from a real player
             // Ideally this would be a more precise check instead of just player name
-            if (item.Player == "Server" && (item.ItemId == "Slide" || item.ItemId == "WallClimb"))
+            if (item.Player == Main.Multiworld.ClientSettings.Name || item.Player == "Server" && (item.ItemId == "Slide" || item.ItemId == "WallClimb"))
                 return;
 
             if (isShowing)

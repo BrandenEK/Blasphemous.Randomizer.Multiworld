@@ -35,7 +35,7 @@ class RandomizerMenu_GetSettings_Patch
 {
     public static bool Prefix(ref Config __result)
     {
-        __result = new Config();
+        __result = Main.Multiworld.ServerSettings.Config;
         return false;
     }
 }

@@ -8,6 +8,8 @@ using Framework.Managers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Blasphemous.Randomizer.Multiworld.Models;
 
 namespace Blasphemous.Randomizer.Multiworld.AP
 {
@@ -19,10 +21,6 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         public bool Connected { get; private set; }
         public string ServerAddress => Connected ? session.Socket.Uri.ToString() : string.Empty;
         public int PlayerSlot => Connected ? session.ConnectionInfo.Slot : -1;
-
-        // These are cleared and refilled when connecting
-        private readonly Dictionary<string, long> apLocationIds = new ();
-        private readonly List<ArchipelagoItem> apItems = new ();
 
         // Save checked hints
         private List<string> scoutedLocations;
@@ -69,7 +67,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 session.Socket.PacketReceived += messageReceiver.OnReceiveMessage;
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnSocketClose;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.IncludeStartingInventory, new Version(0, 5, 0), null, null, password);
+                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.AllItems, new Version(0, 5, 0), null, null, password);
             }
             catch (Exception e)
             {
@@ -98,48 +96,8 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             deathLink.OnDeathLinkReceived += ReceiveDeath;
             EnableDeathLink(dl);
 
-            // Get door list from slot data
-            Dictionary<string, string> mappedDoors = ((JObject)success.SlotData["doors"]).ToObject<Dictionary<string, string>>();
-
-            // Get location list from slot data
-            ArchipelagoLocation[] locations = ((JArray)success.SlotData["locations"]).ToObject<ArchipelagoLocation[]>();
-            Dictionary<string, string> mappedItems = new();
-            apLocationIds.Clear();
-            apItems.Clear();
-
-            // Process locations
-            for (int i = 0; i < locations.Length; i++)
-            {
-                ArchipelagoLocation currentLocation = locations[i];
-                // Add conversion from location id to name
-                apLocationIds.Add(currentLocation.id, currentLocation.ap_id);
-
-                // Add to new list of random items
-                if (currentLocation.player_name == string.Empty) // This wont work anymore!!
-                {
-                    // This is an item for this player
-                    if (ItemNameExists(currentLocation.name, out string itemId))
-                    {
-                        mappedItems.Add(currentLocation.id, itemId);
-                    }
-                    else
-                    {
-                        Main.Multiworld.LogError("Item " + currentLocation.name + " doesn't exist!");
-                        continue;
-                    }
-                }
-                else
-                {
-                    // This is an item to a different game
-                    mappedItems.Add(currentLocation.id, "AP" + apItems.Count);
-                    apItems.Add(new ArchipelagoItem(currentLocation.name, currentLocation.player_name, (ArchipelagoItem.ItemType)currentLocation.type));
-                }
-            }
-
             // Start tracking hints
             session.DataStorage.TrackHints(hintReceiver.OnReceiveHints, true);
-
-            Main.Multiworld.OnConnect(mappedItems, mappedDoors);
         }
 
         /// <summary>
@@ -194,26 +152,23 @@ namespace Blasphemous.Randomizer.Multiworld.AP
 
         public void SendLocation(string location)
         {
-            if (!Connected) return;
+            if (!Connected)
+                return;
 
-            if (apLocationIds.ContainsKey(location))
-                session.Locations.CompleteLocationChecks(apLocationIds[location]);
-            else
-                Main.Multiworld.Log("Location " + location + " does not exist in the multiworld!");
+            long id = Main.Multiworld.LocationScouter.InternalToMultiworldId(location);
+            session.Locations.CompleteLocationChecks(id);
         }
 
         public void SendAllLocations()
         {
-            if (!Connected) return;
+            if (!Connected)
+                return;
 
-            var checkedLocations = new List<long>();
-            foreach (string location in Main.Randomizer.data.itemLocations.Keys)
-            {
-                if (Core.Events.GetFlag("LOCATION_" + location))
-                    checkedLocations.Add(apLocationIds[location]);
-            }
+            var checkedLocations = Main.Randomizer.data.itemLocations.Keys
+                .Where(x => Core.Events.GetFlag("LOCATION_" + x))
+                .Select(Main.Multiworld.LocationScouter.InternalToMultiworldId);
 
-            Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count})");
+            Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count()})");
             session.Locations.CompleteLocationChecks(checkedLocations.ToArray());
         }
 
@@ -251,18 +206,12 @@ namespace Blasphemous.Randomizer.Multiworld.AP
 
         public void ScoutLocation(string location)
         {
-            if (!Connected) return;
-
-            // If location doesn't exist, throw error
-            if (!apLocationIds.ContainsKey(location))
-            {
-                Main.Multiworld.LogError("Location " + location + " does not exist in the multiworld!");
+            if (!Connected)
                 return;
-            }
 
             // If the item isnt progression belonging to another player, return
             Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
-            if (item == null || item.type != 200 || !((ArchipelagoItem)item).IsProgression)
+            if (item == null || item is not MultiworldOtherItem otherItem || !otherItem.progression)
             {
                 Main.Multiworld.Log("Location " + location + " does not qualify to be scouted");
                 return;
@@ -272,14 +221,9 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             if (scoutedLocations.Contains(location))
                 return;
 
-            session.Locations.ScoutLocationsAsync(null, true, apLocationIds[location]);
+            long id = Main.Multiworld.LocationScouter.InternalToMultiworldId(location);
+            session.Locations.ScoutLocationsAsync(null, true, id);
             scoutedLocations.Add(location);
-        }
-
-        public ArchipelagoItem GetAPItem(string apId)
-        {
-            int index = int.Parse(apId.Substring(2));
-            return index >= 0 && index < apItems.Count ? apItems[index] : new ArchipelagoItem("Unknown Item", "Unknown Player", ArchipelagoItem.ItemType.Basic);
         }
 
         public string GetPlayerNameFromSlot(int slot)
@@ -300,35 +244,6 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         public string GetLocationNameFromId(long id)
         {
             return session.Locations.GetLocationNameFromId(id) ?? $"Location[{id}]";
-        }
-
-        public bool ItemNameExists(string itemName, out string itemId)
-        {
-            foreach (Item item in Main.Randomizer.data.items.Values)
-            {
-                if (item.name == itemName)
-                {
-                    itemId = item.id;
-                    return true;
-                }
-            }
-            itemId = null;
-            return false;
-        }
-
-        public bool LocationIdExists(long apId, out string locationId)
-        {
-            foreach (KeyValuePair<string, long> locationPair in apLocationIds)
-            {
-                if (locationPair.Value == apId)
-                {
-                    locationId = locationPair.Key;
-                    return true;
-                }
-            }
-
-            locationId = null;
-            return false;
         }
 
         #endregion Locations, items, & goal

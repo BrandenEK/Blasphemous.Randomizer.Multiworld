@@ -1,5 +1,4 @@
-﻿
-namespace Blasphemous.Randomizer.Multiworld.AP
+﻿namespace Blasphemous.Randomizer.Multiworld.Models
 {
     public class ArchipelagoLocation
     {
