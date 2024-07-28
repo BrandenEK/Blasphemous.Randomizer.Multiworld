@@ -16,13 +16,26 @@ public class LocationScouter
 {
     private readonly Dictionary<string, MultiworldItem> _multiworldItems = new();
     private readonly List<KeyValuePair<string, long>> _idMapping = new();
+    private static readonly object _scoutLock = new();
 
-    private bool _waitingForScout = false;
-
-    //public LocationScouter()
-    //{
-    //    Main.Multiworld.APManager.OnConnect += OnConnect;
-    //}
+    private bool x_waitingForScout = false;
+    private bool WaitingForScout
+    {
+        get
+        {
+            lock (_scoutLock)
+            {
+                return x_waitingForScout;
+            }
+        }
+        set
+        {
+            lock (_scoutLock)
+            {
+                x_waitingForScout = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Replaces the Randomizer getItem method with one that returns the items loaded by multiworld
@@ -96,9 +109,9 @@ public class LocationScouter
             _idMapping.Add(new KeyValuePair<string, long>(location.GameId, location.ApId));
         }
 
-        _waitingForScout = true;
+        WaitingForScout = true;
         Main.Multiworld.APManager.ScoutMultipleLocations(locations.Select(x => x.ApId), OnScoutLocationsV2);
-        yield return new WaitUntil(() => !_waitingForScout);
+        yield return new WaitUntil(() => !WaitingForScout);
         yield return new WaitForSecondsRealtime(5);
     }
 
@@ -119,7 +132,7 @@ public class LocationScouter
             _multiworldItems.Add(internalId, item);
         }
 
-        _waitingForScout = false;
+        WaitingForScout = false;
     }
 
     private void ResetLocationInfo()
