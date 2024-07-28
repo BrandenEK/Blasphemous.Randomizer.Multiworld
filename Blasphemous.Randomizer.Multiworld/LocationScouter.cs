@@ -19,7 +19,10 @@ public class LocationScouter
     private static readonly object _scoutLock = new();
 
     private bool x_waitingForScout = false;
-    private bool WaitingForScout
+    /// <summary>
+    /// Whether the LocationScouter is currently waiting and the menu should be locked
+    /// </summary>
+    public bool WaitingForScout
     {
         get
         {
@@ -112,7 +115,6 @@ public class LocationScouter
         WaitingForScout = true;
         Main.Multiworld.APManager.ScoutMultipleLocations(locations.Select(x => x.ApId), OnScoutLocationsV2);
         yield return new WaitUntil(() => !WaitingForScout);
-        yield return new WaitForSecondsRealtime(5);
     }
 
     private void OnScoutLocationsV2(Dictionary<long, ScoutedItemInfo> items)

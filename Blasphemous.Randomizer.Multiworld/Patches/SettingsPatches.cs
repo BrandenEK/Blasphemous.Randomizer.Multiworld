@@ -1,4 +1,5 @@
-﻿using Blasphemous.Framework.UI;
+﻿using Blasphemous.Framework.Menus.Options;
+using Blasphemous.Framework.UI;
 using Blasphemous.Randomizer.Services;
 using HarmonyLib;
 using UnityEngine;
@@ -45,5 +46,17 @@ class RandomizerMenu_SetSettings_Patch
     public static bool Prefix()
     {
         return false;
+    }
+}
+
+/// <summary>
+/// Prevent changing text on the menu when waiting for location scouts
+/// </summary>
+[HarmonyPatch(typeof(TextOption), "Update")]
+class TextOption_Update_Patch
+{
+    public static bool Prefix()
+    {
+        return !Main.Multiworld.LocationScouter.WaitingForScout;
     }
 }
