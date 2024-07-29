@@ -5,9 +5,11 @@
 ---
 
 ## Connecting to Archipelago
-1. On the main menu screen, press 'backslash' to open up the debug console
-2. Use the connect command to connect to the archipelago server
-    - Example command: ```multiworld connect archipelago.gg:58604 TestName```
+When starting a new save file, a menu will open to prompt you for your connection details.  Enter the required info like this example:
+```
+Server ip: ap:55858
+Player name: Player1
+```
 
 ## Available commands
 - Press the 'backslash' key to open the debug console
@@ -16,15 +18,17 @@
 
 | Command | Parameters | Description |
 | ------- | ----------- | ------- |
-| `multiworld help` | none | List all available commands |
-| `multiworld status` | none | Display connection status |
-| `multiworld connect` | SERVER, NAME, PASSWORD (Optional) | Connect to the specified server IP address |
-| `multiworld disconnect` | none | Disconnect from current server |
-| `multiworld deathlink` | none | Toggles deathlink on/off |
-| `multiworld say` | COMMAND | Sends a command to the AP server |
+| `ap help` | none | List all available commands |
+| `ap status` | none | Display connection status |
+| `ap say` | COMMAND | Sends a command to the AP server |
+| `ap hint` | ITEM | Sends a hint command for the item to the AP server |
 
 ## Translations
 This mod is available in these other languages in addition to English:
 - Spanish (Thanks to Rodol J. "ConanCimmerio" Pérez (Ro))
 - Chinese (Thanks to NewbieElton)
 - French  (Thanks to Rocher)
+
+## Installation
+This mod is available for download through the [Blasphemous Mod Installer](https://github.com/BrandenEK/Blasphemous.Modding.Installer)
+- Required dependencies: Modding API, Randomizer, Cheat Console, Menu Framework
