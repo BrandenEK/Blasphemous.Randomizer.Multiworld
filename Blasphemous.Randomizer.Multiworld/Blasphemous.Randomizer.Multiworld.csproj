@@ -9,7 +9,7 @@
     <Authors>Damocles</Authors>
     <Company>Damocles</Company>
     <Description>A multiworld client for the Blasphemous Randomizer</Description>
-    <Version>2.1.4</Version>
+    <Version>3.0.0</Version>
 
     <TargetName>BlasphemousMultiworld</TargetName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
