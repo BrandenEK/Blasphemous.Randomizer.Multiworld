@@ -253,14 +253,16 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             return session.Players.GetPlayerAlias(slot) ?? $"Player[{slot}]";
         }
 
-        public string GetItemNameFromId(long id)
+        public string GetItemNameForPlayer(long id, int player)
         {
-            return session.Items.GetItemName(id) ?? $"Item[{id}]";
+            string game = session.Players.GetPlayerInfo(player).Game;
+            return session.Items.GetItemName(id, game) ?? $"Item[{id}]";
         }
 
-        public string GetLocationNameFromId(long id)
+        public string GetLocationNameForPlayer(long id, int player)
         {
-            return session.Locations.GetLocationNameFromId(id) ?? $"Location[{id}]";
+            string game = session.Players.GetPlayerInfo(player).Game;
+            return session.Locations.GetLocationNameFromId(id, game) ?? $"Location[{id}]";
         }
 
         #endregion Locations, items, & goal
