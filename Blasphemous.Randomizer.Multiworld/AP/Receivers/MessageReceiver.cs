@@ -37,7 +37,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                                 else
                                     color = ColorType.ItemBasic;
 
-                                text = Main.Multiworld.APManager.GetItemNameFromId(itemId);
+                                text = Main.Multiworld.APManager.GetItemNameForPlayer(itemId, messagePart.Player ?? 0);
                             }
                             else
                             {
@@ -50,7 +50,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                             if (long.TryParse(text, out long locationId))
                             {
                                 color = ColorType.Location;
-                                text = Main.Multiworld.APManager.GetLocationNameFromId(locationId);
+                                text = Main.Multiworld.APManager.GetLocationNameForPlayer(locationId, messagePart.Player ?? 0);
                             }
                             else
                             {
