@@ -40,16 +40,43 @@ class RandomizerRandomize_Patch
 [HarmonyPatch(typeof(HintShuffle), "getHintText")]
 class HintShuffleText_Patch
 {
-    public static void Postfix(ref string __result, string location)
+    public static bool Prefix(ref string __result, string location)
     {
-        Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
-        if (item == null || item is not MultiworldOtherItem otherItem)
-            return;
+        string locationHint, itemHint;
 
-        // This is a valid location that holds another player's item
-        string itemHint = $"'{otherItem.name}' for {otherItem.PlayerName}";
-        __result = __result.Replace("[AP]", itemHint);
-        Main.Multiworld.APManager.ScoutLocation(location);
+        if (location == "SIERPES")
+        {
+            Item item1 = Main.Randomizer.itemShuffler.getItemAtLocation("BossTrigger[5000]");
+            Item item2 = Main.Randomizer.itemShuffler.getItemAtLocation("QI202");
+            locationHint = Main.Randomizer.data.itemLocations["QI202"].Hint;
+            itemHint = $"{GetHintForItem(item1)} and {GetHintForItem(item2)}";
+
+            Main.Multiworld.APManager.ScoutLocation("BossTrigger[5000]");
+            Main.Multiworld.APManager.ScoutLocation("QI202");
+        }
+        else
+        {
+            Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
+            locationHint = Main.Randomizer.data.itemLocations[location].Hint;
+            itemHint = GetHintForItem(item);
+
+            Main.Multiworld.APManager.ScoutLocation(location);
+        }
+
+        string output = locationHint.Replace("*", itemHint);
+        __result = char.ToUpper(output[0]).ToString() + output.Substring(1) + "...";
+        return false;
+    }
+
+    private static string GetHintForItem(Item item)
+    {
+        if (item?.hint == null)
+            return "???";
+
+        if (item is not MultiworldOtherItem other)
+            return item.hint;
+
+        return $"'{other.name}' for {other.PlayerName}";
     }
 }
 
