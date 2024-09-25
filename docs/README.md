@@ -1,8 +1,19 @@
 # Blasphemous Multiworld Client
 
-<img src="https://img.shields.io/github/downloads/BrandenEK/Blasphemous.Randomizer.Multiworld/total?color=6495ED&style=for-the-badge">
+<img src="https://img.shields.io/github/downloads/BrandenEK/Blasphemous.Randomizer.Multiworld/total?color=39B7C6&style=for-the-badge">
 
 ---
+
+## Contributors
+
+***- Programming and design -*** <br>
+[@BrandenEK](https://github.com/BrandenEK), [@TRPG0](https://github.com/TRPG0)
+
+***- Artwork -*** <br>
+[@TRPG0](https://github.com/TRPG0)
+
+***- Translations -*** <br>
+[@ConanCimmerio](https://github.com/ConanCimmerio), [@EltonZhang777](https://github.com/EltonZhang777), [@RocherBrockas](https://github.com/RocherBrockas)
 
 ## Connecting to Archipelago
 When starting a new save file, a menu will open to prompt you for your connection details.  Enter the required info like this example:
@@ -22,12 +33,6 @@ Player name: Player1
 | `ap status` | none | Display connection status |
 | `ap say` | COMMAND | Sends a command to the AP server |
 | `ap hint` | ITEM | Sends a hint command for the item to the AP server |
-
-## Translations
-This mod is available in these other languages in addition to English:
-- Spanish (Thanks to Rodol J. "ConanCimmerio" Pérez (Ro))
-- Chinese (Thanks to NewbieElton)
-- French  (Thanks to Rocher)
 
 ## Installation
 This mod is available for download through the [Blasphemous Mod Installer](https://github.com/BrandenEK/Blasphemous.Modding.Installer)
