@@ -3,6 +3,7 @@ using Blasphemous.Framework.Menus;
 using Blasphemous.Framework.Menus.Options;
 using Blasphemous.Framework.UI;
 using Blasphemous.ModdingAPI;
+using Blasphemous.ModdingAPI.Helpers;
 using Blasphemous.ModdingAPI.Input;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Gameplay.UI;
@@ -173,7 +174,7 @@ public class MultiworldMenu : ModMenu
         MenuFramework.ShowNextMenu();
     }
 
-    private MenuFramework MenuFramework => Main.Multiworld.IsModLoadedName("Menu Framework", out BlasMod mod)
+    private MenuFramework MenuFramework => ModHelper.TryGetModByName("Menu Framework", out BlasMod mod)
         ? mod as MenuFramework
         : throw new System.Exception("Menu Framework was never loaded");
 

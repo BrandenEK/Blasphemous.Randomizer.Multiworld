@@ -1,4 +1,5 @@
-﻿using Framework.Managers;
+﻿using Blasphemous.ModdingAPI;
+using Framework.Managers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -14,7 +15,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
             {
                 foreach (long apId in locations)
                 {
-                    Main.Multiworld.Log($"Receiving checked location: {apId}");
+                    ModLog.Info($"Receiving checked location: {apId}");
                     try
                     {
                         string internalId = Main.Multiworld.LocationScouter.MultiworldToInternalId(apId);
@@ -22,7 +23,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                     }
                     catch
                     {
-                        Main.Multiworld.LogError("Invalid location id");
+                        ModLog.Error("Invalid location id");
                     }
                 }
             }
@@ -33,7 +34,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
             if (locationQueue.Count == 0)
                 return;
 
-            Main.Multiworld.LogWarning("Processing location queue");
+            ModLog.Warn("Processing location queue");
 
             foreach (string locationId in locationQueue)
             {

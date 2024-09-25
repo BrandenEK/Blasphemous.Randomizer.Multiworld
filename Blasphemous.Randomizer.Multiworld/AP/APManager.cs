@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blasphemous.ModdingAPI;
 
 namespace Blasphemous.Randomizer.Multiworld.AP
 {
@@ -92,7 +93,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             // Store custom seed in the config object
             cfg.Seed = CalculateMultiworldSeed(session.RoomState.Seed, Main.Multiworld.ClientSettings.Name);
 
-            Main.Multiworld.Log("Storing server settings from APManager");
+            ModLog.Info("Storing server settings from APManager");
             Main.Multiworld.ServerSettings = new ServerSettings(cfg, ending, dl);
 
             // Set up deathlink
@@ -177,7 +178,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 .Where(x => Core.Events.GetFlag("LOCATION_" + x))
                 .Select(Main.Multiworld.LocationScouter.InternalToMultiworldId);
 
-            Main.Multiworld.Log($"Sending all locations ({checkedLocations.Count()})");
+            ModLog.Info($"Sending all locations ({checkedLocations.Count()})");
             session.Locations.CompleteLocationChecks(checkedLocations.ToArray());
         }
 
@@ -222,7 +223,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             Item item = Main.Randomizer.itemShuffler.getItemAtLocation(location);
             if (item == null || item is not MultiworldOtherItem otherItem || !otherItem.progression)
             {
-                Main.Multiworld.Log("Location " + location + " does not qualify to be scouted");
+                ModLog.Info("Location " + location + " does not qualify to be scouted");
                 return;
             }
 
