@@ -1,4 +1,5 @@
-﻿using Blasphemous.Randomizer.Multiworld.Models;
+﻿using Blasphemous.ModdingAPI;
+using Blasphemous.Randomizer.Multiworld.Models;
 using Framework.Managers;
 
 namespace Blasphemous.Randomizer.Multiworld.DeathLink
@@ -28,7 +29,7 @@ namespace Blasphemous.Randomizer.Multiworld.DeathLink
             if (!Main.Multiworld.ServerSettings.DeathLinkEnabled)
                 return;
 
-            Main.Multiworld.Log("Sending death link!");
+            ModLog.Info("Sending death link!");
             Main.Multiworld.APManager.SendDeath();
         }
 
@@ -39,7 +40,7 @@ namespace Blasphemous.Randomizer.Multiworld.DeathLink
 
             if (!Core.Events.GetFlag("CHERUB_RESPAWN"))
             {
-                Main.Multiworld.Log("Received death link!");
+                ModLog.Info("Received death link!");
                 Main.Multiworld.NotificationManager.DisplayNotification(new QueuedItem("Death", 0, player));
                 CurrentStatus = DeathLinkStatus.Queued;
             }
