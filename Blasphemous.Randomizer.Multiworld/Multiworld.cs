@@ -73,7 +73,7 @@ public class Multiworld : BlasMod, IPersistentMod
         if (cherub != null)
             cherub.name = "Child of Moonlight";
 
-        Log("Multiworld has been initialized!");
+        ModLog.Info("Multiworld has been initialized!");
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public class Multiworld : BlasMod, IPersistentMod
     private void OnDisconnect()
     {
         if (InGame)
-            LogDisplay("Disconnected from multiworld server!");
+            ModLog.Display("Disconnected from multiworld server!");
 
         hasSentLocations = false;
         APManager.ClearAllReceivers();

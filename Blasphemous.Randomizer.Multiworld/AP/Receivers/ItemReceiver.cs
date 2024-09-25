@@ -1,5 +1,6 @@
 ﻿using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
+using Blasphemous.ModdingAPI;
 using Blasphemous.Randomizer.Multiworld.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                 int itemIdx = helper.Index;
                 helper.DequeueItem();
 
-                Main.Multiworld.Log($"Receiving item: {item.ItemName}");
+                ModLog.Info($"Receiving item: {item.ItemName}");
                 try
                 {
                     string itemId = Main.Randomizer.data.items.Values.First(x => x.name == itemName).id;
@@ -33,7 +34,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                 }
                 catch
                 {
-                    Main.Multiworld.LogError("Invalid item name");
+                    ModLog.Error("Invalid item name");
                 }
             }
         }
@@ -43,11 +44,11 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
             if (itemQueue.Count == 0)
                 return;
 
-            Main.Multiworld.LogWarning("Processing item queue");
+            ModLog.Warn("Processing item queue");
 
             foreach (QueuedItem item in itemQueue)
             {
-                Main.Multiworld.Log($"Item '{item.ItemId}' is at index {item.Index} with {itemsReceived} items currently received");
+                ModLog.Info($"Item '{item.ItemId}' is at index {item.Index} with {itemsReceived} items currently received");
                 if (item.Index > itemsReceived)
                 {
                     Main.Randomizer.data.items[item.ItemId].addToInventory();

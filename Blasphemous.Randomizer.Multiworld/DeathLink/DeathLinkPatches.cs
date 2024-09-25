@@ -1,5 +1,5 @@
-﻿using HarmonyLib;
-using Framework.Managers;
+﻿using Framework.Managers;
+using HarmonyLib;
 
 namespace Blasphemous.Randomizer.Multiworld.DeathLink;
 

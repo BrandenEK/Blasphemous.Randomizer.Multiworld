@@ -1,4 +1,5 @@
-﻿using Blasphemous.Randomizer.Multiworld.Models;
+﻿using Blasphemous.ModdingAPI;
+using Blasphemous.Randomizer.Multiworld.Models;
 using Gameplay.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -106,7 +107,7 @@ namespace Blasphemous.Randomizer.Multiworld.Notifications
         {
             if (m_ImageBackground == null || m_ImageBox == null || m_TextFont == null)
                 return;
-            Main.Multiworld.Log("Creating item receiver notification box!");
+            ModLog.Info("Creating item receiver notification box!");
 
             // Find correct canvas
             Transform parent = null;

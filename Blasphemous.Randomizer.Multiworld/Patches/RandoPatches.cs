@@ -1,8 +1,9 @@
-﻿using HarmonyLib;
-using System.Collections.Generic;
-using Blasphemous.Randomizer.ItemRando;
+﻿using Blasphemous.ModdingAPI;
 using Blasphemous.Randomizer.HintRando;
+using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.Multiworld.Models;
+using HarmonyLib;
+using System.Collections.Generic;
 
 namespace Blasphemous.Randomizer.Multiworld.Patches;
 
@@ -28,10 +29,10 @@ class RandomizerRandomize_Patch
         }
         catch (System.Exception e)
         {
-            Main.Multiworld.LogError("Error with filling: " + e.Message);
+            ModLog.Error("Error with filling: " + e.Message);
         }
 
-        Main.Multiworld.Log("Overrode randomizer shuffle");
+        ModLog.Info("Overrode randomizer shuffle");
         return false;
     }
 }

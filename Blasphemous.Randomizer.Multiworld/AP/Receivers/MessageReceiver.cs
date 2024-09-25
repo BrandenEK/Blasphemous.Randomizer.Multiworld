@@ -2,6 +2,7 @@
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
+using Blasphemous.ModdingAPI;
 using System.Collections.Generic;
 
 namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
@@ -107,7 +108,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
             lock (APManager.receiverLock)
             {
                 string message = output.ToString();
-                Main.Multiworld.Log("Queueing message: " + message);
+                ModLog.Info("Queueing message: " + message);
                 messageQueue.Enqueue(message);
             }
         }

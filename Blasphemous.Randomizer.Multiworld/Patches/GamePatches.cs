@@ -1,4 +1,5 @@
-﻿using Framework.Dialog;
+﻿using Blasphemous.ModdingAPI;
+using Framework.Dialog;
 using Framework.Managers;
 using Gameplay.UI.Others.MenuLogic;
 using HarmonyLib;
@@ -43,7 +44,7 @@ class CutscenePlay_Patch
 
         if (acquiredEnding >= chosenEnding)
         {
-            Main.Multiworld.Log($"Completing goal {chosenEnding} with ending {acquiredEnding}!");
+            ModLog.Info($"Completing goal {chosenEnding} with ending {acquiredEnding}!");
             Main.Multiworld.APManager.SendGoal();
         }
     }

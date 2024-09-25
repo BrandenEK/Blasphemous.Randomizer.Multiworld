@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net.Models;
+using Blasphemous.ModdingAPI;
 using Framework.Managers;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                     if (hint.Found || hint.FindingPlayer != Main.Multiworld.APManager.PlayerSlot)
                         continue;
 
-                    Main.Multiworld.Log($"Receiving hinted location: {hint.LocationId}");
+                    ModLog.Info($"Receiving hinted location: {hint.LocationId}");
                     try
                     {
                         string internalId = Main.Multiworld.LocationScouter.MultiworldToInternalId(hint.LocationId);
@@ -25,7 +26,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                     }
                     catch
                     {
-                        Main.Multiworld.LogError("Invalid location id");
+                        ModLog.Error("Invalid location id");
                     }
                 }
             }
@@ -36,7 +37,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
             if (hintQueue.Count == 0)
                 return;
 
-            Main.Multiworld.LogWarning("Processing hint queue");
+            ModLog.Warn("Processing hint queue");
 
             foreach (string locationId in hintQueue)
             {

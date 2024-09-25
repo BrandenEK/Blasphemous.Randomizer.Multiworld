@@ -1,4 +1,5 @@
-﻿using Gameplay.UI.Others.MenuLogic;
+﻿using Blasphemous.ModdingAPI;
+using Gameplay.UI.Others.MenuLogic;
 using Gameplay.UI.Widgets;
 using HarmonyLib;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 namespace Blasphemous.Randomizer.Multiworld.Notifications;
 
 // Send receive notification data to the item receiver
-[HarmonyPatch(typeof(PopupAchievementWidget), "Awake")]
+[HarmonyPatch(typeof(PopupAchievementWidget), nameof(PopupAchievementWidget.Awake))]
 class PopupAchievementWidget_Patch
 {
     public static void Postfix(RectTransform ___PopUp)
@@ -16,7 +17,7 @@ class PopupAchievementWidget_Patch
         Main.Multiworld.NotificationManager.TextFont = ___PopUp.GetChild(1).GetComponent<Text>().font;
     }
 }
-[HarmonyPatch(typeof(NewInventory_GridItem), "Awake")]
+[HarmonyPatch(typeof(NewInventory_GridItem), nameof(NewInventory_GridItem.Awake))]
 class InvGridItem_Patch
 {
     public static void Postfix(Sprite ___backEquipped)
@@ -26,7 +27,7 @@ class InvGridItem_Patch
 }
 
 // Make the console use rich text
-[HarmonyPatch(typeof(ConsoleWidget), "Write")]
+[HarmonyPatch(typeof(ConsoleWidget), nameof(ConsoleWidget.Write))]
 class ConsoleWrite_Patch
 {
     public static void Postfix(ConsoleWidget __instance, ref bool ___scrollToBottom)
@@ -38,7 +39,7 @@ class ConsoleWrite_Patch
         }
         catch (System.Exception)
         {
-            Main.Multiworld.LogWarning("Failed to change console line to rich text");
+            ModLog.Warn("Failed to change console line to rich text");
         }
         ___scrollToBottom = true;
     }
