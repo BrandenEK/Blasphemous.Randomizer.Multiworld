@@ -69,6 +69,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 session.Socket.PacketReceived += messageReceiver.OnReceiveMessage;
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnSocketClose;
+                session.Socket.ErrorReceived += OnSocketError;
                 result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.AllItems, new Version(0, 5, 0), null, null, password);
             }
             catch (Exception e)
@@ -129,6 +130,11 @@ namespace Blasphemous.Randomizer.Multiworld.AP
             session = null;
 
             OnDisconnect?.Invoke();
+        }
+
+        private void OnSocketError(Exception e, string message)
+        {
+            ModLog.Error($"Error received: {message}\n{e}");
         }
 
         public void UpdateAllReceivers()
