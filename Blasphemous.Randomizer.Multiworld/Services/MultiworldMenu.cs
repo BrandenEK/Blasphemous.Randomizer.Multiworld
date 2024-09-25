@@ -99,7 +99,7 @@ public class MultiworldMenu : ModMenu
 
     public override void OnFinish()
     {
-        Main.Multiworld.Log("Storing client settings from menu");
+        ModLog.Info("Storing client settings from menu");
         Main.Multiworld.ClientSettings = new ClientSettings(_server.CurrentValue, _name.CurrentValue, _password.CurrentValue);
     }
 
@@ -108,7 +108,7 @@ public class MultiworldMenu : ModMenu
         if (_server.CurrentValue.StartsWith("ap:"))
             _server.CurrentValue = _server.CurrentValue.Replace("ap:", "archipelago.gg:");
 
-        Main.Multiworld.Log($"Server {_server.CurrentValue} as {_name.CurrentValue} with pass {_password.CurrentValue}");
+        ModLog.Info($"Server {_server.CurrentValue} as {_name.CurrentValue} with pass {_password.CurrentValue}");
         OnFinish();
 
         ShowText("Attempting to connect...", Color.yellow);
@@ -185,7 +185,7 @@ public class MultiworldMenu : ModMenu
         _resultText.text = text;
         _timeShowingText = 0;
 
-        Main.Multiworld.Log($"Menu result: {text}");
+        ModLog.Info($"Menu result: {text}");
     }
 
     private void ShowTextTimed(string text, Color color, float time)
@@ -194,7 +194,7 @@ public class MultiworldMenu : ModMenu
         _resultText.text = text;
         _timeShowingText = time;
 
-        Main.Multiworld.Log($"Menu result: {text}");
+        ModLog.Info($"Menu result: {text}");
     }
 
     private void ShowError(string text)
@@ -203,6 +203,6 @@ public class MultiworldMenu : ModMenu
         _resultText.text = $"Failed to connect:\n{text}";
         _timeShowingText = 5f;
 
-        Main.Multiworld.LogError($"Menu result: {text}");
+        ModLog.Info($"Menu result: {text}");
     }
 }

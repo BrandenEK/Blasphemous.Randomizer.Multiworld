@@ -1,5 +1,6 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Models;
+using Blasphemous.ModdingAPI;
 using Blasphemous.Randomizer.Multiworld.Models;
 using Newtonsoft.Json.Linq;
 using System.Collections;
@@ -48,7 +49,7 @@ public class LocationScouter
         if (_multiworldItems.TryGetValue(locationId, out MultiworldItem item))
             return item;
 
-        Main.Multiworld.LogError($"Location {locationId} was not recevied!");
+        ModLog.Error($"Location {locationId} was not recevied!");
         return new MultiworldOtherItem(locationId, "Unknown item", "Unknown player", MultiworldOtherItem.ItemType.Basic);
     }
 
@@ -73,7 +74,7 @@ public class LocationScouter
     /// </summary>
     public IEnumerator LoadLocationsV1(LoginSuccessful success)
     {
-        Main.Multiworld.LogWarning("Loading location info using v1");
+        ModLog.Warn("Loading location info using v1");
         ResetLocationInfo();
 
         // Get location list from slot data
@@ -100,7 +101,7 @@ public class LocationScouter
     /// </summary>
     public IEnumerator LoadLocationsV2(LoginSuccessful success)
     {
-        Main.Multiworld.LogWarning("Loading location info using v2");
+        ModLog.Warn("Loading location info using v2");
         ResetLocationInfo();
 
         // Get location list from slot data
@@ -119,7 +120,7 @@ public class LocationScouter
 
     private void OnScoutLocationsV2(Dictionary<long, ScoutedItemInfo> items)
     {
-        Main.Multiworld.Log("Received location scout info");
+        ModLog.Info("Received location scout info");
 
         foreach (var kvp in items)
         {
