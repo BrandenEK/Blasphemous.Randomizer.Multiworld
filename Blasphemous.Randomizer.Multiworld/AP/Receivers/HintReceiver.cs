@@ -7,7 +7,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
 {
     public class HintReceiver
     {
-        private readonly List<string> hintQueue = new();
+        private readonly List<long> hintQueue = new();
 
         public void OnReceiveHints(Hint[] hints)
         {
@@ -19,15 +19,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                         continue;
 
                     ModLog.Info($"Receiving hinted location: {hint.LocationId}");
-                    try
-                    {
-                        string internalId = Main.Multiworld.LocationScouter.MultiworldToInternalId(hint.LocationId);
-                        hintQueue.Add(internalId);
-                    }
-                    catch
-                    {
-                        ModLog.Error("Invalid location id");
-                    }
+                    hintQueue.Add(hint.LocationId);
                 }
             }
         }
@@ -39,9 +31,20 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
 
             ModLog.Warn("Processing hint queue");
 
-            foreach (string locationId in hintQueue)
+            foreach (long apId in hintQueue)
             {
-                Core.Events.SetFlag("APHINT_" + locationId, true, false);
+                string internalId;
+                try
+                {
+                    internalId = Main.Multiworld.LocationScouter.MultiworldToInternalId(apId);                    
+                }
+                catch
+                {
+                    ModLog.Error($"Invalid location id: {apId}");
+                    return;
+                }
+
+                Core.Events.SetFlag("APHINT_" + internalId, true, false);
             }
 
             ClearHintQueue();
