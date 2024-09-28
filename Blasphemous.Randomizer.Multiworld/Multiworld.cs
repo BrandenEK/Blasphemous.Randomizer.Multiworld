@@ -77,6 +77,14 @@ public class Multiworld : BlasMod, IPersistentMod
     }
 
     /// <summary>
+    /// Clear id mapping when exiting game
+    /// </summary>
+    protected override void OnExitGame()
+    {
+        LocationScouter.ResetLocationInfo();
+    }
+
+    /// <summary>
     /// Register command
     /// </summary>
     protected override void OnRegisterServices(ModServiceProvider provider)
