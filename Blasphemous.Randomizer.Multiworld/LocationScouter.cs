@@ -138,8 +138,12 @@ public class LocationScouter
         WaitingForScout = false;
     }
 
-    private void ResetLocationInfo()
+    /// <summary>
+    /// Clears the location id mapping
+    /// </summary>
+    public void ResetLocationInfo()
     {
+        ModLog.Info($"Resetting location id mapping");
         _multiworldItems.Clear();
         _idMapping.Clear();
     }
