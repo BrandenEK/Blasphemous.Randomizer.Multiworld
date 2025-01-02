@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.3.1" />
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.5.0" />
     <PackageReference Include="Blasphemous.GameLibs" Version="4.0.67" />
     <PackageReference Include="Blasphemous.CheatConsole" Version="1.0.1" />
     <PackageReference Include="Blasphemous.Framework.Menus" Version="0.3.4" />
