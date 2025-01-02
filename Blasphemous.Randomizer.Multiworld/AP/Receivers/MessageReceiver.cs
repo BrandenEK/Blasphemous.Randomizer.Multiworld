@@ -29,11 +29,11 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                         {
                             if (long.TryParse(text, out long itemId))
                             {
-                                if (messagePart.Flags == ItemFlags.Advancement)
+                                if ((messagePart.Flags & ItemFlags.Advancement) != 0)
                                     color = ColorType.ItemProgression;
-                                else if (messagePart.Flags == ItemFlags.NeverExclude)
+                                else if ((messagePart.Flags & ItemFlags.NeverExclude) != 0)
                                     color = ColorType.ItemUseful;
-                                else if (messagePart.Flags == ItemFlags.Trap)
+                                else if ((messagePart.Flags & ItemFlags.Trap) != 0)
                                     color = ColorType.ItemTrap;
                                 else
                                     color = ColorType.ItemBasic;
