@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using Blasphemous.ModdingAPI;
 using Blasphemous.Randomizer.Multiworld.Models;
@@ -87,7 +88,7 @@ public class LocationScouter
 
             MultiworldItem item = location.player_name == Main.Multiworld.ClientSettings.Name // Probably wont work
                 ? GetSelfItem(location.id, location.name)
-                : GetOtherItem(location.id, location.name, location.player_name, location.type);
+                : GetOtherItem(location.id, location.name, location.player_name, (MultiworldOtherItem.ItemType)location.type);
 
             // Add item to mappedItems
             _multiworldItems.Add(location.id, item);
@@ -127,9 +128,17 @@ public class LocationScouter
             string internalId = MultiworldToInternalId(kvp.Key);
             ScoutedItemInfo itemInfo = kvp.Value;
 
+            MultiworldOtherItem.ItemType type = (itemInfo.Flags & ItemFlags.Advancement) != 0
+                ? MultiworldOtherItem.ItemType.Progression
+                : (itemInfo.Flags & ItemFlags.NeverExclude) != 0
+                    ? MultiworldOtherItem.ItemType.Useful
+                    : (itemInfo.Flags & ItemFlags.Trap) != 0
+                        ? MultiworldOtherItem.ItemType.Trap
+                        : MultiworldOtherItem.ItemType.Basic;
+
             MultiworldItem item = kvp.Value.Player.Slot == Main.Multiworld.APManager.PlayerSlot
                 ? GetSelfItem(internalId, itemInfo.ItemName)
-                : GetOtherItem(internalId, itemInfo.ItemName, itemInfo.Player.Name, (byte)itemInfo.Flags);
+                : GetOtherItem(internalId, itemInfo.ItemName, itemInfo.Player.Name, type);
 
             // Add item to mappedItems
             _multiworldItems.Add(internalId, item);
@@ -153,8 +162,8 @@ public class LocationScouter
         return new MultiworldSelfItem(id, Main.Randomizer.data.items.Values.First(x => x.name == name), name);
     }
 
-    private MultiworldItem GetOtherItem(string id, string name, string player, byte type)
+    private MultiworldItem GetOtherItem(string id, string name, string player, MultiworldOtherItem.ItemType type)
     {
-        return new MultiworldOtherItem(id, name, player, (MultiworldOtherItem.ItemType)type);
+        return new MultiworldOtherItem(id, name, player, type);
     }
 }
