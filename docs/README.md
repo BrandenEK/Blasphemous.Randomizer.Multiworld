@@ -35,5 +35,9 @@ Player name: Player1
 | `ap hint` | ITEM | Sends a hint command for the item to the AP server |
 
 ## Installation
-This mod is available for download through the [Blasphemous Mod Installer](https://github.com/BrandenEK/Blasphemous.Modding.Installer)
-- Required dependencies: Modding API, Randomizer, Cheat Console, Menu Framework
+This mod is available for download through the [Blasphemous Mod Installer](https://github.com/BrandenEK/Blasphemous.Modding.Installer) <br>
+Required dependencies:
+- [Modding API](https://github.com/BrandenEK/Blasphemous.ModdingAPI)
+- [Menu Framework](https://github.com/BrandenEK/Blasphemous.Framework.Menus)
+- [Cheat Console](https://github.com/BrandenEK/Blasphemous.CheatConsole)
+- [Randomizer](https://github.com/BrandenEK/Blasphemous.Randomizer)
