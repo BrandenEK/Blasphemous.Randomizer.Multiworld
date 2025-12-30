@@ -3,15 +3,16 @@ using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
+using ArchipelagoUtility;
+using Blasphemous.ModdingAPI;
+using Blasphemous.Randomizer.ItemRando;
 using Blasphemous.Randomizer.Multiworld.AP.Receivers;
 using Blasphemous.Randomizer.Multiworld.Models;
-using Blasphemous.Randomizer.ItemRando;
 using Framework.Managers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blasphemous.ModdingAPI;
 
 namespace Blasphemous.Randomizer.Multiworld.AP
 {
@@ -70,7 +71,7 @@ namespace Blasphemous.Randomizer.Multiworld.AP
                 session.Locations.CheckedLocationsUpdated += locationReceiver.OnReceiveLocations;
                 session.Socket.SocketClosed += OnSocketClose;
                 session.Socket.ErrorReceived += OnSocketError;
-                result = session.TryConnectAndLogin("Blasphemous", player, ItemsHandlingFlags.AllItems, new Version(0, 5, 0), null, null, password);
+                result = session.TryConnectAndLogin(GAME_NAME, player, ItemsHandlingFlags.AllItems, new Version(0, 5, 0), null, null, password);
             }
             catch (Exception e)
             {
@@ -299,5 +300,15 @@ namespace Blasphemous.Randomizer.Multiworld.AP
         }
 
         #endregion Death link
+
+        // MoveLink
+
+        public void SendMoveLink(float x, float y, float timespan)
+        {
+            var info = new SessionInfo(session, Connected, PlayerSlot);
+            Test.SendMoveLink(info, x, y, timespan);
+        }
+
+        private const string GAME_NAME = "Blasphemous";
     }
 }

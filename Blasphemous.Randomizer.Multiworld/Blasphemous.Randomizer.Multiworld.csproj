@@ -28,6 +28,10 @@
     <PackageReference Include="Blasphemous.Randomizer" Version="3.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ArchipelagoUtility\ArchipelagoUtility.csproj" />
+  </ItemGroup>
+
   <Target Name="Development" AfterTargets="PostBuildEvent">
 
     <!-- Get plugin & resources -->
