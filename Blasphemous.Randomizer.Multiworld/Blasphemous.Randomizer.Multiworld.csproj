@@ -23,9 +23,9 @@
     <PackageReference Include="Archipelago.MultiClient.Net" Version="6.5.0" />
     <PackageReference Include="Blasphemous.GameLibs" Version="4.0.67" />
     <PackageReference Include="Blasphemous.CheatConsole" Version="1.0.1" />
-    <PackageReference Include="Blasphemous.Framework.Menus" Version="0.3.4" />
-    <PackageReference Include="Blasphemous.ModdingAPI" Version="2.4.1" />
-    <PackageReference Include="Blasphemous.Randomizer" Version="3.0.3" />
+    <PackageReference Include="Blasphemous.Framework.Menus" Version="0.4.0" />
+    <PackageReference Include="Blasphemous.ModdingAPI" Version="3.0.0" />
+    <PackageReference Include="Blasphemous.Randomizer" Version="3.2.0" />
   </ItemGroup>
 
   <Target Name="Development" AfterTargets="PostBuildEvent">
