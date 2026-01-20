@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Blasphemous.Randomizer.Multiworld;
 
-public class Multiworld : BlasMod, IPersistentMod
+public class Multiworld : BlasMod, ISlotPersistentMod<MultiworldSlotData>
 {
     internal Multiworld() : base(ModInfo.MOD_ID, ModInfo.MOD_NAME, ModInfo.MOD_AUTHOR, ModInfo.MOD_VERSION) { }
 
@@ -31,8 +31,6 @@ public class Multiworld : BlasMod, IPersistentMod
     /// Responsible for scouting all locations on connect and storing item info
     /// </summary>
     public LocationScouter LocationScouter { get; private set; }
-
-    public string PersistentID => "ID_MULTIWORLD";
 
     public bool InGame { get; private set; }
 
@@ -96,9 +94,9 @@ public class Multiworld : BlasMod, IPersistentMod
         provider.RegisterLoadGameMenu(menu);
     }
 
-    public SaveData SaveGame()
+    public MultiworldSlotData SaveSlot()
     {
-        return new MultiworldPersistenceData
+        return new MultiworldSlotData
         {
             itemsReceived = APManager.ItemReceiver.SaveItemsReceived(),
             scoutedLocations = APManager.SaveScoutedLocations(),
@@ -108,15 +106,14 @@ public class Multiworld : BlasMod, IPersistentMod
         };
     }
 
-    public void LoadGame(SaveData data)
+    public void LoadSlot(MultiworldSlotData data)
     {
-        MultiworldPersistenceData multiworldData = (MultiworldPersistenceData)data;
-        APManager.ItemReceiver.LoadItemsReceived(multiworldData.itemsReceived);
-        APManager.LoadScoutedLocations(multiworldData.scoutedLocations);
-        ClientSettings = new ClientSettings(multiworldData.server, multiworldData.name, multiworldData.password);
+        APManager.ItemReceiver.LoadItemsReceived(data.itemsReceived);
+        APManager.LoadScoutedLocations(data.scoutedLocations);
+        ClientSettings = new ClientSettings(data.server, data.name, data.password);
     }
 
-    public void ResetGame()
+    public void ResetSlot()
     {
         APManager.ItemReceiver.ResetItemsReceived();
         APManager.ClearScoutedLocations();
