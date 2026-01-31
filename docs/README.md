@@ -22,6 +22,9 @@ Server ip: ap:55858
 Player name: Player1
 ```
 
+## Playing on linux
+Unfortunately, this mod is the only blas1 mod that does not work on native linux.  This is due to the game having a *really* outdated version of websockets that does not support encryption.  There is work being done to make a generic fix for this, but no solution yet.  In the meantime, [this information](LINUX.md) may help with getting it running through wine.
+
 ## Available commands
 - Press the 'backslash' key to open the debug console
 - Type the desired command followed by the parameters all separated by a single space
