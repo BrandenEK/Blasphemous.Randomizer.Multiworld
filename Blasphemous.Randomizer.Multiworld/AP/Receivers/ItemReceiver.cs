@@ -22,15 +22,13 @@ namespace Blasphemous.Randomizer.Multiworld.AP.Receivers
                 if (string.IsNullOrEmpty(player))
                     player = "Server";
 
-                string itemName = item.ItemDisplayName;
-                int itemIdx = helper.Index;
                 helper.DequeueItem();
 
                 ModLog.Info($"Receiving item: {item.ItemName}");
                 try
                 {
-                    string itemId = Main.Randomizer.data.items.Values.First(x => x.name == itemName).id;
-                    itemQueue.Add(new QueuedItem(itemId, itemIdx, player));
+                    string itemId = Main.Randomizer.data.items.Values.First(x => x.name == item.ItemName).id;
+                    itemQueue.Add(new QueuedItem(itemId, helper.Index, player));
                 }
                 catch
                 {
