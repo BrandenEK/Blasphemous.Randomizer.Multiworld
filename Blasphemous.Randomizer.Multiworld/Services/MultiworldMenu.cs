@@ -98,6 +98,14 @@ public class MultiworldMenu : ModMenu
         _password.CurrentValue = settings?.Password ?? string.Empty;
     }
 
+    /// <summary>
+    /// When opening the menu, autoselect the first text option
+    /// </summary>
+    public override void OnShow()
+    {
+        base.OnShow();
+    }
+
     public override void OnFinish()
     {
         ModLog.Info("Storing client settings from menu");
